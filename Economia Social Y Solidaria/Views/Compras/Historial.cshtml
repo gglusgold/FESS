@@ -1,0 +1,111 @@
+﻿@model Economia_Social_Y_Solidaria.Controllers.MisCompras
+@{
+    ViewBag.Title = "Historial";
+    Layout = "~/Views/Compartida/_layout.cshtml";
+}
+
+<div class="container" style="margin-top:100px">
+    @for (int x = 0; x < Model.Compras.Count; x = x + 2)
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="row">
+                        <img class="slide-image" src="~/Imagenes/producto-@(Model.Compras[x].productos[0].idProducto).jpg" alt="">
+                    </div>
+                    <div class="container col-md-12">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h4>Encargado en <b>@(Model.Compras[x].local) - @(Model.Compras[x].barrio)</b></h4>
+                            </div>
+                            <div class="col-md-4" style="text-align:right; vertical-align:middle">
+                                <h6><b>@(Model.Compras[x].fecha)</b></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h4>Estado del pedido: <b>@Model.Compras[x].estado</b></h4>
+                            </div>
+                        </div>
+
+                        <table class="table" id="tabla_listado">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>$ Unidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var prod in Model.Compras[x].productos)
+                                {
+                                    <tr><td>@(prod.nombre)</td><td>@(prod.cantidad)</td><td>$@(prod.precioUnidad)</td></tr>
+                                }
+                            </tbody>
+                            <tfoot>
+
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <button class="btn" style="width:100%">Editar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            @if (Model.Compras.Count > x + 1)
+            {
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="row">
+                            <img class="slide-image" src="~/Imagenes/producto-@(Model.Compras[x+1].productos[0].idProducto).jpg" alt="">
+                        </div>
+                        <div class="container col-md-12">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h4>Encargado en <b>@(Model.Compras[x + 1].local) - @(Model.Compras[x + 1].barrio)</b></h4>
+                                </div>
+                                <div class="col-md-4" style="text-align:right; vertical-align:middle">
+                                    <h6><b>@(Model.Compras[x + 1].fecha)</b></h6>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h4>Estado del pedido: <b>@Model.Compras[x + 1].estado</b></h4>
+                                </div>
+                            </div>
+
+                            <table class="table" id="tabla_listado">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Cantidad</th>
+                                        <th>$ Unidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var prod in Model.Compras[x].productos)
+                                    {
+                                        <tr><td>@(prod.nombre)</td><td>@(prod.cantidad)</td><td>$@(prod.precioUnidad)</td></tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn" style="width:100%">Editar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,135 @@
+﻿@model Economia_Social_Y_Solidaria.Controllers.ConfCircuitos
+@{
+    ViewBag.Title = "Circuitos";
+    Layout = "~/Views/Compartida/_layout.cshtml";
+}
+
+
+<div class="container">
+    <form action="~/Tandas/Modificar" method="post" role="form">
+        <input type="hidden" name="codigo" id="codigo" value="-1" />
+
+        <h3>@Model.leyenda</h3>
+        @if (Model.abrir)
+        {
+            <input type="hidden" name="abrir" id="abrir" value="true" />
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>Elegir circuito:</h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="list-group">
+                        <a href="#" data-value="1" class="list-group-item">Circuito SUR</a>
+                        <a href="#" data-value="2" class="list-group-item">Circuito NORTE</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <button class="btn btn-success">Abrir Tanta</button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <input type="hidden" name="abrir" id="abrir" value="false" />
+            <input type="hidden" name="idTanda" id="idTanda" value="@Model.idTanda" />
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>Circuito actual:</h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="list-group">
+                        <a href="#" data-value="1" class="list-group-item disabled">Circuito SUR</a>
+                        <a href="#" data-value="2" class="list-group-item disabled">Circuito NORTE</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <button class="btn btn-warning">Cerrar Tanta</button>
+                </div>
+            </div>
+        }
+    </form>
+
+</div>
+
+<div class="container" style="margin-top:40px">
+    <div class="col-md-12" >
+        <table id="tabla" class="table table-bordered table-hover table-striped"></table>
+    </div>
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $("a[href='/Tandas/Tandas']").closest("li").addClass("active");
+
+        $(".list-group a").not(".disabled").click(function (e) {
+            e.preventDefault();
+            $(".list-group").find("a").removeClass("active");
+            $(this).addClass("active");
+            $("#codigo").val($(this).data("value"));
+        });
+
+        $("form").submit(function (e) {
+            if ($("#codigo").val() == -1 && $("#abrir").val() == true) {
+                alert("Hay que seleccionar alguún circuito", "Frende de Economia Social y Solidaria - Nuevo Encuentro");
+                return false;
+            }
+        });
+
+        var actual = @Model.idCircuito;
+        $(".list-group a[data-value=" + actual + "]").addClass("active");
+
+        var error = '@Model.error';
+        if ( error != "")
+            alert(error, "Frende de Economia Social y Solidaria - Nuevo Encuentro");
+
+        var columnas = [
+               {
+                   //estos son de bootstrap table
+                   field: "idTanda",
+                   valign: 'middle',
+                   visible: false,
+               },
+               {
+                   field: "circuito",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Circuito",
+               },
+               {
+                   field: "fechaAbierto",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Fecha Abierto",
+               },
+               {
+                   field: "fechaCerrado",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Fecha Cerrado",
+               },
+
+               {
+                   field: "responsable",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Responsable Abrir/Cerrar",
+               }
+        ];
+
+        var tabla = $("#tabla");
+        tabla.bootstrapTable({
+            url: "/Tandas/Lista",
+            method: "POST",
+            columns: columnas
+        });
+    </script>
+}

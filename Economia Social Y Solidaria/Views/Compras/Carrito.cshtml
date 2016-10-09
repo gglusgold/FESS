@@ -1,0 +1,365 @@
+﻿@model Economia_Social_Y_Solidaria.Controllers.ChanguitoCompleta
+@{
+    ViewBag.Title = "Carrito";
+    Layout = "~/Views/Compartida/_layout.cshtml";
+}
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-md-3" style="margin-bottom:30px">
+            <p class="lead" id="listado_texto">Listado de compras</p>
+            <ul class="list-group" id="listado">
+                @*<li class="list-group-item"><span class="badge">14</span>Cras justo odio</li>
+                    <li class="list-group-item list-group-item-info">Cras sit amet nibh libero</li>*@
+            </ul>
+            <ul class="list-group">
+                <li class='list-group-item list-group-item-info' id="total" style="display:none">Total gastado: <span class='badge'>0</span></li>
+            </ul>
+            <button class="btn btn-primary" style="display:none" id="btn_confirmar">Confirmar Pedido</button>
+        </div>
+
+        <div class="col-md-9">
+
+            <div class="row carousel-holder">
+
+                <div class="col-md-12">
+                    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                            <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                            <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+                            <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+                        </ol>
+                        <div class="carousel-inner">
+                            <div class="item active">
+                                <img class="slide-image" src="~/Imagenes/Fijas/ESS_1.jpg" alt="">
+                            </div>
+                            <div class="item">
+                                <img class="slide-image" src="~/Imagenes/Fijas/ESS_2.jpg" alt="">
+                            </div>
+                            <div class="item">
+                                <img class="slide-image" src="~/Imagenes/Fijas/ESS_3.jpg" alt="">
+                            </div>
+                        </div>
+                        <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                        </a>
+                        <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                @foreach (var productos in Model.changuito)
+                {
+
+                    <div class="col-sm-4 col-lg-4 col-md-4">
+                        <div class="thumbnail">
+                            <img src="~/Imagenes/Producto-@(productos.idProducto).jpg" alt="">
+                            <div class="caption">
+                                <h4 class="pull-right">$@(productos.precio)</h4>
+                                <h4>
+                                    <a target="_blank" href="~/Compras/Detalle?id=@(productos.idProducto)">@productos.nombre</a>
+                                </h4>
+                                <p>@Html.Raw(productos.descripcion)</p>
+
+
+                                <div class="row" data-idprod="@(productos.idProducto)" data-precio="@(productos.precio)" data-nombre="@productos.nombre">
+                                    <div class="col-md-8">
+                                        <div class="btn-group pedido">
+                                            <button type="button" class="btn btn-primary reservar">Reservar <span class="badge">1</span></button>
+                                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <span class="caret"></span>
+                                                <span class="sr-only">Toggle Dropdown</span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="cantidad">1</a></li>
+                                                <li><a class="cantidad">2</a></li>
+                                                <li><a class="cantidad">3</a></li>
+                                                <li><a class="cantidad">4</a></li>
+                                                <li><a class="cantidad">5</a></li>
+                                            </ul>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="pull-right"><a target="_blank" href="~/Compras/Detalle?id=@(productos.idProducto)">Ver más...</a></h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ratings">
+                                <p class="pull-right">0 comentarios</p>
+                                <p>
+                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="modal fade" id="confirmarCompra" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="form_confirmar" action="~/Compras/ConfirmarPedido" method="post" enctype="application/x-www-form-urlencoded">
+                <div class="modal-body" id="parte_uno" style="display:block">
+                    <table class="table" id="tabla_listado">
+                        <caption>Listado de compras.</caption>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        <tfoot>
+
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="modal-body" id="parte_dos" style="display:none">
+                    <h3>Elegir el local por donde retirar</h3>
+                    <div class="radio">
+                        @foreach (var local in Model.locales)
+                        {
+                            <label style="padding-top: 5px;padding-bottom: 5px;"><input type="radio" name="local" value="@(local.idLocal)" required>@(local.direccion) (Comuna @(local.comuna) - @(local.barrio)) - de @(local.horario).</label>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn_anterior_compra" class="btn btn-primary" style="display: none">Anterior</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btn_siguiente_compra" class="btn btn-primary">Siguiente</button>
+                    <button type="submit" id="confirmada" class="btn btn-success" style="display:none">Comprar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
+        toastr.options.progressBar= true;
+        toastr.options.preventDuplicates= true;
+        toastr.options.timeOut = 3000;
+        toastr.options.newestOnTop = true;
+
+        var checkTanda = @Model.locales.Count;
+        var cerrado = checkTanda == 0;
+        if ( checkTanda == 0 ){
+            Cookies.remove("listado");
+            toastr.warning("No se encuentra abierto el formulario para pedidos", "Reservas cerradas");
+            $(".pedido").hide();
+        }
+
+        var totalCompras = @Model.totalCompraTandaUsuario;
+        if ( totalCompras > 0  ){
+            toastr.info("Ya realizaste una compra, para modificarla, ir a 'Mis Compras'   <a href='/Compras/Historial' style='margin-top:15px; margin-bottom:15px; color:#000' class='btn btn-default'>Modificar</a>")
+        }
+
+        $("a[href='/Compras/Carrito']").closest("li").addClass("active");
+
+        console.log($('.cantidad'));
+        $(document).on('click', '.cantidad', function (e) {
+            console.log(e);
+            e.preventDefault();
+            var cantidad = $(this).text();
+            $(this).closest('div').find(".badge").text(cantidad);
+        });
+
+        $(document).on('click', '.cerrar', function (e) {
+            e.preventDefault();
+            var item = $(this).closest(".itemp");
+            var cantidad = parseInt(item.find(".badge").text());
+            if (cantidad == 1)
+                item.remove();
+            else {
+                cantidad = cantidad - 1;
+                item.find(".badge").text(cantidad);
+            }
+            calcularTotal();
+        });
+
+        $(".reservar").click(function (e) {
+            toastr.options.onclick = function () {
+                $('html, body').animate({ scrollTop: $('#listado_texto').offset().top - 60 }, 'slow');
+            }
+
+            var btn = $(this);
+            var cantidad = parseInt(btn.find('.badge').text());
+            var id = btn.closest(".row").data('idprod');
+            var precio = btn.closest(".row").data('precio');
+            var nombre = btn.closest(".row").data('nombre');
+
+            agregarItem(id, precio, nombre, cantidad, true);
+            calcularTotal();
+
+        });
+
+        function agregarItem(id, precio, nombre, cantidad, mostrar) {
+            var listado = $("#listado");
+            var check = listado.find("li[data-idprod='" + id + "']")
+            if (check.length == 0) {
+                var item = "<li class='list-group-item itemp' data-idprod='" + id + "' data-precio='" + precio + "'><button type='button' class='cerrar' ><span aria-hidden='true'>&times;</span></button><span class='badge'>" + cantidad + "</span>" + nombre + "</li>";
+                listado.append(item);
+
+                if (mostrar)
+                    toastr.success("Se añadio " + cantidad + " " + nombre + " a tu pedido", "Reserva agregada");
+            }
+            else {
+                var pedida = parseInt(check.find(".badge").text());
+                check.find(".badge").text(pedida + cantidad);
+
+                if (mostrar)
+                    toastr.success("Se añadieron " + (pedida + cantidad) + " " + nombre + " a tu pedido", "Reserva agregada")
+            }
+        }
+
+        function calcularTotal() {
+
+            var productos = [];
+
+            var items = $("#listado").find(".itemp");
+            var totalcuenta = 0;
+            $.each(items, function (i, val) {
+                var item = $(val);
+                var id = parseFloat(item.data("idprod"));
+                var precio = parseFloat(item.data("precio"));
+                var cantido = parseFloat(item.find(".badge").text());
+                var totalItem = precio * cantido;
+                var prodcuto = item.contents().filter(function () {
+                    return this.nodeType == 3;
+                }).text();
+
+                totalcuenta += totalItem;
+
+                prod = {}
+                prod["id"] = id;
+                prod["nombre"] = prodcuto;
+                prod["precio"] = precio;
+                prod["cantidad"] = cantido;
+                productos.push(prod);
+            });
+
+            if (items.length > 0) {
+                $("#total").find('.badge').text("$" + totalcuenta);
+                $("#total").show();
+                $("#btn_confirmar").show();
+            }
+            else {
+                $("#total").hide('slow');
+                $("#btn_confirmar").hide('slow');
+            }
+
+            Cookies.set('listado', productos, { path: '/' });
+        }
+
+        $("#btn_confirmar").click(function (e) {
+            e.preventDefault();
+
+            $.post("/Inicio/Logueado", function (vuelta) {
+                console.log(vuelta);
+                if (vuelta.logueado == true)
+                    $("#confirmarCompra").modal('show');
+                else
+                    alert("Hay que iniciar sesión para realizar un pedido", "Frente de Economia Social y Solidaria - Nuevo Encuentro");
+            });
+        });
+
+        $("#confirmarCompra").on('show.bs.modal', function () {
+
+            //Cookies.remove('productos');
+
+            var items = $("#listado").find(".itemp");
+
+            $("#tabla_listado tbody").empty();
+            $("#tabla_listado tfoot").empty();
+            $.each(items, function (i, val) {
+                var item = $(val);
+                var idProd = item.data("idprod");
+                var precio = parseFloat(item.data("precio"));
+                var cantidad = parseFloat(item.find(".badge").text());
+                var prodcuto = item.contents().filter(function () {
+                    return this.nodeType == 3;
+                }).text();
+
+                $("#tabla_listado tbody").append("<tr><th>" + (i + 1) + "</th><td>" + prodcuto + "</td><td>" + cantidad + "</td></tr>");
+            });
+
+            var total = $("#total").find("span").text();
+            $("#tabla_listado tfoot").append("<tr><th style='text-align: right;'  colspan='3'>Total gastado: " + total + "</th></tr>");
+
+        });
+
+        $('#btn_anterior_compra').click(function (e) {
+            $("#btn_anterior_compra").hide();
+            $("#btn_siguiente_compra").show();
+            $("#confirmada").hide();
+
+            $("#parte_dos").hide();
+            $("#parte_uno").show();
+            e.preventDefault();
+        });
+
+        $('#btn_siguiente_compra').click(function (e) {
+            $("#btn_anterior_compra").show();
+            $("#btn_siguiente_compra").hide();
+            $("#confirmada").show();
+
+            $("#parte_dos").show();
+            $("#parte_uno").hide();
+            e.preventDefault();
+        });
+
+        $("#confirmarCompra").on('hidden.bs.modal', function () {
+            $("#parte_uno").show();
+            $("#parte_dos").hide();
+            $("#btn_anterior_compra").hide();
+            $("#confirmada").hide();
+            $("#btn_siguiente_compra").show();
+
+        });
+
+        $(document).on("submit", "#form_confirmar", function(e){
+            var listadoo = Cookies.getJSON('listado');
+
+            var cantidad = [];
+            var id = [];
+
+            $.each(listadoo, function (i, val) {
+                $("#form_confirmar").addHidden('idProducto', val.id);
+                $("#form_confirmar").addHidden('cantidad', val.cantidad);
+            });
+
+            Cookies.remove("listado");
+            return true;
+        });
+
+        var cookieProd = Cookies.getJSON('listado');
+        if (cookieProd != undefined) {
+            $.each(cookieProd, function (i, val) {
+                agregarItem(val.id, val.precio, val.nombre, val.cantidad, false);
+            });
+            calcularTotal();
+        }
+
+    </script>
+}

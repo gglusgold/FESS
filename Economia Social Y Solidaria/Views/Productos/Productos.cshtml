@@ -1,0 +1,214 @@
+﻿@{
+    ViewBag.Title = "Listado";
+    Layout = "~/Views/Compartida/_layout.cshtml";
+}
+
+<input id="BtnBuscar" type="file" name="imagen_img" accept="image/jpeg" style="position: absolute; left: 90999900px">
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h2 style="margin-top: 0px">Productos</h2>
+        </div>
+        <div class="col-md-6">
+            <a id="AgregarNuevo" class="btn btn-primary" style="float: right;"><span class="glyphicon glyphicon-plus"></span> Nuevo Producto</a>
+        </div>
+        <div class="col-md-12">
+            <table id="tabla" class="table table-bordered bg_blanco table-hover"></table>
+            <div id="abm"></div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $("a[href='/Productos/Productos']").closest("li").addClass("active");
+
+
+        var tipos = [
+                { DisplayText: "Bolsones", Value: 1 },
+                { DisplayText: "Almacen", Value: 2 }
+        ]
+
+        var columnas = [
+               {
+                   //estos son de bootstrap table
+                   field: "idProducto",
+                   valign: 'middle',
+                   visible: false,
+                   edit: true,
+                   opciones: {
+                       diseño: {
+                           cssDiv: { display: "none" }
+                       },
+                   }
+               },
+               {
+                   field: "nombre",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Nombre",
+                   sortable: "true",
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       editar: {
+                           atributos: { readonly: true }
+                       }
+                   }
+               },
+               {
+                   field: "descripcion",
+                   align: 'left',
+                   valign: 'middle',
+                   title: "Descripcion",
+                   sortable: "true",
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "multilinea",
+                       atributos: { input: { required: true } }
+                   }
+               },
+               {
+                   field: "imagen",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Imagen",
+                   formatter: function (val, row, i) {
+                       return '<img height="auto" width="150px" src="/Imagenes/Producto-' + row.idProducto + '.jpg"/>';
+                   },
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "imagen",
+                       fileId: "BtnBuscar",
+                       atributos: { input: { required: true } }
+                   }
+               },
+               {
+                   field: "cantidad",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Cantidad",
+                   sortable: "true",
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "input",
+                       atributos: { input: { required: true } }
+                   }
+               },
+               {
+                   field: "esAlmacen",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Tipo de Producto",
+                   sortable: "true",
+                   width: "10%",
+                   formatter: function (val, row, i) {
+                       var obg = $.grep(tipos, function (n) {
+                           return n.Value === val;
+                       });
+                       return obg[0].DisplayText;
+                   },
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "select",
+                       source: tipos,
+                       atributos: { input: { required: true } }
+                   }
+               },
+               {
+                   field: "precio",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Precio",
+                   sortable: "true",
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "input",
+                       atributos: { input: { required: true } },
+                       leyenda: "Para los decimales usar la ,"
+                   }
+               },
+               {
+                   field: "costo",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Costo",
+                   sortable: "true",
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "input",
+                       atributos: { input: { required: true } },
+                       leyenda: "Para los decimales usar la ,"
+                   }
+               },
+               {
+                   field: 'editar',
+                   title: 'Editar',
+                   valign: 'middle',
+                   align: 'center',
+                   width: '5%',
+                   events: {
+                       'click .Editar': function (e, value, row, index) {
+                           abm.Magyp("Mostrar", true, row, index);
+                       }
+                   },
+                   formatter: function operateFormatter(value, row, index) {
+                       return "<a style='cursor:pointer' class='Editar' title='Editar'><i class='glyphicon glyphicon-edit'></i></a>";
+
+                   }
+               },
+               {
+                   field: 'borrar',
+                   title: 'Borrar',
+                   valign: 'middle',
+                   align: 'center',
+                   width: '5%',
+                   events: {
+                       'click .Borrar': function (e, value, row, index) {
+                           confirm("¿Estas seguro que queres borrar el producto '" + row.nombre + "'?", function () {
+                               $.post("/Productos/Borrar", row, function () {
+                                   tabla.bootstrapTable('remove', { field: 'idProducto', values: [row.idProducto] });
+                               });
+                           })
+                       }
+                   },
+                   formatter: function operateFormatter(value, row, index) {
+                       return "<a style='cursor:pointer' class='Borrar' title='Borrar'><i class='glyphicon glyphicon-trash'></i></a>";
+
+                   }
+               }
+        ];
+
+        var tabla = $("#tabla");
+        tabla.bootstrapTable({
+            url: "/Productos/Lista",
+            method: "POST",
+            columns: columnas
+        });
+
+        var abm = $("#abm").Magyp({
+            nombre: "Nuevo Producto",
+            fields: columnas,
+            boostrap: true,
+            unico: true,
+            url: '/Productos/Crear',
+            urlEditar: '/Productos/Editar',
+            grabado: function (editando, data, index) {
+                tabla.bootstrapTable("refresh");
+            }
+        });
+
+        $("#AgregarNuevo").on("click", function () {
+            abm.Magyp("Mostrar", false);
+        });
+
+    </script>
+}

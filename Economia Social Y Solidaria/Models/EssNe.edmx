@@ -1,0 +1,1012 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="TanoNEModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Circuitos">
+          <Key>
+            <PropertyRef Name="idCircuito" />
+          </Key>
+          <Property Name="idCircuito" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="codigo" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Comentarios">
+          <Key>
+            <PropertyRef Name="idComentario" />
+          </Key>
+          <Property Name="idComentario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="comentario" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="estrellas" Type="int" Nullable="false" />
+          <Property Name="fecha" Type="date" Nullable="false" />
+          <Property Name="vecinoId" Type="int" Nullable="false" />
+          <Property Name="productoId" Type="int" />
+          <Property Name="compraId" Type="int" />
+        </EntityType>
+        <EntityType Name="CompraProducto">
+          <Key>
+            <PropertyRef Name="idCompraProducto" />
+          </Key>
+          <Property Name="idCompraProducto" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="compraId" Type="int" Nullable="false" />
+          <Property Name="productoId" Type="int" Nullable="false" />
+          <Property Name="cantidad" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Compras">
+          <Key>
+            <PropertyRef Name="idCompra" />
+          </Key>
+          <Property Name="idCompra" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="fecha" Type="datetime" Nullable="false" />
+          <Property Name="vecinoId" Type="int" Nullable="false" />
+          <Property Name="tandaId" Type="int" Nullable="false" />
+          <Property Name="localId" Type="int" Nullable="false" />
+          <Property Name="estadoId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Costos">
+          <Key>
+            <PropertyRef Name="idCosto" />
+          </Key>
+          <Property Name="idCosto" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="costo" Type="decimal" Precision="6" Scale="2" Nullable="false" />
+          <Property Name="fecha" Type="date" Nullable="false" />
+          <Property Name="productoId" Type="int" />
+        </EntityType>
+        <EntityType Name="EstadosCompra">
+          <Key>
+            <PropertyRef Name="idEstadoCompra" />
+          </Key>
+          <Property Name="idEstadoCompra" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="codigo" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Locales">
+          <Key>
+            <PropertyRef Name="idLocal" />
+          </Key>
+          <Property Name="idLocal" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="varchar" MaxLength="50" />
+          <Property Name="direccion" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="barrio" Type="varchar" MaxLength="50" />
+          <Property Name="horario" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="comuna" Type="int" Nullable="false" />
+          <Property Name="circuitoId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Precios">
+          <Key>
+            <PropertyRef Name="idPrecio" />
+          </Key>
+          <Property Name="idPrecio" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="precio" Type="decimal" Precision="6" Scale="2" Nullable="false" />
+          <Property Name="fecha" Type="date" Nullable="false" />
+          <Property Name="productoId" Type="int" />
+        </EntityType>
+        <EntityType Name="Productos">
+          <Key>
+            <PropertyRef Name="idProducto" />
+          </Key>
+          <Property Name="idProducto" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="descripcion" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="cantidad" Type="varchar" MaxLength="255" />
+          <Property Name="esAlmacen" Type="bit" Nullable="false" />
+          <Property Name="activo" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="idRol" />
+          </Key>
+          <Property Name="idRol" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="codigoRol" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RolesVecinos">
+          <Key>
+            <PropertyRef Name="idRolVecino" />
+          </Key>
+          <Property Name="idRolVecino" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="vecinoId" Type="int" Nullable="false" />
+          <Property Name="rolId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Tandas">
+          <Key>
+            <PropertyRef Name="idTanda" />
+          </Key>
+          <Property Name="idTanda" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="fechaAbierto" Type="date" Nullable="false" />
+          <Property Name="fechaCerrado" Type="date" />
+          <Property Name="circuitoId" Type="int" Nullable="false" />
+          <Property Name="vecinoId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Vecinos">
+          <Key>
+            <PropertyRef Name="idVecino" />
+          </Key>
+          <Property Name="idVecino" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="correo" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="nombres" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="telefono" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="comuna" Type="int" />
+          <Property Name="contrasena" Type="varchar" MaxLength="255" />
+          <Property Name="hash" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="verificado" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Comentarios_Compras">
+          <End Role="Compras" Type="Self.Compras" Multiplicity="0..1" />
+          <End Role="Comentarios" Type="Self.Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Compras">
+              <PropertyRef Name="idCompra" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="compraId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comentarios_Productos">
+          <End Role="Productos" Type="Self.Productos" Multiplicity="0..1" />
+          <End Role="Comentarios" Type="Self.Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="idProducto" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="productoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comentarios_Vecinos">
+          <End Role="Vecinos" Type="Self.Vecinos" Multiplicity="1" />
+          <End Role="Comentarios" Type="Self.Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="vecinoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CompraProducto_Compras">
+          <End Role="Compras" Type="Self.Compras" Multiplicity="1" />
+          <End Role="CompraProducto" Type="Self.CompraProducto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Compras">
+              <PropertyRef Name="idCompra" />
+            </Principal>
+            <Dependent Role="CompraProducto">
+              <PropertyRef Name="compraId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CompraProducto_Productos">
+          <End Role="Productos" Type="Self.Productos" Multiplicity="1" />
+          <End Role="CompraProducto" Type="Self.CompraProducto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="idProducto" />
+            </Principal>
+            <Dependent Role="CompraProducto">
+              <PropertyRef Name="productoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Compras_EstadosCompra">
+          <End Role="EstadosCompra" Type="Self.EstadosCompra" Multiplicity="1" />
+          <End Role="Compras" Type="Self.Compras" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EstadosCompra">
+              <PropertyRef Name="idEstadoCompra" />
+            </Principal>
+            <Dependent Role="Compras">
+              <PropertyRef Name="estadoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Compras_Locales">
+          <End Role="Locales" Type="Self.Locales" Multiplicity="1" />
+          <End Role="Compras" Type="Self.Compras" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Locales">
+              <PropertyRef Name="idLocal" />
+            </Principal>
+            <Dependent Role="Compras">
+              <PropertyRef Name="localId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Compras_Tandas">
+          <End Role="Tandas" Type="Self.Tandas" Multiplicity="1" />
+          <End Role="Compras" Type="Self.Compras" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tandas">
+              <PropertyRef Name="idTanda" />
+            </Principal>
+            <Dependent Role="Compras">
+              <PropertyRef Name="tandaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Compras_Vecinos">
+          <End Role="Vecinos" Type="Self.Vecinos" Multiplicity="1" />
+          <End Role="Compras" Type="Self.Compras" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="Compras">
+              <PropertyRef Name="vecinoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Costos_Productos">
+          <End Role="Productos" Type="Self.Productos" Multiplicity="0..1" />
+          <End Role="Costos" Type="Self.Costos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="idProducto" />
+            </Principal>
+            <Dependent Role="Costos">
+              <PropertyRef Name="productoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Locales_Circuitos">
+          <End Role="Circuitos" Type="Self.Circuitos" Multiplicity="1" />
+          <End Role="Locales" Type="Self.Locales" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Circuitos">
+              <PropertyRef Name="idCircuito" />
+            </Principal>
+            <Dependent Role="Locales">
+              <PropertyRef Name="circuitoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Precios_Productos">
+          <End Role="Productos" Type="Self.Productos" Multiplicity="0..1" />
+          <End Role="Precios" Type="Self.Precios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="idProducto" />
+            </Principal>
+            <Dependent Role="Precios">
+              <PropertyRef Name="productoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RolesVecinos_Roles">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
+          <End Role="RolesVecinos" Type="Self.RolesVecinos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="idRol" />
+            </Principal>
+            <Dependent Role="RolesVecinos">
+              <PropertyRef Name="rolId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RolesVecinos_Vecinos">
+          <End Role="Vecinos" Type="Self.Vecinos" Multiplicity="1" />
+          <End Role="RolesVecinos" Type="Self.RolesVecinos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="RolesVecinos">
+              <PropertyRef Name="vecinoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tandas_Circuitos">
+          <End Role="Circuitos" Type="Self.Circuitos" Multiplicity="1" />
+          <End Role="Tandas" Type="Self.Tandas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Circuitos">
+              <PropertyRef Name="idCircuito" />
+            </Principal>
+            <Dependent Role="Tandas">
+              <PropertyRef Name="circuitoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tandas_Vecinos">
+          <End Role="Vecinos" Type="Self.Vecinos" Multiplicity="1" />
+          <End Role="Tandas" Type="Self.Tandas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="Tandas">
+              <PropertyRef Name="vecinoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="TanoNEModelStoreContainer">
+          <EntitySet Name="Circuitos" EntityType="Self.Circuitos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Comentarios" EntityType="Self.Comentarios" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CompraProducto" EntityType="Self.CompraProducto" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Compras" EntityType="Self.Compras" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Costos" EntityType="Self.Costos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EstadosCompra" EntityType="Self.EstadosCompra" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Locales" EntityType="Self.Locales" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Precios" EntityType="Self.Precios" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Productos" EntityType="Self.Productos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RolesVecinos" EntityType="Self.RolesVecinos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Tandas" EntityType="Self.Tandas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Vecinos" EntityType="Self.Vecinos" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Comentarios_Compras" Association="Self.FK_Comentarios_Compras">
+            <End Role="Compras" EntitySet="Compras" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comentarios_Productos" Association="Self.FK_Comentarios_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comentarios_Vecinos" Association="Self.FK_Comentarios_Vecinos">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CompraProducto_Compras" Association="Self.FK_CompraProducto_Compras">
+            <End Role="Compras" EntitySet="Compras" />
+            <End Role="CompraProducto" EntitySet="CompraProducto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CompraProducto_Productos" Association="Self.FK_CompraProducto_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="CompraProducto" EntitySet="CompraProducto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Compras_EstadosCompra" Association="Self.FK_Compras_EstadosCompra">
+            <End Role="EstadosCompra" EntitySet="EstadosCompra" />
+            <End Role="Compras" EntitySet="Compras" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Compras_Locales" Association="Self.FK_Compras_Locales">
+            <End Role="Locales" EntitySet="Locales" />
+            <End Role="Compras" EntitySet="Compras" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Compras_Tandas" Association="Self.FK_Compras_Tandas">
+            <End Role="Tandas" EntitySet="Tandas" />
+            <End Role="Compras" EntitySet="Compras" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Compras_Vecinos" Association="Self.FK_Compras_Vecinos">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="Compras" EntitySet="Compras" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Costos_Productos" Association="Self.FK_Costos_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="Costos" EntitySet="Costos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Locales_Circuitos" Association="Self.FK_Locales_Circuitos">
+            <End Role="Circuitos" EntitySet="Circuitos" />
+            <End Role="Locales" EntitySet="Locales" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Precios_Productos" Association="Self.FK_Precios_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="Precios" EntitySet="Precios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RolesVecinos_Roles" Association="Self.FK_RolesVecinos_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="RolesVecinos" EntitySet="RolesVecinos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RolesVecinos_Vecinos" Association="Self.FK_RolesVecinos_Vecinos">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="RolesVecinos" EntitySet="RolesVecinos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tandas_Circuitos" Association="Self.FK_Tandas_Circuitos">
+            <End Role="Circuitos" EntitySet="Circuitos" />
+            <End Role="Tandas" EntitySet="Tandas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tandas_Vecinos" Association="Self.FK_Tandas_Vecinos">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="Tandas" EntitySet="Tandas" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="TanoNEModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="TanoNEEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Circuitos" EntityType="TanoNEModel.Circuitos" />
+          <EntitySet Name="Comentarios" EntityType="TanoNEModel.Comentarios" />
+          <EntitySet Name="CompraProducto" EntityType="TanoNEModel.CompraProducto" />
+          <EntitySet Name="Compras" EntityType="TanoNEModel.Compras" />
+          <EntitySet Name="Costos" EntityType="TanoNEModel.Costos" />
+          <EntitySet Name="EstadosCompra" EntityType="TanoNEModel.EstadosCompra" />
+          <EntitySet Name="Locales" EntityType="TanoNEModel.Locales" />
+          <EntitySet Name="Precios" EntityType="TanoNEModel.Precios" />
+          <EntitySet Name="Productos" EntityType="TanoNEModel.Productos" />
+          <EntitySet Name="Roles" EntityType="TanoNEModel.Roles" />
+          <EntitySet Name="RolesVecinos" EntityType="TanoNEModel.RolesVecinos" />
+          <EntitySet Name="Tandas" EntityType="TanoNEModel.Tandas" />
+          <EntitySet Name="Vecinos" EntityType="TanoNEModel.Vecinos" />
+          <AssociationSet Name="FK_Locales_Circuitos" Association="TanoNEModel.FK_Locales_Circuitos">
+            <End Role="Circuitos" EntitySet="Circuitos" />
+            <End Role="Locales" EntitySet="Locales" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tandas_Circuitos" Association="TanoNEModel.FK_Tandas_Circuitos">
+            <End Role="Circuitos" EntitySet="Circuitos" />
+            <End Role="Tandas" EntitySet="Tandas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comentarios_Compras" Association="TanoNEModel.FK_Comentarios_Compras">
+            <End Role="Compras" EntitySet="Compras" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comentarios_Productos" Association="TanoNEModel.FK_Comentarios_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comentarios_Vecinos" Association="TanoNEModel.FK_Comentarios_Vecinos">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CompraProducto_Compras" Association="TanoNEModel.FK_CompraProducto_Compras">
+            <End Role="Compras" EntitySet="Compras" />
+            <End Role="CompraProducto" EntitySet="CompraProducto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CompraProducto_Productos" Association="TanoNEModel.FK_CompraProducto_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="CompraProducto" EntitySet="CompraProducto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Compras_EstadosCompra" Association="TanoNEModel.FK_Compras_EstadosCompra">
+            <End Role="EstadosCompra" EntitySet="EstadosCompra" />
+            <End Role="Compras" EntitySet="Compras" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Compras_Locales" Association="TanoNEModel.FK_Compras_Locales">
+            <End Role="Locales" EntitySet="Locales" />
+            <End Role="Compras" EntitySet="Compras" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Compras_Tandas" Association="TanoNEModel.FK_Compras_Tandas">
+            <End Role="Tandas" EntitySet="Tandas" />
+            <End Role="Compras" EntitySet="Compras" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Compras_Vecinos" Association="TanoNEModel.FK_Compras_Vecinos">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="Compras" EntitySet="Compras" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Costos_Productos" Association="TanoNEModel.FK_Costos_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="Costos" EntitySet="Costos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Precios_Productos" Association="TanoNEModel.FK_Precios_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="Precios" EntitySet="Precios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RolesVecinos_Roles" Association="TanoNEModel.FK_RolesVecinos_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="RolesVecinos" EntitySet="RolesVecinos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RolesVecinos_Vecinos" Association="TanoNEModel.FK_RolesVecinos_Vecinos">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="RolesVecinos" EntitySet="RolesVecinos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tandas_Vecinos" Association="TanoNEModel.FK_Tandas_Vecinos">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="Tandas" EntitySet="Tandas" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Circuitos">
+          <Key>
+            <PropertyRef Name="idCircuito" />
+          </Key>
+          <Property Name="idCircuito" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="codigo" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Locales" Relationship="TanoNEModel.FK_Locales_Circuitos" FromRole="Circuitos" ToRole="Locales" />
+          <NavigationProperty Name="Tandas" Relationship="TanoNEModel.FK_Tandas_Circuitos" FromRole="Circuitos" ToRole="Tandas" />
+        </EntityType>
+        <EntityType Name="Comentarios">
+          <Key>
+            <PropertyRef Name="idComentario" />
+          </Key>
+          <Property Name="idComentario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="comentario" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="estrellas" Type="Int32" Nullable="false" />
+          <Property Name="fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="vecinoId" Type="Int32" Nullable="false" />
+          <Property Name="productoId" Type="Int32" />
+          <Property Name="compraId" Type="Int32" />
+          <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Comentarios_Compras" FromRole="Comentarios" ToRole="Compras" />
+          <NavigationProperty Name="Productos" Relationship="TanoNEModel.FK_Comentarios_Productos" FromRole="Comentarios" ToRole="Productos" />
+          <NavigationProperty Name="Vecinos" Relationship="TanoNEModel.FK_Comentarios_Vecinos" FromRole="Comentarios" ToRole="Vecinos" />
+        </EntityType>
+        <EntityType Name="CompraProducto">
+          <Key>
+            <PropertyRef Name="idCompraProducto" />
+          </Key>
+          <Property Name="idCompraProducto" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="compraId" Type="Int32" Nullable="false" />
+          <Property Name="productoId" Type="Int32" Nullable="false" />
+          <Property Name="cantidad" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_CompraProducto_Compras" FromRole="CompraProducto" ToRole="Compras" />
+          <NavigationProperty Name="Productos" Relationship="TanoNEModel.FK_CompraProducto_Productos" FromRole="CompraProducto" ToRole="Productos" />
+        </EntityType>
+        <EntityType Name="Compras">
+          <Key>
+            <PropertyRef Name="idCompra" />
+          </Key>
+          <Property Name="idCompra" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="fecha" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="vecinoId" Type="Int32" Nullable="false" />
+          <Property Name="tandaId" Type="Int32" Nullable="false" />
+          <Property Name="localId" Type="Int32" Nullable="false" />
+          <Property Name="estadoId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Comentarios" Relationship="TanoNEModel.FK_Comentarios_Compras" FromRole="Compras" ToRole="Comentarios" />
+          <NavigationProperty Name="CompraProducto" Relationship="TanoNEModel.FK_CompraProducto_Compras" FromRole="Compras" ToRole="CompraProducto" />
+          <NavigationProperty Name="EstadosCompra" Relationship="TanoNEModel.FK_Compras_EstadosCompra" FromRole="Compras" ToRole="EstadosCompra" />
+          <NavigationProperty Name="Locales" Relationship="TanoNEModel.FK_Compras_Locales" FromRole="Compras" ToRole="Locales" />
+          <NavigationProperty Name="Tandas" Relationship="TanoNEModel.FK_Compras_Tandas" FromRole="Compras" ToRole="Tandas" />
+          <NavigationProperty Name="Vecinos" Relationship="TanoNEModel.FK_Compras_Vecinos" FromRole="Compras" ToRole="Vecinos" />
+        </EntityType>
+        <EntityType Name="Costos">
+          <Key>
+            <PropertyRef Name="idCosto" />
+          </Key>
+          <Property Name="idCosto" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="costo" Type="Decimal" Nullable="false" Precision="6" Scale="2" />
+          <Property Name="fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="productoId" Type="Int32" />
+          <NavigationProperty Name="Productos" Relationship="TanoNEModel.FK_Costos_Productos" FromRole="Costos" ToRole="Productos" />
+        </EntityType>
+        <EntityType Name="EstadosCompra">
+          <Key>
+            <PropertyRef Name="idEstadoCompra" />
+          </Key>
+          <Property Name="idEstadoCompra" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="codigo" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Compras_EstadosCompra" FromRole="EstadosCompra" ToRole="Compras" />
+        </EntityType>
+        <EntityType Name="Locales">
+          <Key>
+            <PropertyRef Name="idLocal" />
+          </Key>
+          <Property Name="idLocal" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="direccion" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="barrio" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="horario" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="comuna" Type="Int32" Nullable="false" />
+          <Property Name="circuitoId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Circuitos" Relationship="TanoNEModel.FK_Locales_Circuitos" FromRole="Locales" ToRole="Circuitos" />
+          <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Compras_Locales" FromRole="Locales" ToRole="Compras" />
+        </EntityType>
+        <EntityType Name="Precios">
+          <Key>
+            <PropertyRef Name="idPrecio" />
+          </Key>
+          <Property Name="idPrecio" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="precio" Type="Decimal" Nullable="false" Precision="6" Scale="2" />
+          <Property Name="fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="productoId" Type="Int32" />
+          <NavigationProperty Name="Productos" Relationship="TanoNEModel.FK_Precios_Productos" FromRole="Precios" ToRole="Productos" />
+        </EntityType>
+        <EntityType Name="Productos">
+          <Key>
+            <PropertyRef Name="idProducto" />
+          </Key>
+          <Property Name="idProducto" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="descripcion" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="cantidad" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="esAlmacen" Type="Boolean" Nullable="false" />
+          <Property Name="activo" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Comentarios" Relationship="TanoNEModel.FK_Comentarios_Productos" FromRole="Productos" ToRole="Comentarios" />
+          <NavigationProperty Name="CompraProducto" Relationship="TanoNEModel.FK_CompraProducto_Productos" FromRole="Productos" ToRole="CompraProducto" />
+          <NavigationProperty Name="Costos" Relationship="TanoNEModel.FK_Costos_Productos" FromRole="Productos" ToRole="Costos" />
+          <NavigationProperty Name="Precios" Relationship="TanoNEModel.FK_Precios_Productos" FromRole="Productos" ToRole="Precios" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="idRol" />
+          </Key>
+          <Property Name="idRol" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="codigoRol" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="RolesVecinos" Relationship="TanoNEModel.FK_RolesVecinos_Roles" FromRole="Roles" ToRole="RolesVecinos" />
+        </EntityType>
+        <EntityType Name="RolesVecinos">
+          <Key>
+            <PropertyRef Name="idRolVecino" />
+          </Key>
+          <Property Name="idRolVecino" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="vecinoId" Type="Int32" Nullable="false" />
+          <Property Name="rolId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Roles" Relationship="TanoNEModel.FK_RolesVecinos_Roles" FromRole="RolesVecinos" ToRole="Roles" />
+          <NavigationProperty Name="Vecinos" Relationship="TanoNEModel.FK_RolesVecinos_Vecinos" FromRole="RolesVecinos" ToRole="Vecinos" />
+        </EntityType>
+        <EntityType Name="Tandas">
+          <Key>
+            <PropertyRef Name="idTanda" />
+          </Key>
+          <Property Name="idTanda" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="fechaAbierto" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="fechaCerrado" Type="DateTime" Precision="0" />
+          <Property Name="circuitoId" Type="Int32" Nullable="false" />
+          <Property Name="vecinoId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Circuitos" Relationship="TanoNEModel.FK_Tandas_Circuitos" FromRole="Tandas" ToRole="Circuitos" />
+          <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Compras_Tandas" FromRole="Tandas" ToRole="Compras" />
+          <NavigationProperty Name="Vecinos" Relationship="TanoNEModel.FK_Tandas_Vecinos" FromRole="Tandas" ToRole="Vecinos" />
+        </EntityType>
+        <EntityType Name="Vecinos">
+          <Key>
+            <PropertyRef Name="idVecino" />
+          </Key>
+          <Property Name="idVecino" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="correo" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="nombres" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="telefono" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="comuna" Type="Int32" />
+          <Property Name="contrasena" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="hash" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="verificado" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Comentarios" Relationship="TanoNEModel.FK_Comentarios_Vecinos" FromRole="Vecinos" ToRole="Comentarios" />
+          <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Compras_Vecinos" FromRole="Vecinos" ToRole="Compras" />
+          <NavigationProperty Name="RolesVecinos" Relationship="TanoNEModel.FK_RolesVecinos_Vecinos" FromRole="Vecinos" ToRole="RolesVecinos" />
+          <NavigationProperty Name="Tandas" Relationship="TanoNEModel.FK_Tandas_Vecinos" FromRole="Vecinos" ToRole="Tandas" />
+        </EntityType>
+        <Association Name="FK_Locales_Circuitos">
+          <End Type="TanoNEModel.Circuitos" Role="Circuitos" Multiplicity="1" />
+          <End Type="TanoNEModel.Locales" Role="Locales" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Circuitos">
+              <PropertyRef Name="idCircuito" />
+            </Principal>
+            <Dependent Role="Locales">
+              <PropertyRef Name="circuitoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tandas_Circuitos">
+          <End Type="TanoNEModel.Circuitos" Role="Circuitos" Multiplicity="1" />
+          <End Type="TanoNEModel.Tandas" Role="Tandas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Circuitos">
+              <PropertyRef Name="idCircuito" />
+            </Principal>
+            <Dependent Role="Tandas">
+              <PropertyRef Name="circuitoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comentarios_Compras">
+          <End Type="TanoNEModel.Compras" Role="Compras" Multiplicity="0..1" />
+          <End Type="TanoNEModel.Comentarios" Role="Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Compras">
+              <PropertyRef Name="idCompra" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="compraId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comentarios_Productos">
+          <End Type="TanoNEModel.Productos" Role="Productos" Multiplicity="0..1" />
+          <End Type="TanoNEModel.Comentarios" Role="Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="idProducto" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="productoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comentarios_Vecinos">
+          <End Type="TanoNEModel.Vecinos" Role="Vecinos" Multiplicity="1" />
+          <End Type="TanoNEModel.Comentarios" Role="Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="vecinoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CompraProducto_Compras">
+          <End Type="TanoNEModel.Compras" Role="Compras" Multiplicity="1" />
+          <End Type="TanoNEModel.CompraProducto" Role="CompraProducto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Compras">
+              <PropertyRef Name="idCompra" />
+            </Principal>
+            <Dependent Role="CompraProducto">
+              <PropertyRef Name="compraId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CompraProducto_Productos">
+          <End Type="TanoNEModel.Productos" Role="Productos" Multiplicity="1" />
+          <End Type="TanoNEModel.CompraProducto" Role="CompraProducto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="idProducto" />
+            </Principal>
+            <Dependent Role="CompraProducto">
+              <PropertyRef Name="productoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Compras_EstadosCompra">
+          <End Type="TanoNEModel.EstadosCompra" Role="EstadosCompra" Multiplicity="1" />
+          <End Type="TanoNEModel.Compras" Role="Compras" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EstadosCompra">
+              <PropertyRef Name="idEstadoCompra" />
+            </Principal>
+            <Dependent Role="Compras">
+              <PropertyRef Name="estadoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Compras_Locales">
+          <End Type="TanoNEModel.Locales" Role="Locales" Multiplicity="1" />
+          <End Type="TanoNEModel.Compras" Role="Compras" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Locales">
+              <PropertyRef Name="idLocal" />
+            </Principal>
+            <Dependent Role="Compras">
+              <PropertyRef Name="localId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Compras_Tandas">
+          <End Type="TanoNEModel.Tandas" Role="Tandas" Multiplicity="1" />
+          <End Type="TanoNEModel.Compras" Role="Compras" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tandas">
+              <PropertyRef Name="idTanda" />
+            </Principal>
+            <Dependent Role="Compras">
+              <PropertyRef Name="tandaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Compras_Vecinos">
+          <End Type="TanoNEModel.Vecinos" Role="Vecinos" Multiplicity="1" />
+          <End Type="TanoNEModel.Compras" Role="Compras" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="Compras">
+              <PropertyRef Name="vecinoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Costos_Productos">
+          <End Type="TanoNEModel.Productos" Role="Productos" Multiplicity="0..1" />
+          <End Type="TanoNEModel.Costos" Role="Costos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="idProducto" />
+            </Principal>
+            <Dependent Role="Costos">
+              <PropertyRef Name="productoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Precios_Productos">
+          <End Type="TanoNEModel.Productos" Role="Productos" Multiplicity="0..1" />
+          <End Type="TanoNEModel.Precios" Role="Precios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="idProducto" />
+            </Principal>
+            <Dependent Role="Precios">
+              <PropertyRef Name="productoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RolesVecinos_Roles">
+          <End Type="TanoNEModel.Roles" Role="Roles" Multiplicity="1" />
+          <End Type="TanoNEModel.RolesVecinos" Role="RolesVecinos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="idRol" />
+            </Principal>
+            <Dependent Role="RolesVecinos">
+              <PropertyRef Name="rolId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RolesVecinos_Vecinos">
+          <End Type="TanoNEModel.Vecinos" Role="Vecinos" Multiplicity="1" />
+          <End Type="TanoNEModel.RolesVecinos" Role="RolesVecinos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="RolesVecinos">
+              <PropertyRef Name="vecinoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tandas_Vecinos">
+          <End Type="TanoNEModel.Vecinos" Role="Vecinos" Multiplicity="1" />
+          <End Type="TanoNEModel.Tandas" Role="Tandas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="Tandas">
+              <PropertyRef Name="vecinoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="TanoNEModelStoreContainer" CdmEntityContainer="TanoNEEntities">
+          <EntitySetMapping Name="Circuitos">
+            <EntityTypeMapping TypeName="TanoNEModel.Circuitos">
+              <MappingFragment StoreEntitySet="Circuitos">
+                <ScalarProperty Name="codigo" ColumnName="codigo" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="idCircuito" ColumnName="idCircuito" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Comentarios">
+            <EntityTypeMapping TypeName="TanoNEModel.Comentarios">
+              <MappingFragment StoreEntitySet="Comentarios">
+                <ScalarProperty Name="compraId" ColumnName="compraId" />
+                <ScalarProperty Name="productoId" ColumnName="productoId" />
+                <ScalarProperty Name="vecinoId" ColumnName="vecinoId" />
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="estrellas" ColumnName="estrellas" />
+                <ScalarProperty Name="comentario" ColumnName="comentario" />
+                <ScalarProperty Name="idComentario" ColumnName="idComentario" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CompraProducto">
+            <EntityTypeMapping TypeName="TanoNEModel.CompraProducto">
+              <MappingFragment StoreEntitySet="CompraProducto">
+                <ScalarProperty Name="cantidad" ColumnName="cantidad" />
+                <ScalarProperty Name="productoId" ColumnName="productoId" />
+                <ScalarProperty Name="compraId" ColumnName="compraId" />
+                <ScalarProperty Name="idCompraProducto" ColumnName="idCompraProducto" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Compras">
+            <EntityTypeMapping TypeName="TanoNEModel.Compras">
+              <MappingFragment StoreEntitySet="Compras">
+                <ScalarProperty Name="estadoId" ColumnName="estadoId" />
+                <ScalarProperty Name="localId" ColumnName="localId" />
+                <ScalarProperty Name="tandaId" ColumnName="tandaId" />
+                <ScalarProperty Name="vecinoId" ColumnName="vecinoId" />
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="idCompra" ColumnName="idCompra" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Costos">
+            <EntityTypeMapping TypeName="TanoNEModel.Costos">
+              <MappingFragment StoreEntitySet="Costos">
+                <ScalarProperty Name="productoId" ColumnName="productoId" />
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="costo" ColumnName="costo" />
+                <ScalarProperty Name="idCosto" ColumnName="idCosto" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EstadosCompra">
+            <EntityTypeMapping TypeName="TanoNEModel.EstadosCompra">
+              <MappingFragment StoreEntitySet="EstadosCompra">
+                <ScalarProperty Name="codigo" ColumnName="codigo" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="idEstadoCompra" ColumnName="idEstadoCompra" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Locales">
+            <EntityTypeMapping TypeName="TanoNEModel.Locales">
+              <MappingFragment StoreEntitySet="Locales">
+                <ScalarProperty Name="circuitoId" ColumnName="circuitoId" />
+                <ScalarProperty Name="comuna" ColumnName="comuna" />
+                <ScalarProperty Name="horario" ColumnName="horario" />
+                <ScalarProperty Name="barrio" ColumnName="barrio" />
+                <ScalarProperty Name="direccion" ColumnName="direccion" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="idLocal" ColumnName="idLocal" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Precios">
+            <EntityTypeMapping TypeName="TanoNEModel.Precios">
+              <MappingFragment StoreEntitySet="Precios">
+                <ScalarProperty Name="productoId" ColumnName="productoId" />
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="precio" ColumnName="precio" />
+                <ScalarProperty Name="idPrecio" ColumnName="idPrecio" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Productos">
+            <EntityTypeMapping TypeName="TanoNEModel.Productos">
+              <MappingFragment StoreEntitySet="Productos">
+                <ScalarProperty Name="activo" ColumnName="activo" />
+                <ScalarProperty Name="esAlmacen" ColumnName="esAlmacen" />
+                <ScalarProperty Name="cantidad" ColumnName="cantidad" />
+                <ScalarProperty Name="descripcion" ColumnName="descripcion" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="idProducto" ColumnName="idProducto" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Roles">
+            <EntityTypeMapping TypeName="TanoNEModel.Roles">
+              <MappingFragment StoreEntitySet="Roles">
+                <ScalarProperty Name="codigoRol" ColumnName="codigoRol" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="idRol" ColumnName="idRol" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RolesVecinos">
+            <EntityTypeMapping TypeName="TanoNEModel.RolesVecinos">
+              <MappingFragment StoreEntitySet="RolesVecinos">
+                <ScalarProperty Name="rolId" ColumnName="rolId" />
+                <ScalarProperty Name="vecinoId" ColumnName="vecinoId" />
+                <ScalarProperty Name="idRolVecino" ColumnName="idRolVecino" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Tandas">
+            <EntityTypeMapping TypeName="TanoNEModel.Tandas">
+              <MappingFragment StoreEntitySet="Tandas">
+                <ScalarProperty Name="vecinoId" ColumnName="vecinoId" />
+                <ScalarProperty Name="circuitoId" ColumnName="circuitoId" />
+                <ScalarProperty Name="fechaCerrado" ColumnName="fechaCerrado" />
+                <ScalarProperty Name="fechaAbierto" ColumnName="fechaAbierto" />
+                <ScalarProperty Name="idTanda" ColumnName="idTanda" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Vecinos">
+            <EntityTypeMapping TypeName="TanoNEModel.Vecinos">
+              <MappingFragment StoreEntitySet="Vecinos">
+                <ScalarProperty Name="verificado" ColumnName="verificado" />
+                <ScalarProperty Name="hash" ColumnName="hash" />
+                <ScalarProperty Name="contrasena" ColumnName="contrasena" />
+                <ScalarProperty Name="comuna" ColumnName="comuna" />
+                <ScalarProperty Name="telefono" ColumnName="telefono" />
+                <ScalarProperty Name="nombres" ColumnName="nombres" />
+                <ScalarProperty Name="correo" ColumnName="correo" />
+                <ScalarProperty Name="idVecino" ColumnName="idVecino" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

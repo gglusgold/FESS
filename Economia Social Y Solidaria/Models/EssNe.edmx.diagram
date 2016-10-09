@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="f03a32299ab94c96bc192919290ddef0" Name="Diagram1" ZoomLevel="25">
+        <EntityTypeShape EntityType="TanoNEModel.Circuitos" Width="1.5" PointX="0.75" PointY="3.875" />
+        <EntityTypeShape EntityType="TanoNEModel.Comentarios" Width="1.5" PointX="6" PointY="7.25" />
+        <EntityTypeShape EntityType="TanoNEModel.CompraProducto" Width="1.5" PointX="7.5" PointY="3.25" />
+        <EntityTypeShape EntityType="TanoNEModel.Compras" Width="1.5" PointX="5.25" PointY="2.75" />
+        <EntityTypeShape EntityType="TanoNEModel.Costos" Width="1.5" PointX="7.5" PointY="13.75" />
+        <EntityTypeShape EntityType="TanoNEModel.EstadosCompra" Width="1.5" PointX="3" PointY="12.25" />
+        <EntityTypeShape EntityType="TanoNEModel.Locales" Width="1.5" PointX="3" PointY="0.75" />
+        <EntityTypeShape EntityType="TanoNEModel.Precios" Width="1.5" PointX="7.5" PointY="11" />
+        <EntityTypeShape EntityType="TanoNEModel.Productos" Width="1.5" PointX="5.25" PointY="10.875" />
+        <EntityTypeShape EntityType="TanoNEModel.Roles" Width="1.5" PointX="0.75" PointY="11.75" />
+        <EntityTypeShape EntityType="TanoNEModel.RolesVecinos" Width="1.5" PointX="3" PointY="7.75" />
+        <EntityTypeShape EntityType="TanoNEModel.Tandas" Width="1.5" PointX="3" PointY="4.375" />
+        <EntityTypeShape EntityType="TanoNEModel.Vecinos" Width="1.5" PointX="0.75" PointY="7" />
+        <AssociationConnector Association="TanoNEModel.FK_Locales_Circuitos" />
+        <AssociationConnector Association="TanoNEModel.FK_Tandas_Circuitos" />
+        <AssociationConnector Association="TanoNEModel.FK_Comentarios_Compras" />
+        <AssociationConnector Association="TanoNEModel.FK_Comentarios_Productos" />
+        <AssociationConnector Association="TanoNEModel.FK_Comentarios_Vecinos" />
+        <AssociationConnector Association="TanoNEModel.FK_CompraProducto_Compras" />
+        <AssociationConnector Association="TanoNEModel.FK_CompraProducto_Productos" />
+        <AssociationConnector Association="TanoNEModel.FK_Compras_EstadosCompra" />
+        <AssociationConnector Association="TanoNEModel.FK_Compras_Locales" />
+        <AssociationConnector Association="TanoNEModel.FK_Compras_Tandas" />
+        <AssociationConnector Association="TanoNEModel.FK_Compras_Vecinos" />
+        <AssociationConnector Association="TanoNEModel.FK_Costos_Productos" />
+        <AssociationConnector Association="TanoNEModel.FK_Precios_Productos" />
+        <AssociationConnector Association="TanoNEModel.FK_RolesVecinos_Roles" />
+        <AssociationConnector Association="TanoNEModel.FK_RolesVecinos_Vecinos" />
+        <AssociationConnector Association="TanoNEModel.FK_Tandas_Vecinos" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
