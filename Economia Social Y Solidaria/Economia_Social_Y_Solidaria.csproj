@@ -191,6 +191,7 @@
     <Content Include="Css\bootstrap.css" />
     <Content Include="Css\historial.css" />
     <Content Include="Css\iniciarsesion.css" />
+    <Content Include="Css\jquery.toast.min.css" />
     <Content Include="Css\shop-homepage.css" />
     <Content Include="Css\shop-item.css" />
     <Content Include="Css\toastr.css" />
@@ -202,8 +203,10 @@
     <Content Include="Js\bootstrap-table-es-ES.js" />
     <Content Include="Js\bootstrap-table.js" />
     <Content Include="Js\bootstrap.js" />
+    <Content Include="Js\jquery-3.1.1.min.js" />
     <Content Include="Js\jquery-3.0.0.js" />
     <Content Include="Js\jquery-ui.js" />
+    <Content Include="Js\jquery.toast.min.js" />
     <Content Include="Js\js.cookie.js" />
     <Content Include="Js\magyp.js" />
     <Content Include="Js\menu.js" />
@@ -285,6 +288,7 @@
     <None Include="Properties\PublishProfiles\Escri.pubxml" />
     <Content Include="Views\Tandas\Tandas.cshtml" />
     <Content Include="Views\Compras\Historial.cshtml" />
+    <None Include="Properties\PublishProfiles\FTP.pubxml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -3,6 +3,11 @@
     ViewBag.Title = "Carrito";
     Layout = "~/Views/Compartida/_layout.cshtml";
 }
+<style>
+    .dropdown-backdrop {
+        position: static;
+    }
+</style>
 <div class="container">
 
     <div class="row">
@@ -116,6 +121,64 @@
 
 <div class="modal fade" id="confirmarCompra" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
+        <form id="form_confirmar" action="~/Compras/ConfirmarPedido" method="post" enctype="application/x-www-form-urlencoded">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Terminar Pedido</h4>
+                </div>
+                <div class="modal-body" id="parte_uno" style="display:block">
+                    <table class="table" id="tabla_listado">
+                        <caption>Listado de compras.</caption>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        <tfoot>
+
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="modal-body" id="parte_dos" style="display:none">
+                    <h3>Elegir el local por donde retirar</h3>
+                    <div class="radio">
+                        @foreach (var local in Model.locales)
+                        {
+                            <label style="padding-top: 5px;padding-bottom: 5px;"><input type="radio" name="local" value="@(local.idLocal)" required>@(local.direccion) (Comuna @(local.comuna) - @(local.barrio)) - de @(local.horario).</label>
+                        }
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                @*<input data-loading-text="Espere..." type="submit" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-primary" value="Iniciar Sesión">*@
+                                <button type="button" id="btn_anterior_compra" class="form-control btn btn-primary" style="display: none">Anterior</button>
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="button" class="form-control btn btn-default" data-dismiss="modal">Cancelar</button>
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="button" id="btn_siguiente_compra" class="form-control btn btn-primary">Siguiente</button>
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="submit" id="confirmada" class="form-control btn btn-success" style="display:none">Terminar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </form>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="confirmarCompra" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form id="form_confirmar" action="~/Compras/ConfirmarPedido" method="post" enctype="application/x-www-form-urlencoded">
                 <div class="modal-body" id="parte_uno" style="display:block">
@@ -144,10 +207,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="btn_anterior_compra" class="btn btn-primary" style="display: none">Anterior</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <button type="button" id="btn_siguiente_compra" class="btn btn-primary">Siguiente</button>
-                    <button type="submit" id="confirmada" class="btn btn-success" style="display:none">Comprar</button>
+                    <button type="button" id="btn_anterior_compra" class="form-control btn btn-primary" style="display: none">Anterior</button>
+                    <button type="button" class="form-control btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btn_siguiente_compra" class="form-control btn btn-primary">Siguiente</button>
+                    <button type="submit" id="confirmada" class="form-control btn btn-success" style="display:none">Comprar</button>
                 </div>
             </form>
         </div>
@@ -156,30 +219,41 @@
 
 @section scripts{
     <script type="text/javascript">
-        $('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
-        toastr.options.progressBar= true;
-        toastr.options.preventDuplicates= true;
-        toastr.options.timeOut = 3000;
-        toastr.options.newestOnTop = true;
+
+
+        //$('html, body').animate({ scrollTop: $('#listado_texto').offset().top - 60 }, 'slow');
 
         var checkTanda = @Model.locales.Count;
         var cerrado = checkTanda == 0;
         if ( checkTanda == 0 ){
             Cookies.remove("listado");
-            toastr.warning("No se encuentra abierto el formulario para pedidos", "Reservas cerradas");
+
+            $.toast({
+                heading: 'Advertencia',
+                text: 'No se encuentra abierto el formulario para pedidos", "Reservas cerradas',
+                icon: 'warning',
+                loader: false,
+            })
+
+            toastr.warning("");
             $(".pedido").hide();
         }
 
         var totalCompras = @Model.totalCompraTandaUsuario;
         if ( totalCompras > 0  ){
-            toastr.info("Ya realizaste una compra, para modificarla, ir a 'Mis Compras'   <a href='/Compras/Historial' style='margin-top:15px; margin-bottom:15px; color:#000' class='btn btn-default'>Modificar</a>")
+
+            $.toast({
+                heading: 'Información',
+                text: "Ya realizaste una compra! Haciendo <a href='/Compras/Historial'>click acá</a>, la podés modificar.",
+                icon: 'info',
+                loader: false,
+                hideAfter: 10000
+            })
         }
 
         $("a[href='/Compras/Carrito']").closest("li").addClass("active");
 
-        console.log($('.cantidad'));
         $(document).on('click', '.cantidad', function (e) {
-            console.log(e);
             e.preventDefault();
             var cantidad = $(this).text();
             $(this).closest('div').find(".badge").text(cantidad);
@@ -199,10 +273,6 @@
         });
 
         $(".reservar").click(function (e) {
-            toastr.options.onclick = function () {
-                $('html, body').animate({ scrollTop: $('#listado_texto').offset().top - 60 }, 'slow');
-            }
-
             var btn = $(this);
             var cantidad = parseInt(btn.find('.badge').text());
             var id = btn.closest(".row").data('idprod');
@@ -214,22 +284,41 @@
 
         });
 
+        var toastAgregar;
+
         function agregarItem(id, precio, nombre, cantidad, mostrar) {
             var listado = $("#listado");
             var check = listado.find("li[data-idprod='" + id + "']")
+            var cantMostrar = 0;
             if (check.length == 0) {
                 var item = "<li class='list-group-item itemp' data-idprod='" + id + "' data-precio='" + precio + "'><button type='button' class='cerrar' ><span aria-hidden='true'>&times;</span></button><span class='badge'>" + cantidad + "</span>" + nombre + "</li>";
                 listado.append(item);
-
-                if (mostrar)
-                    toastr.success("Se añadio " + cantidad + " " + nombre + " a tu pedido", "Reserva agregada");
+                cantMostrar = cantidad;
             }
             else {
                 var pedida = parseInt(check.find(".badge").text());
                 check.find(".badge").text(pedida + cantidad);
+                cantMostrar = (pedida + cantidad);
+            }
 
-                if (mostrar)
-                    toastr.success("Se añadieron " + (pedida + cantidad) + " " + nombre + " a tu pedido", "Reserva agregada")
+            if (mostrar){
+                if (toastAgregar == undefined)
+                    var toastAgregar  = $.toast({
+                        heading: 'Reserva agregada!',
+                        text: "Se añadio " + cantidad + " " + nombre + " a tu pedido",
+                        icon: 'success',
+                        stack: false,
+                        loader:false
+
+                    })
+                else
+                    toastAgregar.update({
+                        eading: 'Reserva agregada!',
+                        text: "Se añadio " + cantidad + " " + nombre + " a tu pedido",
+                        icon: 'success',
+                        stack: false,
+                        loader:false
+                    });
             }
         }
 
@@ -276,7 +365,6 @@
             e.preventDefault();
 
             $.post("/Inicio/Logueado", function (vuelta) {
-                console.log(vuelta);
                 if (vuelta.logueado == true)
                     $("#confirmarCompra").modal('show');
                 else

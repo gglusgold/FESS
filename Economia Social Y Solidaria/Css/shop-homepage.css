@@ -80,3 +80,8 @@ button.cerrar {
     opacity: .2;
     padding-right:10px!important;
 }
+
+.modal_log{
+    padding-top: 30px;
+}
+

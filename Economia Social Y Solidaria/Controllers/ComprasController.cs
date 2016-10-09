@@ -39,6 +39,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
         public string local;
         public string barrio;
         public string fecha;
+        public bool editar = false;
         public List<ProductosComprados> productos;
         public string estado;
     }
@@ -96,6 +97,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             TanoNEEntities ctx = new TanoNEEntities();
             Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
 
+            EstadosCompra EstadoEntregado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
+
             MisCompras compras = new MisCompras();
             compras.Compras = ctx.Compras.Where(a => a.vecinoId == vecino.idVecino).ToList().Select(a => new Comprados
                 {
@@ -103,6 +106,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     fecha = a.fecha.ToString("hh:mm dd/MM/yyyy"),
                     local = a.Locales.direccion,
                     barrio = a.Locales.barrio,
+                    editar = a.estadoId == EstadoEntregado.idEstadoCompra,
                     comuna = a.Locales.comuna,
                     productos = a.CompraProducto.ToList().Select(b => new ProductosComprados
                     {

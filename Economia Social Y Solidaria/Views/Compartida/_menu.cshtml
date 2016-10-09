@@ -73,90 +73,124 @@
         <!-- /.container -->
     </nav>
 
-    <div id="login" class="hidden" style="width:300px">
-        <form id="login-form" action="~/Inicio/IniciarSesion" method="post" role="form" style="display: block;">
-            <div class="form-group">
-                <input type="text" name="usuario" id="usuario" tabindex="1" class="form-control" placeholder="Correo Electrónico" value="" required>
-            </div>
-            <div class="form-group">
-                <input type="password" name="pass" id="pass" tabindex="2" class="form-control" placeholder="Contraseña" required>
-            </div>
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-sm-6 col-sm-offset-3">
-                        <input type="submit" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-primary" value="Iniciar Sesión">
+    <div class="modal fade" id="login" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <form id="login-form" action="~/Inicio/IniciarSesion" method="post" role="form">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Iniciar Sesión</h4>
                     </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="text-center">
-                            <a href="" tabindex="5" class="forgot-password">Te olvidaste la contraseña?</a>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="text" name="usuario" id="usuario" tabindex="1" class="form-control" placeholder="Correo Electrónico" value="" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" name="pass" id="pass" tabindex="2" class="form-control" placeholder="Contraseña" required>
+                        </div>
+                        <div class="alert  alert-dismissable" id="divError" style="display:none">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <p id="sError"></p>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="alert  alert-dismissable" id="divError" style="display:none">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <p id="sError"></p>
-            </div>
-        </form>
-    </div>
-    <div id="registrarse" class="hidden">
-        <form id="register-form" action="~/Inicio/IniciarSesion" method="post" role="form">
-            <div class="form-group">
-                <input type="email" name="email" id="email" tabindex="1" class="form-control" placeholder="Correo Electrónico" required="true" value="">
-            </div>
-            <div class="form-group">
-                <input type="text" name="nombres" id="nombres" tabindex="2" class="form-control" placeholder="Nombre y Apellido" required="true" value="">
-            </div>
-            <div class="row">
-
-                <div class="form-group col-md-6" style="padding-right:0">
-                    <input type="number" name="telefono" id="telefono" tabindex="3" class="form-control" placeholder="Telefono" required="true" value="">
-                </div>
-
-                <div class="form-group col-md-6" style="padding-left:0">
-                    <select name="comuna" id="comuna" tabindex="4" class="form-control" required="true">
-                        <option value="">Comuna</option>
-                        <optgroup label="Circuito Sur">
-                            <option value="1">Comuna 1</option>
-                            <option value="4">Comuna 4</option>
-                            <option value="5">Comuna 5</option>
-                            <option value="6">Comuna 6</option>
-                            <option value="7">Comuna 7</option>
-                            <option value="8">Comuna 8</option>
-                            <option value="9">Comuna 9</option>
-                            <option value="10">Comuna 10</option>
-                        </optgroup>
-                        <optgroup label="Circuito Norte">
-                            <option value="2">Comuna 2</option>
-                            <option value="3">Comuna 3</option>
-                            <option value="11">Comuna 11</option>
-                            <option value="12">Comuna 12</option>
-                            <option value="13">Comuna 13</option>
-                            <option value="14">Comuna 14</option>
-                            <option value="15">Comuna 15</option>
-                        </optgroup>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-
-                <div class="form-group col-md-6" style="padding-right:0">
-                    <input type="password" name="password" id="password" tabindex="5" class="form-control" required="true" placeholder="Contraseña" max="12" min="6">
-                </div>
-                <div class="form-group col-md-6" style="padding-left:0">
-                    <input type="password" name="confirmpassword" id="confirmpassword" tabindex="6" class="form-control" required="true" placeholder="Confirmar contraseña" max="12" min="6">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-sm-6 col-sm-offset-3">
-                        <input type="submit" name="register-submit" id="register-submit" tabindex="6" class="form-control btn btn-primary" value="Registrarse">
+                    <div class="modal-footer">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-6 col-sm-offset-3">
+                                    <input data-loading-text="Espere..." type="submit" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-primary" value="Iniciar Sesión">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="text-center">
+                                        <a href="" tabindex="5" class="forgot-password">Te olvidaste la contraseña?</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </form>
-    </div>
+                </div><!-- /.modal-content -->
+            </form>
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal fade" id="registrarse" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form id="register-form" action="~/Inicio/IniciarSesion" method="post" role="form">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Registrarse</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="email" name="email" id="email" tabindex="1" class="form-control" placeholder="Correo Electrónico" required="true" value="">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="nombres" id="nombres" tabindex="2" class="form-control" placeholder="Nombre y Apellido" required="true" value="">
+                        </div>
+                        <div class="row">
+
+                            <div class="form-group col-md-6">
+                                <input type="number" name="telefono" id="telefono" tabindex="3" class="form-control" placeholder="Telefono" required="true" value="">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <select name="comuna" id="comuna" tabindex="4" class="form-control" required="true">
+                                    <option value="">Comuna</option>
+                                    <optgroup label="Circuito Sur">
+                                        <option value="1">Comuna 1</option>
+                                        <option value="4">Comuna 4</option>
+                                        <option value="5">Comuna 5</option>
+                                        <option value="6">Comuna 6</option>
+                                        <option value="7">Comuna 7</option>
+                                        <option value="8">Comuna 8</option>
+                                        <option value="9">Comuna 9</option>
+                                        <option value="10">Comuna 10</option>
+                                    </optgroup>
+                                    <optgroup label="Circuito Norte">
+                                        <option value="2">Comuna 2</option>
+                                        <option value="3">Comuna 3</option>
+                                        <option value="11">Comuna 11</option>
+                                        <option value="12">Comuna 12</option>
+                                        <option value="13">Comuna 13</option>
+                                        <option value="14">Comuna 14</option>
+                                        <option value="15">Comuna 15</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="form-group col-md-6">
+                                <input type="password" name="password" id="password" tabindex="5" class="form-control" required="true" placeholder="Contraseña" max="12" min="6">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <input type="password" name="confirmpassword" id="confirmpassword" tabindex="6" class="form-control" required="true" placeholder="Confirmar contraseña" max="12" min="6">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-6 col-sm-offset-3">
+                                    <input type="submit" data-loading-text="Espere..." name="register-submit" id="register-submit" tabindex="7" class="form-control btn btn-primary" value="Registrarse">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="text-center">
+                                    <a href="" tabindex="8" class="forgot-password">No te llegó el mail de registro?</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->

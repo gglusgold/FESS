@@ -5,23 +5,13 @@
 
 
 
-    $("#btn_iniciar").popover({
-        html: true,
-        content: function () {
-            return $("#login").html();
-        },
-        title: "Iniciar Sesion",
-        placement: "bottom"
-    });
+    $("#btn_iniciar").click(function(){
+		$("#login").modal("toggle")
+	});
 
-    $("#btn_registrarse").popover({
-        html: true,
-        content: function () {
-            return $("#registrarse").html();
-        },
-        title: "Registrarse",
-        placement: "bottom"
-    });
+    $("#btn_registrarse").click(function(){
+		$("#registrarse").modal("toggle")
+	});
 
 
 
@@ -48,6 +38,7 @@
     var mensaje = Cookies.get('Mensaje');
 
     if ((error !== undefined && error !== '') || (info !== undefined && info !== '') || (mensaje !== undefined && mensaje !== '')) {
+        $("#login").modal("toggle")
         $('#btn_iniciar').popover('show');
         if (error !== "")
             $("#divError").addClass("alert-danger");
@@ -80,11 +71,15 @@
     confirm_password.onkeyup = validatePassword;
 
     $(document).on("submit", "#login-form", function (e) {
-        $("#login-form").addHidden('url', window.location.pathname).submit();
+        $("#login-form").find("input[type='submit']").button('loading');
+        $("#login-form").addHidden('url', window.location.pathname);
+        return true;
     });
 
     $(document).on("submit", "#register-form", function (e) {
-        $("#register-form").addHidden('url', window.location.pathname).submit();
+        $("#register-form").find("input[type='submit']").button('loading');
+        $("#register-form").addHidden('url', window.location.pathname);
+        return true;
     });
 
     

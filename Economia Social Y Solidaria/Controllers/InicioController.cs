@@ -94,7 +94,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                     using (MailMessage mail = new MailMessage())
                     {
-                        string datos = "Datos para entrar:<br/>Usuario: " + email + "<br/>Contraseña: " + password;
+                        string datos = "Datos para entrar:<br/>Usuario: " + email;
                         mail.From = new MailAddress("racinglocura07@gmail.com", "Economía Social y Solidaria");
                         mail.To.Add(email);
                         mail.Subject = "Economia Social y Solidaria -- Nuevo Encuentro";
