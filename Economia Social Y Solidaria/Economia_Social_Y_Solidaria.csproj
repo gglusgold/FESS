@@ -197,6 +197,7 @@
     <Content Include="Css\toastr.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="Imagenes\Fijas\contact-form.png" />
     <Content Include="Imagenes\Fijas\ESS_1.jpg" />
     <Content Include="Imagenes\Fijas\ESS_2.jpg" />
     <Content Include="Imagenes\Fijas\ESS_3.jpg" />

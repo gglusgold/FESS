@@ -157,17 +157,16 @@
                     <div class="form-group">
                         <div class="row">
                             <div class="col-sm-4">
-                                @*<input data-loading-text="Espere..." type="submit" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-primary" value="Iniciar Sesión">*@
-                                <button type="button" id="btn_anterior_compra" class="form-control btn btn-primary" style="display: none">Anterior</button>
+                                <button type="button" data-loading-text="Espere..." id="btn_anterior_compra" class="form-control btn btn-primary" style="display: none">Anterior</button>
                             </div>
                             <div class="col-sm-4">
-                                <button type="button" class="form-control btn btn-default" data-dismiss="modal">Cancelar</button>
+                                <button type="button" data-loading-text="Espere..." class="form-control btn btn-default" data-dismiss="modal">Cancelar</button>
                             </div>
                             <div class="col-sm-4">
                                 <button type="button" id="btn_siguiente_compra" class="form-control btn btn-primary">Siguiente</button>
                             </div>
                             <div class="col-sm-4">
-                                <button type="submit" id="confirmada" class="form-control btn btn-success" style="display:none">Terminar</button>
+                                <button type="submit" id="confirmada" data-loading-text="Espere..." class="form-control btn btn-success" style="display:none">Terminar</button>
                             </div>
                         </div>
                     </div>
@@ -176,46 +175,6 @@
         </form>
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
-<div class="modal fade" id="confirmarCompra" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form id="form_confirmar" action="~/Compras/ConfirmarPedido" method="post" enctype="application/x-www-form-urlencoded">
-                <div class="modal-body" id="parte_uno" style="display:block">
-                    <table class="table" id="tabla_listado">
-                        <caption>Listado de compras.</caption>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                        <tfoot>
-
-                        </tfoot>
-                    </table>
-                </div>
-                <div class="modal-body" id="parte_dos" style="display:none">
-                    <h3>Elegir el local por donde retirar</h3>
-                    <div class="radio">
-                        @foreach (var local in Model.locales)
-                        {
-                            <label style="padding-top: 5px;padding-bottom: 5px;"><input type="radio" name="local" value="@(local.idLocal)" required>@(local.direccion) (Comuna @(local.comuna) - @(local.barrio)) - de @(local.horario).</label>
-                        }
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="btn_anterior_compra" class="form-control btn btn-primary" style="display: none">Anterior</button>
-                    <button type="button" class="form-control btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <button type="button" id="btn_siguiente_compra" class="form-control btn btn-primary">Siguiente</button>
-                    <button type="submit" id="confirmada" class="form-control btn btn-success" style="display:none">Comprar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 @section scripts{
     <script type="text/javascript">
@@ -427,6 +386,7 @@
         });
 
         $(document).on("submit", "#form_confirmar", function(e){
+            $("#form_confirmar .modal-footer").find("button").button('loading');
             var listadoo = Cookies.getJSON('listado');
 
             var cantidad = [];

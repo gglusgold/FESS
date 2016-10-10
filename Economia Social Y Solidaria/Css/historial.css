@@ -28,3 +28,8 @@
 .item {
     border-radius: 4px;
 }
+
+.btn-card {
+    color: #333;
+    background-color: #fff;
+}

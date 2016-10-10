@@ -123,6 +123,15 @@ namespace Economia_Social_Y_Solidaria.Controllers
                             conf.idCircuito = ultima.Circuitos.idCircuito;
                             conf.codigo = ultima.Circuitos.codigo;
 
+                            //CERRAR TODOS LOS PEDIDOS DE ESTA TANDA
+
+                            EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 2);
+                            foreach (var compraEnTanda in tanda.Compras)
+                            {
+                                compraEnTanda.EstadosCompra = confirmado;
+                                MandarMailConfirmandoCompra(compraEnTanda.Vecinos.correo);
+                            }
+
                             ctx.SaveChanges();
                         }
                     }
@@ -148,6 +157,12 @@ namespace Economia_Social_Y_Solidaria.Controllers
             });
             return Json(lista, JsonRequestBehavior.DenyGet);
         }
+
+        private void MandarMailConfirmandoCompra(string p)
+        {
+            //throw new NotImplementedException();
+        }
+
 
     }
 }

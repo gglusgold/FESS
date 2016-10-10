@@ -35,6 +35,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
     public class Comprados
     {
+        public int idCompra;
         public int comuna;
         public string local;
         public string barrio;
@@ -102,6 +103,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             MisCompras compras = new MisCompras();
             compras.Compras = ctx.Compras.Where(a => a.vecinoId == vecino.idVecino).ToList().Select(a => new Comprados
                 {
+                    idCompra = a.idCompra,
                     estado = a.EstadosCompra.nombre,
                     fecha = a.fecha.ToString("hh:mm dd/MM/yyyy"),
                     local = a.Locales.direccion,
@@ -118,6 +120,41 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 }).ToList();
 
             return View(compras);
+        }
+
+        public ActionResult CancelarPedido(int idCompra)
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+            Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
+
+            EstadosCompra EstadoEntregado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
+            Compras cancelar = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra && vecino.idVecino == a.vecinoId);
+            if (cancelar != null)
+            {
+                ctx.Compras.Remove(cancelar);
+                ctx.SaveChanges();
+            }
+
+            MisCompras compras = new MisCompras();
+            compras.Compras = ctx.Compras.Where(a => a.vecinoId == vecino.idVecino).ToList().Select(a => new Comprados
+            {
+                idCompra = a.idCompra,
+                estado = a.EstadosCompra.nombre,
+                fecha = a.fecha.ToString("hh:mm dd/MM/yyyy"),
+                local = a.Locales.direccion,
+                barrio = a.Locales.barrio,
+                editar = a.estadoId == EstadoEntregado.idEstadoCompra,
+                comuna = a.Locales.comuna,
+                productos = a.CompraProducto.ToList().Select(b => new ProductosComprados
+                {
+                    idProducto = b.Productos.idProducto,
+                    nombre = b.Productos.nombre,
+                    cantidad = b.cantidad,
+                    precioUnidad = b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio
+                }).ToList()
+            }).ToList();
+
+            return Json(compras);
         }
 
         public ActionResult ConfirmarPedido(int local, int[] idProducto, int[] cantidad)
