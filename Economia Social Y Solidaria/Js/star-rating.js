@@ -547,19 +547,19 @@
     $.fn.ratingLocales.en = {
         defaultCaption: '{rating} Estrellas',
         starCaptions: {
-            0.5: 'Media estrella',
-            1: '1 estrella',
-            1.5: '1 1/2 estrellas',
-            2: '2 estrellas',
-            2.5: '2 1/2 estrellas',
-            3: '3 estrellas',
-            3.5: '3 1/2 estrellas',
-            4: '4 estrellas',
-            4.5: '4 1/2 estrellas',
-            5: '5 estrellas'
+            0.5: 'Media Estrella',
+            1: 'Una Estrella',
+            1.5: 'Una Estrella y Media',
+            2: 'Dos Estrellas',
+            2.5: 'Dos Estrellas y Media',
+            3: 'Tres Estrellas',
+            3.5: 'Tres Estrellas y Media',
+            4: 'Cuatro Estrellas',
+            4.5: 'Cuatro Estrellas y Media',
+            5: 'Cinco Estrellas'
         },
-        clearButtonTitle: 'Clear',
-        clearCaption: 'Not Rated'
+        clearButtonTitle: 'Limpiar',
+        clearCaption: 'Sin Calificar'
     };
 
     $.fn.rating.Constructor = Rating;
