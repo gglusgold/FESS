@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
@@ -14,6 +15,7 @@ namespace Economia_Social_Y_Solidaria
     {
         protected void Application_Start()
         {
+            //CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-AR");
             AreaRegistration.RegisterAllAreas();
 
             WebApiConfig.Register(GlobalConfiguration.Configuration);
