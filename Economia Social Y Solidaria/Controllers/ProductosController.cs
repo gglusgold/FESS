@@ -28,25 +28,26 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 nombre = a.nombre,
                 descripcion = a.descripcion.Replace("\n", "<br/>"),
                 cantidad = a.cantidad,
-                esAlmacen = a.esAlmacen ? 2 : 1,
+                categoria = a.Categorias.nombre,
                 precio = a.Precios.LastOrDefault().precio,
                 costo = a.Costos.LastOrDefault().costo,
             });
             return Json(lista, JsonRequestBehavior.DenyGet);
         }
 
-        public JsonResult Crear(string nombre, string descripcion, HttpPostedFileBase imagen_img, string cantidad, int esAlmacen, decimal precio, decimal costo)
+        public JsonResult Crear(string nombre, string descripcion, HttpPostedFileBase imagen_img, string cantidad, int idCategoria, decimal precio, decimal costo)
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
             Productos item = ctx.Productos.FirstOrDefault(a => a.nombre == nombre && a.activo);
             if (item == null)
             {
+                Categorias categoria = ctx.Categorias.FirstOrDefault(a => a.idCategoria == idCategoria);
                 item = new Productos();
                 item.nombre = nombre;
                 item.descripcion = descripcion;
                 item.cantidad = cantidad;
-                item.esAlmacen = esAlmacen == 2;
+                item.Categorias = categoria;
                 item.activo = true;
 
                 Precios pre = new Precios();
@@ -76,16 +77,17 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(new { error = false, mensaje = "Producto grabado satisfactoriamente" }, JsonRequestBehavior.DenyGet);
         }
 
-        public JsonResult Editar(int idProducto, string nombre, string descripcion, HttpPostedFileBase imagen_img, string cantidad, int esAlmacen, decimal precio, decimal costo)
+        public JsonResult Editar(int idProducto, string nombre, string descripcion, HttpPostedFileBase imagen_img, string cantidad, int idCategoria, decimal precio, decimal costo)
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
             Productos item = ctx.Productos.FirstOrDefault(a => a.idProducto == idProducto);
             if (item != null)
             {
+                Categorias categoria = ctx.Categorias.FirstOrDefault(a => a.idCategoria == idCategoria);
                 item.descripcion = descripcion;
                 item.cantidad = cantidad;
-                item.esAlmacen = esAlmacen == 2;
+                item.Categorias = categoria;
 
                 Precios pre = new Precios();
                 pre.precio = precio;

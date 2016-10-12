@@ -12,20 +12,16 @@ namespace Economia_Social_Y_Solidaria.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Comentarios
+    public partial class Categorias
     {
-        public Comentarios()
+        public Categorias()
         {
-            this.ComentariosProducto = new HashSet<ComentariosProducto>();
-            this.Compras = new HashSet<Compras>();
+            this.Productos = new HashSet<Productos>();
         }
     
-        public int idComentario { get; set; }
-        public System.DateTime fecha { get; set; }
-        public int vecinoId { get; set; }
+        public int idCategoria { get; set; }
+        public string nombre { get; set; }
     
-        public virtual Vecinos Vecinos { get; set; }
-        public virtual ICollection<ComentariosProducto> ComentariosProducto { get; set; }
-        public virtual ICollection<Compras> Compras { get; set; }
+        public virtual ICollection<Productos> Productos { get; set; }
     }
 }

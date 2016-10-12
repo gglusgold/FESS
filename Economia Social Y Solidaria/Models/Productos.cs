@@ -16,7 +16,7 @@ namespace Economia_Social_Y_Solidaria.Models
     {
         public Productos()
         {
-            this.Comentarios = new HashSet<Comentarios>();
+            this.ComentariosProducto = new HashSet<ComentariosProducto>();
             this.CompraProducto = new HashSet<CompraProducto>();
             this.Costos = new HashSet<Costos>();
             this.Precios = new HashSet<Precios>();
@@ -26,10 +26,11 @@ namespace Economia_Social_Y_Solidaria.Models
         public string nombre { get; set; }
         public string descripcion { get; set; }
         public string cantidad { get; set; }
-        public bool esAlmacen { get; set; }
         public bool activo { get; set; }
+        public Nullable<int> categoriaId { get; set; }
     
-        public virtual ICollection<Comentarios> Comentarios { get; set; }
+        public virtual Categorias Categorias { get; set; }
+        public virtual ICollection<ComentariosProducto> ComentariosProducto { get; set; }
         public virtual ICollection<CompraProducto> CompraProducto { get; set; }
         public virtual ICollection<Costos> Costos { get; set; }
         public virtual ICollection<Precios> Precios { get; set; }

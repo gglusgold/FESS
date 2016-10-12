@@ -9,31 +9,46 @@
 
 <div class="modal fade" id="comentarmodal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-        <form id="login-form" action="~/Inicio/IniciarSesion" method="post" role="form">
+        <form id="calificarform" method="post" role="form">
+            <input type="hidden" name="idCompra" id="idCompra" />
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Comentar pedido</h4>
                 </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <textarea id="tComentarios" class="form-control" maxlength="300"></textarea>
-                            <span id="totalcaracteres" class="help-block pull-right" style="color:red"></span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12"><input id="rating" type="text"></div>
-                    </div>
+                <div class="modal-body containercom">
+
                 </div>
                 <div class="modal-footer">
-                    
-                    
+
+                    <div class="row">
+
+                    </div>
+
                 </div>
             </div><!-- /.modal-content -->
         </form>
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<div id="comentarproducto" style="display:none">
+    <div class="row">
+        <div class="col-md-12">
+            <p class="nombre"></p>
+        </div>
+    </div>
+    <div class="row" id="comentarproducto">
+        <div class="col-md-8">
+            <label for="tComentarios">Dejanos tu opinion, nos interesa para mejorar!</label>
+            <textarea id="tComentarios" required tabindex="1" class="form-control" maxlength="180"></textarea>
+            <span id="totalcaracteres" class="help-block pull-right" style="color:red"></span>
+        </div>
+        <div class="col-md-4">
+            <label for="rating">Puntaje</label>
+            <input id="rating" type="text" tabindex="2" required data-min="0" data-max="5" data-step="1" data-show-clear="false" data-show-caption="false">
+        </div>
+    </div>
+</div>
 
 <div id="compra" style="display:none">
     <div class="card">
@@ -128,9 +143,8 @@
             nueva.removeAttr('id');
 
             $.each(comprado.productos, function(i,val){
-                nueva.find(".productos").append("<tr><td>" + val.nombre+ "</td><td>" +val.cantidad+ "</td><td>$" +val.precioUnidad+ "</td></tr>");
+                nueva.find(".productos").append("<tr data-idproducto='" + comprado.productos.idProducto + "'><td>" + val.nombre+ "</td><td>" +val.cantidad+ "</td><td>$" +val.precioUnidad+ "</td></tr>");
             });
-            nueva.find()
             nueva.show();
 
             return nueva;
@@ -146,28 +160,93 @@
 
         });
 
+        var comentarios = [];
         var boton = null;
         $(document).on("click", ".comentar", function(e){
+
             boton = $(e.currentTarget);
-            boton.closest('.row').find('button').button('loading')
-            $("#comentarmodal").modal('toggle');
+            boton.closest('.row').find('button').button('loading');
+            var idCompra = boton.closest('.card').data('idcompra');
+
+
+            var compra = returnObj(compras, idCompra);
+
+            comentarios = [];
+            var prodcom = {};
+            $.each(compra.productos, function(i,val){
+                prodcom["idProducto"] = val.idProducto;
+                prodcom["nombre"] = val.nombre;
+                prodcom["comentario"] = "";
+                prodcom["rating"] = 5;
+                comentarios.push(prodcom);
+            });
+
+
+            $("#comentarmodal").find('#idCompra').val(idCompra);
+            $("#comentarmodal").modal('show');
         });
 
         $("#comentarmodal").on('hidden.bs.modal', function () {
             boton.closest('.row').find('button').button('reset')
+            comentarios= [];
         });
 
+        //        <div class="col-md-3 col-sm-offset-6">
+        //    <input type="button" data-dismiss="modal" data-loading-text="Espere..." tabindex="3" class="form-control btn btn-warning" value="Cancelar">
+        //</div>
+        //<div class="col-md-3">
+        //    <input type="submit" data-loading-text="Espere..." tabindex="4" class="form-control btn btn-success" value="Enviar">
+        //</div>
+
+        var actual = 0;
         $("#comentarmodal").on('show.bs.modal', function () {
-            $("#rating").rating({'size':'sm'});
-            console.log($("#tComentarios"));
-            $("#tComentarios").val("");
+
+
+            var nuevo = $("#comentarproducto").clone();
+            actual = 0;
+            $("#comentarmodal").find(".containercom").empty();
+            $("#comentarmodal").find(".containercom").append(llenarComentario(nuevo, actual));
+            nuevo.show();
+
         });
 
-        $("#tComentarios").keyup(function(){
+        function llenarComentario(nuevo, actual){
+            nuevo.find(".totalcaracteres").text("");
+            nuevo.find(".tComentarios").val(actual.nombre);
+            nuevo.find(".rating").rating({'size':'xs'});
+            nuevo.find(".rating").rating('update', actual.rating);
+
+            return nuevo;
+        }
+
+        $(".tComentarios").keyup(function(){
             var total = parseInt($(this).attr("maxlength"));
             var actuales = $(this).val().length;
             $("#totalcaracteres").text("Caracteres restantes: " + (total - actuales));
         });
+
+        $("#calificarform").submit(function(e){
+            e.preventDefault();
+            $("#comentarmodal").modal('hide');
+            var form = $(this);
+            var idCompra = form.find("#idCompra").val();
+            var coment = form.find("#tComentarios").val();
+            var rating = form.find("#rating").val();
+
+
+            $.post("/Compras/Calificar", {idCompra: idCompra, tComentarios:coment, rating:rating}, function(vuelta){
+                $("[data-idcompra=" + idCompra + "]").find(".btncomentar").hide();
+                $("[data-idcompra=" + idCompra + "]").find(".estado").text(vuelta);
+            });
+
+            return false;
+        });
+
+        function returnObj(arr,r){
+            return $.grep(arr, function(elem,index){
+                return elem ? elem.idCompra == r : false;
+            })[0];
+        }
 
 
     </script>

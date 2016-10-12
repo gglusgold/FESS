@@ -35,7 +35,8 @@ body {
     }
 
 .thumbnail img {
-    width: 100%;
+    width: auto;
+    max-height: 200px;
 }
 
 .ratings {
@@ -78,10 +79,9 @@ button.cerrar {
     text-shadow: 0 1px 0 #fff;
     filter: alpha(opacity=20);
     opacity: .2;
-    padding-right:10px!important;
+    padding-right: 10px !important;
 }
 
-.modal_log{
+.modal_log {
     padding-top: 30px;
 }
-
