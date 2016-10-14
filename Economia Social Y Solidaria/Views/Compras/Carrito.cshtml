@@ -98,14 +98,8 @@
                                 </div>
                             </div>
                             <div class="ratings">
-                                <p class="pull-right">0 comentarios</p>
-                                <p>
-                                    <span class="glyphicon glyphicon-star-empty"></span>
-                                    <span class="glyphicon glyphicon-star-empty"></span>
-                                    <span class="glyphicon glyphicon-star-empty"></span>
-                                    <span class="glyphicon glyphicon-star-empty"></span>
-                                    <span class="glyphicon glyphicon-star-empty"></span>
-                                </p>
+                                <p class="pull-right">@(productos.comentarios) comentarios</p>
+                                <input type="number" class="rating" value="@(productos.rating)" min=0 max=5 step=1 data-size="xs" disabled="true" data-show-caption="false" data-show-clear="false">
                             </div>
                         </div>
                     </div>
@@ -175,7 +169,6 @@
         </form>
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
 @section scripts{
     <script type="text/javascript">
 

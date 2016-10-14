@@ -15,6 +15,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
         public string nombre { get; set; }
         public string descripcion { get; set; }
         public decimal precio = 0;
+
+        public int comentarios = 0;
+        public double rating = 0;
     }
 
     public class ChanguitoCompleta
@@ -76,7 +79,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 idProducto = a.idProducto,
                 nombre = a.nombre,
                 descripcion = a.descripcion.Replace("\n", "<br/>"),
-                precio = a.Precios.LastOrDefault().precio
+                precio = a.Precios.LastOrDefault().precio,
+                comentarios = a.ComentariosProducto.Count,
+                rating = a.ComentariosProducto.Count == 0 ? 0 : a.ComentariosProducto.Average(b => b.estrellas)
             }).ToList();
 
             return View(completo);
