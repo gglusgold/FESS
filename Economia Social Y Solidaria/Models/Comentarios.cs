@@ -17,15 +17,15 @@ namespace Economia_Social_Y_Solidaria.Models
         public Comentarios()
         {
             this.ComentariosProducto = new HashSet<ComentariosProducto>();
-            this.Compras = new HashSet<Compras>();
         }
     
         public int idComentario { get; set; }
         public System.DateTime fecha { get; set; }
         public int vecinoId { get; set; }
+        public int compraId { get; set; }
     
+        public virtual Compras Compras { get; set; }
         public virtual Vecinos Vecinos { get; set; }
         public virtual ICollection<ComentariosProducto> ComentariosProducto { get; set; }
-        public virtual ICollection<Compras> Compras { get; set; }
     }
 }

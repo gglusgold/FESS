@@ -16,6 +16,7 @@ namespace Economia_Social_Y_Solidaria.Models
     {
         public Compras()
         {
+            this.Comentarios = new HashSet<Comentarios>();
             this.CompraProducto = new HashSet<CompraProducto>();
         }
     
@@ -25,9 +26,8 @@ namespace Economia_Social_Y_Solidaria.Models
         public int tandaId { get; set; }
         public int localId { get; set; }
         public int estadoId { get; set; }
-        public Nullable<int> comentarioId { get; set; }
     
-        public virtual Comentarios Comentarios { get; set; }
+        public virtual ICollection<Comentarios> Comentarios { get; set; }
         public virtual ICollection<CompraProducto> CompraProducto { get; set; }
         public virtual EstadosCompra EstadosCompra { get; set; }
         public virtual Locales Locales { get; set; }

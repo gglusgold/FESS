@@ -13,17 +13,15 @@
             <input type="hidden" name="idCompra" id="idCompra" />
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Comentar pedido</h4>
+                    <h4 class="js-title-step"></h4>
                 </div>
                 <div class="modal-body">
 
                 </div>
                 <div class="modal-footer">
-
-                    <div class="row">
-
-                    </div>
+                    <button type="button" class="btn btn-default js-btn-step pull-left" data-orientation="cancel" data-dismiss="modal"></button>
+                    <button type="button" class="btn btn-warning js-btn-step" data-orientation="previous"></button>
+                    <button type="button" class="btn btn-success js-btn-step" data-orientation="next"></button>
 
                 </div>
             </div><!-- /.modal-content -->
@@ -31,22 +29,21 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<div id="comentarproducto" style="display:none">
-    <div class="row">
-        <div class="col-md-12">
-            <h3 class="nombre"></h3>
-        </div>
-    </div>
-    <div class="row" id="comentarproducto">
+<div class="row hide" id="comentarproducto">
+    <div class="row col-md-12">
         <div class="col-md-8">
+            <input type="hidden" name="idProducto" class="idProducto" />
             <label>Dejanos tu opinion, nos interesa para mejorar!</label>
-            <textarea required tabindex="1" class="form-control tComentarios" maxlength="180"></textarea>
+            <textarea name="tComentarios" required tabindex="1" class="form-control tComentarios" maxlength="180"></textarea>
             <span class="help-block pull-right totalcaracteres" style="color:red"></span>
         </div>
         <div class="col-md-4">
-            <label >Puntaje</label>
-            <div class="rating"></div>
+            <label>Puntaje</label>
+            <input name="rating" type="text" class="estrellas">
         </div>
+    </div>
+    <div class="row col-md-12">
+        <span class="help-block pull-right validacionerror" style="color:red; display:none"></span>
     </div>
 </div>
 
@@ -160,7 +157,47 @@
 
         });
 
-        var boton = null;
+        $('#comentarmodal').modalSteps({
+            completeCallback: function(){
+                console.log($('#comentarmodal').find("form").serialize());
+                $.post("/Compras/Calificar", $('#comentarmodal').find("form").serialize(), function(devuelta){
+                    if (devuelta.bien){
+                        $.toast({
+                            heading: 'Frente de Economía Social y Solidaria!',
+                            text: 'Gracias por dejarnos tus comentarios',
+                            icon: 'info',
+                            loader: false,
+                            hideAfter: 5000
+                        })
+
+                        $("[data-idcompra=" + devuelta.idCompra + "]").find(".btncomentar").hide();
+                        $("[data-idcompra=" + devuelta.idCompra + "]").find(".estado").text(devuelta.comentario);
+                    }
+                });
+            },
+            validar: function(actual){
+                var comentario = actual.find(".tComentarios").val();
+                var rating = actual.find(".estrellas").val();
+                var error = $(".validacionerror");
+
+                if ( comentario.length < 5 ){
+                    error.show();
+                    error.text("El comentario debe tener un mínimo de 5 caracteres")
+                    return false;
+                } else if ( rating == 0 ){
+                    error.show();
+                    error.text("Hay que seleccionar al menos 1 estrella")
+                    return false;
+                }
+                error.hide();
+
+                return true;
+
+                //confirm_password.setCustomValidity("Las contraseñas no coinciden");
+            }
+        });
+
+
         $(document).on("click", ".comentar", function(e){
 
             boton = $(e.currentTarget);
@@ -170,15 +207,17 @@
             var compra = returnObj(compras, idCompra);
 
             $("#comentarmodal").find(".modal-body").empty();
+            $("#comentarmodal").find("#idCompra").val(idCompra);
+
 
             $.each(compra.productos, function(i,val){
+                console.log(i,val);
                 var nuevo = $("#comentarproducto").clone();
+                nuevo.attr({"data-step": i + 1, "data-title": val.nombre});
+                nuevo.find(".idProducto").val(val.idProducto);
+                nuevo.show();
 
-                nuevo.find(".nombre").text("Item " + (i + 1) + ": " + val.nombre);
-                nuevo.find(".tComentarios").val("");
-                //nuevo.find(".rating").rating('update', val.rating);
-
-                $("#comentarmodal").find(".modal-body").append(nuevo.show());
+                $("#comentarmodal").find(".modal-body").append(nuevo);
 
             });
 
@@ -188,15 +227,68 @@
 
         $("#comentarmodal").on('hidden.bs.modal', function () {
             boton.closest('.row').find('button').button('reset')
-            comentarios= [];
+            $(".validacionerror").hide();
         });
 
         $("#comentarmodal").on('show.bs.modal', function () {
-            $.each($("#comentarmodal").find(".rating"), function(i,val){
-                var myRating = rating(val, 0, 5);
-            })
-            
+            $("#comentarmodal").find(".estrellas").rating({
+                min:0,
+                max:5,
+                step:1,
+                size:'xs',
+                showClear:false,
+                showCaption:false});
         });
+
+        $(document).on("keyup", ".tComentarios", function(){
+            var error = $(".validacionerror");
+            if ( error.is(":visible"))
+                error.hide();
+
+            var caract = $(this).closest('#comentarproducto')
+
+            var total = parseInt($(this).attr("maxlength"));
+            var actuales = $(this).val().length;
+            caract.find(".totalcaracteres").text("Caracteres restantes: " + (total - actuales));
+        });
+
+        //var boton = null;
+        //$(document).on("click", ".comentar", function(e){
+
+        //    boton = $(e.currentTarget);
+        //    boton.closest('.row').find('button').button('loading');
+        //    var idCompra = boton.closest('.card').data('idcompra');
+
+        //    var compra = returnObj(compras, idCompra);
+
+        //    $("#comentarmodal").find(".modal-body").empty();
+
+        //    $.each(compra.productos, function(i,val){
+        //        var nuevo = $("#comentarproducto").clone();
+
+        //        nuevo.find(".nombre").text("Item " + (i + 1) + ": " + val.nombre);
+        //        nuevo.find(".tComentarios").val("");
+        //        //nuevo.find(".rating").rating('update', val.rating);
+
+        //        $("#comentarmodal").find(".modal-body").append(nuevo.show());
+
+        //    });
+
+        //    $("#comentarmodal").find('#idCompra').val(idCompra);
+        //    $("#comentarmodal").modal('show');
+        //});
+
+        //$("#comentarmodal").on('hidden.bs.modal', function () {
+        //    boton.closest('.row').find('button').button('reset')
+        //    comentarios= [];
+        //});
+
+        //$("#comentarmodal").on('show.bs.modal', function () {
+        //    $.each($("#comentarmodal").find(".rating"), function(i,val){
+        //        var myRating = rating(val, 0, 5);
+        //    })
+
+        //});
 
         /*var comentarios = [];
         var boton = null;
@@ -267,7 +359,7 @@
 
         function crearComentario(actual){
             var nuevo = $("#comentarproducto");
-            
+
             $("#comentarmodal").find(".modal-body").empty();
             $("#comentarmodal").find(".modal-body").append(llenarComentario(nuevo, actual));
 

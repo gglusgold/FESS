@@ -27,6 +27,7 @@
           <Property Name="idComentario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="fecha" Type="datetime" Nullable="false" />
           <Property Name="vecinoId" Type="int" Nullable="false" />
+          <Property Name="compraId" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="ComentariosProducto">
           <Key>
@@ -57,7 +58,6 @@
           <Property Name="tandaId" Type="int" Nullable="false" />
           <Property Name="localId" Type="int" Nullable="false" />
           <Property Name="estadoId" Type="int" Nullable="false" />
-          <Property Name="comentarioId" Type="int" />
         </EntityType>
         <EntityType Name="Costos">
           <Key>
@@ -147,6 +147,18 @@
           <Property Name="hash" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="verificado" Type="bit" Nullable="false" />
         </EntityType>
+        <Association Name="FK_Comentarios_Compras1">
+          <End Role="Compras" Type="Self.Compras" Multiplicity="1" />
+          <End Role="Comentarios" Type="Self.Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Compras">
+              <PropertyRef Name="idCompra" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="compraId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Comentarios_Vecinos1">
           <End Role="Vecinos" Type="Self.Vecinos" Multiplicity="1" />
           <End Role="Comentarios" Type="Self.Comentarios" Multiplicity="*" />
@@ -206,18 +218,6 @@
             </Principal>
             <Dependent Role="CompraProducto">
               <PropertyRef Name="productoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Compras_Comentarios">
-          <End Role="Comentarios" Type="Self.Comentarios" Multiplicity="0..1" />
-          <End Role="Compras" Type="Self.Compras" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Comentarios">
-              <PropertyRef Name="idComentario" />
-            </Principal>
-            <Dependent Role="Compras">
-              <PropertyRef Name="comentarioId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -381,6 +381,10 @@
           <EntitySet Name="RolesVecinos" EntityType="Self.RolesVecinos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Tandas" EntityType="Self.Tandas" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Vecinos" EntityType="Self.Vecinos" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Comentarios_Compras1" Association="Self.FK_Comentarios_Compras1">
+            <End Role="Compras" EntitySet="Compras" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
+          </AssociationSet>
           <AssociationSet Name="FK_Comentarios_Vecinos1" Association="Self.FK_Comentarios_Vecinos1">
             <End Role="Vecinos" EntitySet="Vecinos" />
             <End Role="Comentarios" EntitySet="Comentarios" />
@@ -400,10 +404,6 @@
           <AssociationSet Name="FK_CompraProducto_Productos" Association="Self.FK_CompraProducto_Productos">
             <End Role="Productos" EntitySet="Productos" />
             <End Role="CompraProducto" EntitySet="CompraProducto" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Compras_Comentarios" Association="Self.FK_Compras_Comentarios">
-            <End Role="Comentarios" EntitySet="Comentarios" />
-            <End Role="Compras" EntitySet="Compras" />
           </AssociationSet>
           <AssociationSet Name="FK_Compras_EstadosCompra" Association="Self.FK_Compras_EstadosCompra">
             <End Role="EstadosCompra" EntitySet="EstadosCompra" />
@@ -486,6 +486,10 @@
             <End Role="Circuitos" EntitySet="Circuitos" />
             <End Role="Tandas" EntitySet="Tandas" />
           </AssociationSet>
+          <AssociationSet Name="FK_Comentarios_Compras1" Association="TanoNEModel.FK_Comentarios_Compras1">
+            <End Role="Compras" EntitySet="Compras" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
+          </AssociationSet>
           <AssociationSet Name="FK_Comentarios_Vecinos1" Association="TanoNEModel.FK_Comentarios_Vecinos1">
             <End Role="Vecinos" EntitySet="Vecinos" />
             <End Role="Comentarios" EntitySet="Comentarios" />
@@ -493,10 +497,6 @@
           <AssociationSet Name="FK_ComentariosProducto_Comentarios" Association="TanoNEModel.FK_ComentariosProducto_Comentarios">
             <End Role="Comentarios" EntitySet="Comentarios" />
             <End Role="ComentariosProducto" EntitySet="ComentariosProducto" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Compras_Comentarios" Association="TanoNEModel.FK_Compras_Comentarios">
-            <End Role="Comentarios" EntitySet="Comentarios" />
-            <End Role="Compras" EntitySet="Compras" />
           </AssociationSet>
           <AssociationSet Name="FK_ComentariosProducto_Productos" Association="TanoNEModel.FK_ComentariosProducto_Productos">
             <End Role="Productos" EntitySet="Productos" />
@@ -572,9 +572,10 @@
           <Property Name="idComentario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="fecha" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="vecinoId" Type="Int32" Nullable="false" />
+          <Property Name="compraId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Comentarios_Compras1" FromRole="Comentarios" ToRole="Compras" />
           <NavigationProperty Name="Vecinos" Relationship="TanoNEModel.FK_Comentarios_Vecinos1" FromRole="Comentarios" ToRole="Vecinos" />
           <NavigationProperty Name="ComentariosProducto" Relationship="TanoNEModel.FK_ComentariosProducto_Comentarios" FromRole="Comentarios" ToRole="ComentariosProducto" />
-          <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Compras_Comentarios" FromRole="Comentarios" ToRole="Compras" />
         </EntityType>
         <EntityType Name="ComentariosProducto">
           <Key>
@@ -609,8 +610,7 @@
           <Property Name="tandaId" Type="Int32" Nullable="false" />
           <Property Name="localId" Type="Int32" Nullable="false" />
           <Property Name="estadoId" Type="Int32" Nullable="false" />
-          <Property Name="comentarioId" Type="Int32" />
-          <NavigationProperty Name="Comentarios" Relationship="TanoNEModel.FK_Compras_Comentarios" FromRole="Compras" ToRole="Comentarios" />
+          <NavigationProperty Name="Comentarios" Relationship="TanoNEModel.FK_Comentarios_Compras1" FromRole="Compras" ToRole="Comentarios" />
           <NavigationProperty Name="CompraProducto" Relationship="TanoNEModel.FK_CompraProducto_Compras" FromRole="Compras" ToRole="CompraProducto" />
           <NavigationProperty Name="EstadosCompra" Relationship="TanoNEModel.FK_Compras_EstadosCompra" FromRole="Compras" ToRole="EstadosCompra" />
           <NavigationProperty Name="Locales" Relationship="TanoNEModel.FK_Compras_Locales" FromRole="Compras" ToRole="Locales" />
@@ -761,6 +761,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Comentarios_Compras1">
+          <End Type="TanoNEModel.Compras" Role="Compras" Multiplicity="1" />
+          <End Type="TanoNEModel.Comentarios" Role="Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Compras">
+              <PropertyRef Name="idCompra" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="compraId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Comentarios_Vecinos1">
           <End Type="TanoNEModel.Vecinos" Role="Vecinos" Multiplicity="1" />
           <End Type="TanoNEModel.Comentarios" Role="Comentarios" Multiplicity="*" />
@@ -781,18 +793,6 @@
               <PropertyRef Name="idComentario" />
             </Principal>
             <Dependent Role="ComentariosProducto">
-              <PropertyRef Name="comentarioId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Compras_Comentarios">
-          <End Type="TanoNEModel.Comentarios" Role="Comentarios" Multiplicity="0..1" />
-          <End Type="TanoNEModel.Compras" Role="Compras" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Comentarios">
-              <PropertyRef Name="idComentario" />
-            </Principal>
-            <Dependent Role="Compras">
               <PropertyRef Name="comentarioId" />
             </Dependent>
           </ReferentialConstraint>
@@ -969,6 +969,7 @@
           <EntitySetMapping Name="Comentarios">
             <EntityTypeMapping TypeName="TanoNEModel.Comentarios">
               <MappingFragment StoreEntitySet="Comentarios">
+                <ScalarProperty Name="compraId" ColumnName="compraId" />
                 <ScalarProperty Name="vecinoId" ColumnName="vecinoId" />
                 <ScalarProperty Name="fecha" ColumnName="fecha" />
                 <ScalarProperty Name="idComentario" ColumnName="idComentario" />
@@ -999,7 +1000,6 @@
           <EntitySetMapping Name="Compras">
             <EntityTypeMapping TypeName="TanoNEModel.Compras">
               <MappingFragment StoreEntitySet="Compras">
-                <ScalarProperty Name="comentarioId" ColumnName="comentarioId" />
                 <ScalarProperty Name="estadoId" ColumnName="estadoId" />
                 <ScalarProperty Name="localId" ColumnName="localId" />
                 <ScalarProperty Name="tandaId" ColumnName="tandaId" />
