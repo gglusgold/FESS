@@ -295,7 +295,7 @@
 
         if (typeof fieldoptions.opciones.source === 'string')
         {
-            $.post(fieldoptions.opciones.source, {id: valorcombo}, function (data) {
+            $.post(fieldoptions.opciones.source, { id: valorcombo }, function (data) {
                 $.each(data.Options, function (i, item) {
                     input.append("<option value='" + item.Value + "'>" + item.DisplayText + "</option>");
                 });
@@ -319,16 +319,6 @@
                 } else
                 if (principal.options.info !== undefined) {
                     input.find("option[value='" + principal.options.info[name] + "']").attr('selected', 'selected');
-
-                }
-                if (fieldoptions.opciones.chosen !== undefined && fieldoptions.opciones.chosen === true) {
-
-                    input.chosen();
-                    if (fieldoptions.opciones.diseño !== undefined && fieldoptions.opciones.diseño.clasesInput !== undefined)
-                        input.closest("div").find(".chosen-search input").addClass(fieldoptions.opciones.diseño.clasesInput);
-                    input.trigger("chosen:updated");
-                    $('.chosen-container').css("width", "100%");
-
 
                 }
             });

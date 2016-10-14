@@ -28,6 +28,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 nombre = a.nombre,
                 descripcion = a.descripcion.Replace("\n", "<br/>"),
                 cantidad = a.cantidad,
+                idCategoria = a.categoriaId,
                 categoria = a.Categorias.nombre,
                 precio = a.Precios.LastOrDefault().precio,
                 costo = a.Costos.LastOrDefault().costo,

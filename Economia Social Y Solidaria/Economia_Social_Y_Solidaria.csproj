@@ -120,11 +120,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\CategoriasController.cs" />
     <Compile Include="Controllers\TandasController.cs" />
     <Compile Include="Controllers\ComprasController.cs" />
     <Compile Include="Controllers\InicioController.cs" />
     <Compile Include="Controllers\ProductosController.cs" />
-    <Content Include="Css\star-rating.css" />
+    <Content Include="Css\rating.css" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -203,6 +204,7 @@
     <Content Include="Css\shop-item.css" />
     <Content Include="Css\toastr.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="fonts\stars.svg" />
     <Content Include="Global.asax" />
     <Content Include="Imagenes\Fijas\contact-form.png" />
     <Content Include="Imagenes\Fijas\ESS_1.jpg" />
@@ -218,7 +220,7 @@
     <Content Include="Js\js.cookie.js" />
     <Content Include="Js\magyp.js" />
     <Content Include="Js\menu.js" />
-    <Content Include="Js\star-rating.js" />
+    <Content Include="Js\rating.js" />
     <Content Include="Js\tano.js" />
     <Content Include="Js\toastr.min.js" />
     <Content Include="Web.config" />

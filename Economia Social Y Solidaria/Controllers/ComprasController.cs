@@ -101,6 +101,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
         {
             TanoNEEntities ctx = new TanoNEEntities();
             Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
+            if ( vecino == null ) 
+                return RedirectToAction("Carrito", "Compras");
 
             EstadosCompra EstadoEntregado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
             EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 3);

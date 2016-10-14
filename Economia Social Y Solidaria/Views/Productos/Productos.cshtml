@@ -25,12 +25,6 @@
     <script type="text/javascript">
         $("a[href='/Productos/Productos']").closest("li").addClass("active");
 
-
-        var tipos = [
-                { DisplayText: "Bolsones", Value: 1 },
-                { DisplayText: "Almacen", Value: 2 }
-        ]
-
         var columnas = [
                {
                    //estos son de bootstrap table
@@ -101,25 +95,27 @@
                    }
                },
                {
-                   field: "esAlmacen",
+                   field: "idCategoria",
                    align: 'center',
                    valign: 'middle',
-                   title: "Tipo de Producto",
-                   sortable: "true",
-                   width: "10%",
-                   formatter: function (val, row, i) {
-                       var obg = $.grep(tipos, function (n) {
-                           return n.Value === val;
-                       });
-                       return obg[0].DisplayText;
-                   },
+                   title: "Categoría",
+                   visible: false,
                    create: true,
                    edit: true,
                    opciones: {
                        tipo: "select",
-                       source: tipos,
+                       source: "/Categorias/Lista",
                        atributos: { input: { required: true } }
                    }
+               },
+               {
+                   field: "categoria",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Categoría",
+                   sortable: "true",
+                   create: false,
+                   edit: false,
                },
                {
                    field: "precio",
