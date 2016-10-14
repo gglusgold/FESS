@@ -25,8 +25,14 @@ namespace Economia_Social_Y_Solidaria.Controllers
         public int totalCompraTandaUsuario = 0;
         public List<Locales> locales = new List<Locales>();
         public List<Changuito> changuito = new List<Changuito>();
+        public List<Cat> categorias = new List<Cat>();
     }
 
+    public class Cat
+    {
+        public int idCategoria;
+        public string nombre;
+    }
 
     public class ProductosComprados
     {
@@ -59,12 +65,29 @@ namespace Economia_Social_Y_Solidaria.Controllers
     {
         public ActionResult Carrito()
         {
-            TanoNEEntities ctx = new TanoNEEntities();
-            ChanguitoCompleta completo = new ChanguitoCompleta();
 
+            ChanguitoCompleta completo = new ChanguitoCompleta();
+            crearChango(completo);
+
+            return View(completo);
+        }
+
+        public ActionResult cambioCategoria(int idCategoria)
+        {
+            ChanguitoCompleta completo = new ChanguitoCompleta();
+            crearChango(completo, idCategoria);
+
+            return Json(new { lista= completo.changuito });
+        }
+
+        public ChanguitoCompleta crearChango(ChanguitoCompleta completo, int idCategoria = -1)
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
             Tandas ultima = ctx.Tandas.ToList().LastOrDefault();
             if (ultima != null && ultima.fechaCerrado == null)
                 completo.locales = ultima.Circuitos.Locales.ToList();
+
+            completo.categorias = ctx.Categorias.Select(a => new Cat { idCategoria = a.idCategoria, nombre = a.nombre }).ToList();
 
             if (User.Identity.IsAuthenticated && ultima != null)
             {
@@ -74,7 +97,13 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 completo.totalCompraTandaUsuario = ctx.Compras.Where(a => a.vecinoId == actual.idVecino && a.tandaId == ultima.idTanda && a.estadoId == EstadoEntregado.idEstadoCompra).Count();
             }
 
-            completo.changuito = ctx.Productos.ToList().Where(a => a.activo).Select(a => new Changuito()
+            Categorias cat = ctx.Categorias.FirstOrDefault(a => a.nombre == "Bolsones");
+            if (idCategoria != -1)
+            {
+                cat = ctx.Categorias.FirstOrDefault(a => a.idCategoria == idCategoria);
+            }
+
+            completo.changuito = ctx.Productos.Where(a => a.categoriaId == cat.idCategoria).ToList().Where(a => a.activo).Select(a => new Changuito()
             {
                 idProducto = a.idProducto,
                 nombre = a.nombre,
@@ -84,7 +113,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 rating = a.ComentariosProducto.Count == 0 ? 0 : a.ComentariosProducto.Average(b => b.estrellas)
             }).ToList();
 
-            return View(completo);
+            return completo;
         }
 
         public ActionResult Detalle(int id)
@@ -237,10 +266,10 @@ namespace Economia_Social_Y_Solidaria.Controllers
             EstadosCompra comentado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 4);
 
             Compras compra = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra);
-            
+
 
             Comentarios comentario = new Comentarios();
-            if ( ctx.Comentarios.FirstOrDefault(a => a.vecinoId == vecino.idVecino && a.compraId == compra.idCompra) == null)
+            if (ctx.Comentarios.FirstOrDefault(a => a.vecinoId == vecino.idVecino && a.compraId == compra.idCompra) == null)
             {
                 compra.EstadosCompra = comentado;
 

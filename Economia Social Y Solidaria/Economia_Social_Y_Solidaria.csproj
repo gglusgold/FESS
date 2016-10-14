@@ -216,6 +216,7 @@
     <Content Include="Js\jquery-3.0.0.js" />
     <Content Include="Js\jquery-bootstrap-modal-steps.min.js" />
     <Content Include="Js\jquery-ui.js" />
+    <Content Include="Js\jquery.blockUI.min.js" />
     <Content Include="Js\jquery.toast.min.js" />
     <Content Include="Js\js.cookie.js" />
     <Content Include="Js\magyp.js" />
