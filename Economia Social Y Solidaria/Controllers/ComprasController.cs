@@ -107,7 +107,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             {
                 idProducto = a.idProducto,
                 nombre = a.nombre,
-                descripcion = a.descripcion.Replace("\n", "<br/>"),
+                descripcion = a.descripcion,//.Replace("\n", "<br/>"),
                 precio = a.Precios.LastOrDefault().precio,
                 comentarios = a.ComentariosProducto.Count,
                 rating = a.ComentariosProducto.Count == 0 ? 0 : a.ComentariosProducto.Average(b => b.estrellas)

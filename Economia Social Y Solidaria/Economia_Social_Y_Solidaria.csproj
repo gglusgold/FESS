@@ -202,8 +202,8 @@
     <Content Include="Css\historial.css" />
     <Content Include="Css\iniciarsesion.css" />
     <Content Include="Css\jquery.toast.min.css" />
-    <Content Include="Css\shop-homepage.css" />
-    <Content Include="Css\shop-item.css" />
+    <Content Include="Css\carrito.css" />
+    <Content Include="Css\detalle.css" />
     <Content Include="Css\toastr.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />

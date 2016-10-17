@@ -136,12 +136,11 @@
 </div><!-- /.modal -->
 
 <div id="producto" class="col-md-4 arriba" style="display:none">
-
-    <div class="row">
-        <div class="thumbnail" style="margin-bottom:0"><img class="imagen" alt=""></div>
-    </div>
-    <div style="padding:15px" class="borde">
+    <div class="card">
         <div class="row">
+            <div class="thumbnail" style="margin-bottom:0"><img class="imagen" alt=""></div>
+        </div>
+        <div class="row espacio">
             <div class="col-md-9 pocopadding">
                 <h4 class="pnombre"></h4>
             </div>
@@ -149,13 +148,13 @@
                 <h4 class="pull-right pprecio"></h4>
             </div>
         </div>
-        <div class="row" style="text-align:justify">
+        <div class="row espacio" style="text-align:justify">
             <div class="col-md-12 pocopadding">
                 <p class="pdesc"></p>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-9 pocopadding">
+        <div class="row espacio">
+            <div class="col-md-8 col-md-offset-2">
                 <div class="btn-group pedido">
                     <button type="button" class="btn btn-primary reservar">Reservar <span class="badge">1</span></button>
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -171,18 +170,16 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-md-3 pocopadding pull-right">
-                <h6 class="pull-right"><a class="pvermas" target="_blank" href="">Ver más...</a></h6>
-            </div>
         </div>
-        <div class="row">
+        <div class="row espacio">
             <div class="col-md-5 pocopadding">
                 <p class="pcomentarios" style="margin-top: 5PX;">0 comentarios</p>
             </div>
             <div class="col-md-7 pocopadding">
-                <input type="number" class="rating pestrellas" value="" min=0 max=5 step=1 data-size="xxs" disabled="true" data-show-caption="false" data-show-clear="false">
+                <input type="number" class="pestrellas" value="" min=0 max=5 step=1 data-size="xxs" disabled="true" data-show-caption="false" data-show-clear="false">
             </div>
         </div>
+
     </div>
 </div>
 
@@ -231,10 +228,19 @@
             nueva.find(".imagen").attr('src','/Imagenes/producto-' + producto.idProducto + '.jpg');
             nueva.find(".pnombre").append($("<a/>").attr("href",link).text(producto.nombre));
             nueva.find(".pprecio").text("$" + producto.precio);
-            nueva.find(".pdesc").html(producto.descripcion);
-            nueva.find(".pvermas").attr('href',link);
+
+            var vermas = $("<a/>").attr({"href":link, "target":"_blank"}).text("Ver más")
+
+            var max = 125;
+            if ( producto.descripcion.length > max ){
+                nueva.find(".pdesc").html(producto.descripcion.substring(0,max).replace(new RegExp("\n", 'g'), "<br/>") + "... ");
+                nueva.find(".pdesc").append(vermas);
+            }
+            else
+                nueva.find(".pdesc").html(producto.descripcion.replace(new RegExp("\n", 'g'), "<br/>"));
+
             nueva.find(".pcomentarios").text(producto.comentarios + " Comentarios");
-            nueva.find(".pestrellas").val(producto.rating);
+            nueva.find(".pestrellas").rating('update', producto.rating);
             nueva.attr("data-idproducto", producto.idProducto);
 
             nueva.removeAttr('id');
@@ -477,6 +483,11 @@
                 return elem ? elem.idProducto == r : false;
             })[0];
         }
+
+        String.prototype.replaceAll = function(search, replacement) {
+            var target = this;
+            return target.replace(new RegExp(search, 'g'), replacement);
+        };
 
     </script>
 }

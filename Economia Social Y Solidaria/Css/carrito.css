@@ -8,7 +8,7 @@ body {
     padding-top: 70px;
 }
 
-.slide-image {
+/*.slide-image {
     width: 100%;
 }
 
@@ -19,10 +19,9 @@ body {
 .carousel-control,
 .item {
     border-radius: 4px;
-}
+}*/
 
-.caption {
-    /*height: 180px;*/
+/*.caption {
     overflow: hidden;
 }
 
@@ -32,27 +31,25 @@ body {
     .caption p {
         height: 100px;
         overflow: hidden;
-    }
+    }*/
 
 .thumbnail img {
     width: auto;
     max-height: 200px;
 }
 
-.ratings {
+/*.ratings {
     padding-right: 10px;
     padding-left: 10px;
     color: #d17581;
-}
+}*/
 
 .thumbnail {
+    margin-left: 5px;
+    margin-right: 5px;
+    border: 0;
     padding: 0;
 }
-
-    .thumbnail .caption-full {
-        padding: 9px;
-        color: #333;
-    }
 
 footer {
     margin: 50px 0;
@@ -91,15 +88,11 @@ button.cerrar {
     padding-right: 5px;
 }
 
-.borde {
+/*.borde {
     border: #cdcdcd 1.5px solid;
-}
+}*/
 
-.thumbnail {
-    padding-left: 15px;
-    padding-right: 15px;
-    border: 0;
-}
+
 
 .card {
     /* Add shadows to create the "card" effect */
@@ -114,7 +107,18 @@ button.cerrar {
         box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
     }
 
-.pdesc{
-    max-height: 100px;
-    overflow: hidden;
+.pdesc {
+    /*max-height: 100px;
+    overflow: hidden;*/
+}
+
+.pedido {
+    margin-bottom: 15px;
+    margin-top: 15px;
+    width:100%;
+}
+
+
+.espacio {
+    padding: 2px 25px;
 }
