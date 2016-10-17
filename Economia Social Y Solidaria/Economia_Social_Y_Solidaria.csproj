@@ -121,10 +121,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CategoriasController.cs" />
+    <Compile Include="Controllers\EstadisticasController.cs" />
     <Compile Include="Controllers\TandasController.cs" />
     <Compile Include="Controllers\ComprasController.cs" />
     <Compile Include="Controllers\InicioController.cs" />
     <Compile Include="Controllers\ProductosController.cs" />
+    <Content Include="Css\dc.css" />
     <Content Include="Css\rating.css" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -205,6 +207,8 @@
     <Content Include="Css\toastr.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="Js\crossfilter.js" />
+    <Content Include="Js\d3.js" />
     <Content Include="Imagenes\Fijas\contact-form.png" />
     <Content Include="Imagenes\Fijas\ESS_1.jpg" />
     <Content Include="Imagenes\Fijas\ESS_2.jpg" />
@@ -212,6 +216,7 @@
     <Content Include="Js\bootstrap-table-es-ES.js" />
     <Content Include="Js\bootstrap-table.js" />
     <Content Include="Js\bootstrap.js" />
+    <Content Include="Js\dc.js" />
     <Content Include="Js\jquery-3.1.1.min.js" />
     <Content Include="Js\jquery-3.0.0.js" />
     <Content Include="Js\jquery-bootstrap-modal-steps.min.js" />
@@ -302,6 +307,7 @@
     <Content Include="Views\Compras\Historial.cshtml" />
     <None Include="Properties\PublishProfiles\FTP.pubxml" />
     <Content Include="Views\Compras\Entregar.cshtml" />
+    <Content Include="Views\Estadisticas\Estadisticas.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

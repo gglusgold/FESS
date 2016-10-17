@@ -26,6 +26,10 @@
     {
         <link href="~/Css/historial.css" rel="stylesheet">
     }
+    else if (ViewBag.Title == "Estadisticas")
+    {
+        <link href="~/Css/dc.css" rel="stylesheet">
+    }
     else
     {
         <link href="~/Css/shop-homepage.css" rel="stylesheet">
@@ -61,6 +65,13 @@
     <script src="~/Js/menu.js"></script>
     <script src="~/Js/jquery-bootstrap-modal-steps.min.js"></script>
     <script src="~/Js/jquery.blockUI.min.js"></script>
+    @if (ViewBag.Title == "Estadisticas")
+    {
+        
+        <script src="~/Js/d3.js"></script>
+        <script src="~/Js/crossfilter.js"></script>
+        <script src="~/Js/dc.js"></script>
+    }
     @RenderSection("scripts", false)
 </body>
 </html>
