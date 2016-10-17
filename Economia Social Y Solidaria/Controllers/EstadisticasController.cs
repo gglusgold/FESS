@@ -9,9 +9,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
 {
     public class Estadistica
     {
-        public string Nombre;
-        public string Gasto;
-        public int Cuando;
+        public string Comuna;
+        public int Compras;
+        //public int Cuando;
     }
 
 
@@ -23,12 +23,20 @@ namespace Economia_Social_Y_Solidaria.Controllers
             TanoNEEntities ctx = new TanoNEEntities();
             List<Estadistica> lista = new List<Estadistica>();
 
-            lista = ctx.Compras.ToList().Select(com => new Estadistica
+
+            EstadosCompra Entregado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo ==3);
+
+            lista = ctx.Compras.GroupBy(a => a.Locales.comuna).Select(b => new Estadistica { Comuna = "Comuna " + b.Key, Compras = b.Count() }).ToList();
+
+            //var ls = ctx.Compras.Where(a => a.EstadosCompra.codigo > Entregado.codigo).GroupBy(a => a.Locales.comuna).Select(a =>
+            //{
+
+            //});
+            /*lista = ctx.Compras.Where(a => a.EstadosCompra.codigo > Entregado.codigo).Select(com => new Estadistica
             {
-                Nombre = com.Vecinos.nombres,
-                Gasto = com.CompraProducto.Sum(cp => cp.Productos.Precios.FirstOrDefault(p => p.fecha < com.fecha).precio).ToString("0.##"),
-                Cuando = com.fecha.Month
-            }).ToList();
+                Comuna = "Comuna " + com.Locales.comuna,
+                Compras = com.
+            }).ToList();*/
 
             return View(lista);
         }

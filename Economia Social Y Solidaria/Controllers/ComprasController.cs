@@ -127,7 +127,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 idProducto = actual.idProducto,
                 nombre = actual.nombre,
                 descripcion = actual.descripcion.Replace("\n", "<br/>"),
-                precio = actual.Precios.LastOrDefault().precio
+                precio = actual.Precios.LastOrDefault().precio,
+                comentarios = actual.ComentariosProducto.Count,
+                rating = actual.ComentariosProducto.Count == 0 ? 0 : actual.ComentariosProducto.Average(b => b.estrellas)
             });
         }
 

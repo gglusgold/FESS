@@ -8,41 +8,10 @@ body {
     padding-top: 70px;
 }
 
-/*.slide-image {
-    width: 100%;
-}
-
-.carousel-holder {
-    margin-bottom: 30px;
-}
-
-.carousel-control,
-.item {
-    border-radius: 4px;
-}*/
-
-/*.caption {
-    overflow: hidden;
-}
-
-    .caption h4 {
-    }
-
-    .caption p {
-        height: 100px;
-        overflow: hidden;
-    }*/
-
 .thumbnail img {
     width: auto;
     max-height: 200px;
 }
-
-/*.ratings {
-    padding-right: 10px;
-    padding-left: 10px;
-    color: #d17581;
-}*/
 
 .thumbnail {
     margin-left: 5px;
@@ -88,12 +57,6 @@ button.cerrar {
     padding-right: 5px;
 }
 
-/*.borde {
-    border: #cdcdcd 1.5px solid;
-}*/
-
-
-
 .card {
     /* Add shadows to create the "card" effect */
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
@@ -107,15 +70,10 @@ button.cerrar {
         box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
     }
 
-.pdesc {
-    /*max-height: 100px;
-    overflow: hidden;*/
-}
-
 .pedido {
     margin-bottom: 15px;
     margin-top: 15px;
-    width:100%;
+    width: 100%;
 }
 
 

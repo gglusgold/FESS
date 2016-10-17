@@ -195,6 +195,7 @@
             $.blockUI({ message: null });
             $.post("/Compras/cambioCategoria", {idCategoria:$(this).val()}, function(e){
                 $.unblockUI();
+                productos = e.lista;
                 cargarDatos(e.lista);
             }).fail(function(xhr, status, error) {
                 $.unblockUI();
@@ -306,7 +307,7 @@
             var producto = returnObj(productos, id);
             var cantidad = parseInt(btn.find('.badge').text());
 
-            console.log(id, producto.precio, producto.nombre, cantidad, true);
+            console.log(id, productos);
             agregarItem(id, producto.precio, producto.nombre, cantidad, true);
             calcularTotal();
 

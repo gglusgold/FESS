@@ -28,7 +28,7 @@
     }
     else if (ViewBag.Title == "Estadisticas")
     {
-        <link href="~/Css/dc.css" rel="stylesheet">
+        <link href="~/Css/estadisticas.css" rel="stylesheet">
     }
     else
     {
@@ -67,10 +67,7 @@
     <script src="~/Js/jquery.blockUI.min.js"></script>
     @if (ViewBag.Title == "Estadisticas")
     {
-        
-        <script src="~/Js/d3.js"></script>
-        <script src="~/Js/crossfilter.js"></script>
-        <script src="~/Js/dc.js"></script>
+        <script src="~/Js/highmaps.js"></script>
     }
     @RenderSection("scripts", false)
 </body>
