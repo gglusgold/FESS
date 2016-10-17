@@ -225,6 +225,7 @@
     <Content Include="Js\jquery.toast.min.js" />
     <Content Include="Js\js.cookie.js" />
     <Content Include="Js\magyp.js" />
+    <Content Include="Js\map.js" />
     <Content Include="Js\menu.js" />
     <Content Include="Js\rating.js" />
     <Content Include="Js\tano.js" />

@@ -7,6 +7,27 @@
 <div class="container" id="mapa" style="margin:0 auto; margin-top:70px">
 </div>
 
+<div class="modal fade" id="disc" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="form_confirmar" action="~/Compras/ConfirmarPedido" method="post" enctype="application/x-www-form-urlencoded">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titulo"></h4>
+                </div>
+                <div class="modal-body" id="parte_uno" style="display:block">
+                    <div id="gdisc" style="height: 400px; width: 550px; margin: 0 auto"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" data-loading-text="Espere..." class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 @section scripts{
 
     <script type="text/javascript">
@@ -19,9 +40,69 @@
         var cont = @Html.Raw(Json.Encode(Model));
         var data = [];
         $.each(cont, function(i,val){
-            data.push({ name:val.Comuna, value:val.Compras })
+            data.push({ name:val.Comuna, value:val.Compras, id:val.ComunaNumero })
         });
-        console.log(data);
+
+
+        function clickComuna(e){
+            var grafico = this;
+            $.blockUI({ message: null });
+            $.post("/Estadisticas/ProductoPorComuna", { comuna:this.options.id }, function(data){
+                $.unblockUI();
+
+                var productos = [];
+                $.each(data.listado, function(i,val){
+                    productos.push({ name:val.Nombre, y: val.Cantidad});
+                });
+                console.log(data);
+                
+
+                $("#disc").modal("show");
+                $("#disc").find("#titulo").text("Compras en la " + grafico.options.name);
+                $("#gdisc").highcharts({
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: 'Historial de productos comprados en la comuna'
+                    },
+                    xAxis: {
+                        type: 'category'
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Total'
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        series: {
+                            borderWidth: 0,
+                            dataLabels: {
+                                enabled: true,
+                                format: '{point.y}'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b><br/>'
+                    },
+                    series: [{
+                        name: 'Productos',
+                        colorByPoint: true,
+                        data: productos
+                    }]
+                });
+
+            }).fail(function(xhr, status, error) {
+                $.unblockUI();
+            });
+
+        }
 
         $('#mapa').highcharts('Map', {
             title: {
@@ -37,6 +118,17 @@
             {
                 joinBy: ['name', 'name'],
                 data: data,
+                point: {
+                    events: {
+                        click: clickComuna
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+
+                    format: '{point.name}'
+                },
+                name: 'Compras en total',
                 mapData: [
                     {
                         "name": "Comuna 8",
