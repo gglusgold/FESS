@@ -75,19 +75,17 @@
                    events: {
                        'click .Retiro': function (e, value, row, index) {
 
-                           if ($(e.target).hasClass("glyphicon-remove")) {
-                               $(e.target).removeClass("glyphicon-remove").addClass("glyphicon-ok");
-                               $.post("/Vecinos/Editar", { idVecino: row.idVecino, administrador: true }, function (devuelta) {
-                                   if (devuelta.error == true) {
-                                       $(e.target).removeClass("glyphicon-ok").addClass("glyphicon-remove");
-                                   }
-                               });
-                           }
+                           var que = $(e.target).hasClass("glyphicon-ok");
+                           $(e.target).removeClass("glyphicon-remove").removeClass("glyphicon-ok")
+
+                           $.post("/Vecinos/Editar", { idVecino: row.idVecino, administrador: !que }, function (devuelta) {
+                               $(e.target).addClass(devuelta.admin ? "glyphicon-ok" : "glyphicon-remove");
+                           });
 
                        }
                    },
                    formatter: function operateFormatter(value, row, index) {
-                       return "<a style='cursor:pointer' class='Retiro' title='Retiro'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
+                       return "<a style='cursor:pointer' class='Retiro' title='Administrar'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
 
                    }
                },
@@ -100,20 +98,18 @@
                    events: {
                        'click .Retiro': function (e, value, row, index) {
 
-                           if ($(e.target).hasClass("glyphicon-remove")) {
-                               $(e.target).removeClass("glyphicon-remove").addClass("glyphicon-ok");
-                               $.post("/Vecinos/Editar", { idVecino: row.idVecino, contador: true }, function (devuelta) {
-                                   if (devuelta.error == true) {
-                                       $(e.target).removeClass("glyphicon-ok").addClass("glyphicon-remove");
-                                   }
-                               });
-                           }
+                           var que = $(e.target).hasClass("glyphicon-ok");
+                           $(e.target).removeClass("glyphicon-remove").removeClass("glyphicon-ok")
+
+                           $.post("/Vecinos/Editar", { idVecino: row.idVecino, contador: !que }, function (devuelta) {
+                               $(e.target).addClass(devuelta.contador ? "glyphicon-ok" : "glyphicon-remove");
+                           });
 
                        }
                    },
                    formatter: function operateFormatter(value, row, index) {
                        console.log(row);
-                       return "<a style='cursor:pointer' class='Retiro' title='Retiro'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
+                       return "<a style='cursor:pointer' class='Retiro' title='Finanzas'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
 
                    }
                },
@@ -127,19 +123,17 @@
                    events: {
                        'click .Retiro': function (e, value, row, index) {
 
-                           if ($(e.target).hasClass("glyphicon-remove")) {
-                               $(e.target).removeClass("glyphicon-remove").addClass("glyphicon-ok");
-                               $.post("/Vecinos/Editar", { idVecino: row.idVecino, encargado: true }, function (devuelta) {
-                                   if (devuelta.error == true) {
-                                       $(e.target).removeClass("glyphicon-ok").addClass("glyphicon-remove");
-                                   }
-                               });
-                           }
+                           var que = $(e.target).hasClass("glyphicon-ok");
+                           $(e.target).removeClass("glyphicon-remove").removeClass("glyphicon-ok")
+
+                           $.post("/Vecinos/Editar", { idVecino: row.idVecino, encargado: !que }, function (devuelta) {
+                               $(e.target).addClass(devuelta.encargado ? "glyphicon-ok" : "glyphicon-remove");
+                           });
 
                        }
                    },
                    formatter: function operateFormatter(value, row, index) {
-                       return "<a style='cursor:pointer' class='Retiro' title='Retiro'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
+                       return "<a style='cursor:pointer' class='Retiro' title='Encargado'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
 
                    }
                }

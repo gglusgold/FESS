@@ -7,7 +7,7 @@
     if (actual != null)
     {
         nombres = actual.nombres;
-        roles = actual.RolesVecinos.Select(a => a.Roles.codigoRol).ToArray();
+        roles = actual.RolesVecinos.OrderBy(b => b.Roles.codigoRol).Select(a => a.Roles.codigoRol).ToArray();
     }
 
 }
@@ -36,10 +36,16 @@
                     {
                         if (rol == 2)
                         {
-                            <li><a href="~/Productos/Productos">Productos</a></li>
-                            <li><a href="~/Tandas/Tandas">Tandas</a></li>
-                            <li><a href="~/Estadisticas/Estadisticas">Estadisticas</a></li>
-                            <li><a href="~/Vecinos/Vecino">Administrar</a></li>  
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
+                                <ul class="dropdown-menu" style="position: absolute;">
+                                    <li><a href="~/Productos/Productos">Productos</a></li>
+                                    <li><a href="~/Tandas/Tandas">Tandas</a></li>
+                                    <li><a href="~/Estadisticas/Estadisticas">Estadisticas</a></li>
+                                    <li><a href="~/Vecinos/Vecino">Administrar</a></li>  
+                                </ul>
+                            </li>
+                            
                         }
                         if (rol == 3)
                         {
@@ -48,7 +54,7 @@
                         if (rol == 4)
                         {
                             <li><a href="~/Compras/Entregar">Entregar</a></li>
-                            <li><a href="~/Compras/Encargar">@*Encargar*@</a></li>
+                            @*<li><a href="~/Compras/Encargar">Encargar</a></li>*@
                         }
                     }
                 </ul>
@@ -63,8 +69,13 @@
                     }
                     else
                     {
-                        <li><a href="#">@nombres</a></li>
-                        <li><a id="btn_cerrar" href="/Inicio/CerrarSesion">Cerrar sesión</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">@nombres <span class="caret"></span></a>
+                            <ul class="dropdown-menu" style="position: absolute;">
+                                <li><a href="#">Mi Perfil</a></li>
+                                <li><a id="btn_cerrar" href="/Inicio/CerrarSesion">Cerrar sesión</a></li>
+                            </ul>
+                        </li>                        
                     }
                 </ul>
             </div>
@@ -142,7 +153,7 @@
 
                             <div class="form-group col-md-6">
                                 <select name="comuna" id="comuna" tabindex="4" class="form-control" required="true">
-                                    <option value="">Comuna</option>
+                                    <option value="">Comuna donde vivis</option>
                                     <optgroup label="Circuito Sur">
                                         <option value="1">Comuna 1</option>
                                         <option value="4">Comuna 4</option>

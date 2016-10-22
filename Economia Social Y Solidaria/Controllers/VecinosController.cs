@@ -27,35 +27,45 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 correo = a.correo,
                 telefono = a.telefono,
                 comuna = a.comuna,
-                administrador = a.RolesVecinos.Any(b => b.Roles.codigoRol == 3),
-                contador = a.RolesVecinos.Any(b => b.Roles.codigoRol == 4),
-                encargado = a.RolesVecinos.Any(b => b.Roles.codigoRol == 5),
+                roles = a.RolesVecinos.Select(b => b.Roles.codigoRol),
+                administrador = a.RolesVecinos.Any(b => b.Roles.codigoRol == 2),
+                contador = a.RolesVecinos.Any(b => b.Roles.codigoRol == 3),
+                encargado = a.RolesVecinos.Any(b => b.Roles.codigoRol == 4),
             });
 
             return Json(lista, JsonRequestBehavior.DenyGet);
         }
 
-        public JsonResult Editar(int idVecino, bool administrador = false, bool contador = false, bool encargado = false)
+        public JsonResult Editar(int idVecino, bool? administrador = null, bool? contador = null, bool? encargado = null)
         {
             TanoNEEntities ctx = new TanoNEEntities();
             Vecinos vec = ctx.Vecinos.FirstOrDefault(a => a.idVecino == idVecino);
 
-            Roles admin = ctx.Roles.FirstOrDefault(a => a.codigoRol == 3);
-            Roles cont = ctx.Roles.FirstOrDefault(a => a.codigoRol == 4);
-            Roles enc = ctx.Roles.FirstOrDefault(a => a.codigoRol == 5);
+            Roles admin = ctx.Roles.FirstOrDefault(a => a.codigoRol == 2);
+            Roles cont = ctx.Roles.FirstOrDefault(a => a.codigoRol == 3);
+            Roles enc = ctx.Roles.FirstOrDefault(a => a.codigoRol == 4);
 
-            if (administrador)
+            //var rolesVecino = ctx.RolesVecinos.Where(a => a.vecinoId == vec.idVecino).ToList<RolesVecinos>();
+            //rolesVecino.ForEach(cs => ctx.RolesVecinos.Remove(cs));
+
+            if (administrador.HasValue && administrador.Value)
                 ctx.RolesVecinos.Add(new RolesVecinos { Roles = admin, vecinoId = vec.idVecino });
+            else if (administrador.HasValue && !administrador.Value)
+                ctx.RolesVecinos.Remove(vec.RolesVecinos.FirstOrDefault(a => a.rolId == admin.idRol));
 
-            if (contador)
+            if (contador.HasValue && contador.Value)
                 ctx.RolesVecinos.Add(new RolesVecinos { Roles = cont, vecinoId = vec.idVecino });
+            else if (contador.HasValue && !contador.Value)
+                ctx.RolesVecinos.Remove(vec.RolesVecinos.FirstOrDefault(a => a.rolId == cont.idRol));
 
-            if (encargado)
+            if (encargado.HasValue && encargado.Value)
                 ctx.RolesVecinos.Add(new RolesVecinos { Roles = enc, vecinoId = vec.idVecino });
+            else if (encargado.HasValue && !encargado.Value)
+                ctx.RolesVecinos.Remove(vec.RolesVecinos.FirstOrDefault(a => a.rolId == enc.idRol));
 
             ctx.SaveChanges();
 
-            return Json(new { error = false, mensaje = "Vecine editado satisfactoriamente" }, JsonRequestBehavior.DenyGet);
+            return Json(new { error = false, admin = administrador, contador = contador, encargado = encargado }, JsonRequestBehavior.DenyGet);
         }
 
     }

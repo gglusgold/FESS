@@ -15,6 +15,7 @@ namespace Economia_Social_Y_Solidaria
     {
         protected void Application_Start()
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.CreateSpecificCulture("es-AR");
             //CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-AR");
             AreaRegistration.RegisterAllAreas();
 
