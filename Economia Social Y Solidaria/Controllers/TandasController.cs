@@ -1,7 +1,10 @@
 ﻿using Economia_Social_Y_Solidaria.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 
@@ -129,7 +132,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                             foreach (var compraEnTanda in tanda.Compras)
                             {
                                 compraEnTanda.EstadosCompra = confirmado;
-                                MandarMailConfirmandoCompra(compraEnTanda.Vecinos.correo);
+                                MandarMailConfirmandoCompra(compraEnTanda.Vecinos.correo, compraEnTanda);
                             }
 
                             ctx.SaveChanges();
@@ -158,11 +161,43 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(lista, JsonRequestBehavior.DenyGet);
         }
 
-        private void MandarMailConfirmandoCompra(string p)
+        private void MandarMailConfirmandoCompra(string email, Compras actual)
         {
-            //throw new NotImplementedException();
+
+            DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            string fecha = ProximaEntrea.ToShortDateString() + " - " + actual.Locales.horario;
+
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress("racinglocura07@gmail.com", "Economía Social y Solidaria");
+                mail.To.Add(email);
+                mail.Subject = "Economia Social y Solidaria -- Nuevo Encuentro";
+                mail.Body = "<p>Se ha confirmado la compra de los siguientes productos</p>";
+                mail.Body += "<p>-------------------</p>";
+                foreach (CompraProducto prod in actual.CompraProducto)
+                {
+                    mail.Body += "<p>" + prod.Productos.nombre + " - Cantidad: " + prod.cantidad + "</p>";
+                }
+                mail.Body += "<p>-------------------</p>";
+               
+                mail.Body += "<p>Lo tenés que pasar a retirar el dia " + fecha + " Por nuestrno local en " + actual.Locales.direccion + "</p>";
+                mail.Body += "<p>Muchas gracias! Te esperamos</p>";
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtp.Credentials = new NetworkCredential("racinglocura07@gmail.com", "kapanga34224389,");
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                }
+            }
         }
 
+        public static DateTime GetNextWeekday(DateTime start, DayOfWeek day)
+        {
+            int daysToAdd = ((int)day - (int)start.DayOfWeek + 7) % 7;
+            return start.AddDays(daysToAdd);
+        }
 
     }
 }

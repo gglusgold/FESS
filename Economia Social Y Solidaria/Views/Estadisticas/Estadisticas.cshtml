@@ -52,10 +52,9 @@
 
                 var productos = [];
                 $.each(data.listado, function(i,val){
-                    productos.push({ name:val.Nombre, y: val.Cantidad});
+                    productos.push({ name:val.Nombre, y: val.Cantidad, drilldown: null});
                 });
-                console.log(data);
-                
+
 
                 $("#disc").modal("show");
                 $("#disc").find("#titulo").text("Compras en la " + grafico.options.name);
@@ -95,7 +94,10 @@
                         name: 'Productos',
                         colorByPoint: true,
                         data: productos
-                    }]
+                    }],
+                    drilldown:{
+                        series: data.quienes
+                    }
                 });
 
             }).fail(function(xhr, status, error) {

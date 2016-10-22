@@ -91,7 +91,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     vecino.hash = hash;
                     ctx.Vecinos.Add(vecino);
 
-
+                    
                     using (MailMessage mail = new MailMessage())
                     {
                         string datos = "Datos para entrar:<br/>Usuario: " + email;

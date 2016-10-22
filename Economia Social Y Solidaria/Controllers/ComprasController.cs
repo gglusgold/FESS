@@ -23,6 +23,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
     public class ChanguitoCompleta
     {
         public int totalCompraTandaUsuario = 0;
+        public string proxFecha { get; set; }
         public List<Locales> locales = new List<Locales>();
         public List<Changuito> changuito = new List<Changuito>();
         public List<Cat> categorias = new List<Cat>();
@@ -69,6 +70,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
             ChanguitoCompleta completo = new ChanguitoCompleta();
             crearChango(completo);
 
+            DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            completo.proxFecha = ProximaEntrea.ToShortDateString();
+
             return View(completo);
         }
 
@@ -76,6 +80,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
         {
             ChanguitoCompleta completo = new ChanguitoCompleta();
             crearChango(completo, idCategoria);
+
+            DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            completo.proxFecha = ProximaEntrea.ToShortDateString();
 
             return Json(new { lista= completo.changuito });
         }
@@ -330,6 +337,12 @@ namespace Economia_Social_Y_Solidaria.Controllers
             ctx.SaveChanges();
 
             return Json(new { error = false }, JsonRequestBehavior.DenyGet);
+        }
+
+        public static DateTime GetNextWeekday(DateTime start, DayOfWeek day)
+        {
+            int daysToAdd = ((int)day - (int)start.DayOfWeek + 7) % 7;
+            return start.AddDays(daysToAdd);
         }
     }
 }

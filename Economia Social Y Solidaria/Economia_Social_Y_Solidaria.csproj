@@ -126,8 +126,10 @@
     <Compile Include="Controllers\ComprasController.cs" />
     <Compile Include="Controllers\InicioController.cs" />
     <Compile Include="Controllers\ProductosController.cs" />
+    <Content Include="Css\bootstrap-switch.css" />
     <Content Include="Css\estadisticas.css" />
     <Content Include="Css\rating.css" />
+    <Compile Include="Controllers\VecinosController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -211,10 +213,12 @@
     <Content Include="Imagenes\Fijas\ESS_1.jpg" />
     <Content Include="Imagenes\Fijas\ESS_2.jpg" />
     <Content Include="Imagenes\Fijas\ESS_3.jpg" />
+    <Content Include="Js\bootstrap-switch.js" />
     <Content Include="Js\bootstrap-table-es-ES.js" />
     <Content Include="Js\bootstrap-table.js" />
     <Content Include="Js\bootstrap.js" />
     <None Include="Js\comunas.json" />
+    <Content Include="Js\drilldown.js" />
     <Content Include="Js\highcharts.js" />
     <Content Include="Js\highmaps.js" />
     <Content Include="Js\jquery-3.1.1.min.js" />
@@ -240,6 +244,7 @@
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Views\Vecinos\Vecino.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
