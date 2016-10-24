@@ -176,7 +176,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 mail.Body += "<p>-------------------</p>";
                 foreach (CompraProducto prod in actual.CompraProducto)
                 {
-                    mail.Body += "<p>" + prod.Productos.nombre + " - Cantidad: " + prod.cantidad + "</p>";
+                    mail.Body += "<p>" + prod.Productos.producto + " - Cantidad: " + prod.cantidad + "</p>";
                 }
                 mail.Body += "<p>-------------------</p>";
                

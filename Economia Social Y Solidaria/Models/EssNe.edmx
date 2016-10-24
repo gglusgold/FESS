@@ -38,6 +38,7 @@
           <Property Name="productoId" Type="int" Nullable="false" />
           <Property Name="comentario" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="estrellas" Type="int" Nullable="false" />
+          <Property Name="visible" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="CompraProducto">
           <Key>
@@ -102,9 +103,10 @@
             <PropertyRef Name="idProducto" />
           </Key>
           <Property Name="idProducto" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="nombre" Type="varchar" MaxLength="255" Nullable="false" />
-          <Property Name="descripcion" Type="varchar" MaxLength="255" Nullable="false" />
-          <Property Name="cantidad" Type="varchar" MaxLength="255" />
+          <Property Name="producto" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="descripcion" Type="varchar" MaxLength="255" />
+          <Property Name="marca" Type="varchar" MaxLength="255" />
+          <Property Name="presentacion" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="activo" Type="bit" Nullable="false" />
           <Property Name="categoriaId" Type="int" />
         </EntityType>
@@ -586,6 +588,7 @@
           <Property Name="productoId" Type="Int32" Nullable="false" />
           <Property Name="comentario" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="estrellas" Type="Int32" Nullable="false" />
+          <Property Name="visible" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Comentarios" Relationship="TanoNEModel.FK_ComentariosProducto_Comentarios" FromRole="ComentariosProducto" ToRole="Comentarios" />
           <NavigationProperty Name="Productos" Relationship="TanoNEModel.FK_ComentariosProducto_Productos" FromRole="ComentariosProducto" ToRole="Productos" />
         </EntityType>
@@ -665,9 +668,10 @@
             <PropertyRef Name="idProducto" />
           </Key>
           <Property Name="idProducto" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="nombre" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="descripcion" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="cantidad" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="producto" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="descripcion" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="marca" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="presentacion" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="activo" Type="Boolean" Nullable="false" />
           <Property Name="categoriaId" Type="Int32" />
           <NavigationProperty Name="Categorias" Relationship="TanoNEModel.FK_Productos_Categorias" FromRole="Productos" ToRole="Categorias" />
@@ -979,6 +983,7 @@
           <EntitySetMapping Name="ComentariosProducto">
             <EntityTypeMapping TypeName="TanoNEModel.ComentariosProducto">
               <MappingFragment StoreEntitySet="ComentariosProducto">
+                <ScalarProperty Name="visible" ColumnName="visible" />
                 <ScalarProperty Name="estrellas" ColumnName="estrellas" />
                 <ScalarProperty Name="comentario" ColumnName="comentario" />
                 <ScalarProperty Name="productoId" ColumnName="productoId" />
@@ -1056,9 +1061,10 @@
               <MappingFragment StoreEntitySet="Productos">
                 <ScalarProperty Name="categoriaId" ColumnName="categoriaId" />
                 <ScalarProperty Name="activo" ColumnName="activo" />
-                <ScalarProperty Name="cantidad" ColumnName="cantidad" />
+                <ScalarProperty Name="presentacion" ColumnName="presentacion" />
+                <ScalarProperty Name="marca" ColumnName="marca" />
                 <ScalarProperty Name="descripcion" ColumnName="descripcion" />
-                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="producto" ColumnName="producto" />
                 <ScalarProperty Name="idProducto" ColumnName="idProducto" />
               </MappingFragment>
             </EntityTypeMapping>

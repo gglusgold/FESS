@@ -216,6 +216,7 @@
     <Content Include="Imagenes\Fijas\ESS_1.jpg" />
     <Content Include="Imagenes\Fijas\ESS_2.jpg" />
     <Content Include="Imagenes\Fijas\ESS_3.jpg" />
+    <Content Include="Imagenes\Fijas\pp.jpeg" />
     <Content Include="Js\bootstrap-switch.js" />
     <Content Include="Js\bootstrap-table-es-ES.js" />
     <Content Include="Js\bootstrap-table.js" />

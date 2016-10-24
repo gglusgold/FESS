@@ -63,7 +63,7 @@
                    field: "comuna",
                    align: 'center',
                    valign: 'middle',
-                   title: "Cantidad",
+                   title: "Comuna",
                    sortable: "true",
                },
                {
@@ -108,7 +108,6 @@
                        }
                    },
                    formatter: function operateFormatter(value, row, index) {
-                       console.log(row);
                        return "<a style='cursor:pointer' class='Retiro' title='Finanzas'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
 
                    }

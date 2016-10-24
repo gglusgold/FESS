@@ -44,7 +44,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
             EstadosCompra Entregado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 3);
             var listado = ctx.CompraProducto.Where(a => a.Compras.EstadosCompra.codigo >= Entregado.codigo && a.Compras.Locales.comuna == comuna)
-                .GroupBy(a => a.Productos.nombre)
+                .GroupBy(a => a.Productos.producto)
                 .Select(b => new
                 {
                     Nombre = b.Key,

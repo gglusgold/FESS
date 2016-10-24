@@ -96,7 +96,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             if (ultima != null && ultima.fechaCerrado == null)
                 completo.locales = ultima.Circuitos.Locales.ToList();
 
-            completo.categorias = ctx.Categorias.Select(a => new Cat { idCategoria = a.idCategoria, nombre = a.nombre }).ToList();
+            completo.categorias = ctx.Categorias.Select(a => new Cat { idCategoria = a.idCategoria, nombre = a.nombre }).OrderBy(a => a.nombre).ToList();
 
             if (User.Identity.IsAuthenticated && ultima != null)
             {
@@ -115,8 +115,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             completo.changuito = ctx.Productos.Where(a => a.categoriaId == cat.idCategoria).ToList().Where(a => a.activo).Select(a => new Changuito()
             {
                 idProducto = a.idProducto,
-                nombre = a.nombre,
-                descripcion = a.descripcion,//.Replace("\n", "<br/>"),
+                nombre = a.producto + " - " + a.presentacion + (a.marca != null ? "\n" + a.marca : ""),
+                descripcion = a.descripcion == null ? "" : a.descripcion,//.Replace("\n", "<br/>"),
                 precio = a.Precios.LastOrDefault().precio,
                 comentarios = a.ComentariosProducto.Count,
                 rating = a.ComentariosProducto.Count == 0 ? 0 : a.ComentariosProducto.Average(b => b.estrellas)
@@ -134,8 +134,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return View(new Changuito()
             {
                 idProducto = actual.idProducto,
-                nombre = actual.nombre,
-                descripcion = actual.descripcion.Replace("\n", "<br/>"),
+                nombre = actual.producto,
+                descripcion = actual.descripcion == null ? "" : actual.descripcion.Replace("\n", "<br/>"),
                 precio = actual.Precios.LastOrDefault().precio,
                 comentarios = actual.ComentariosProducto.Count,
                 rating = actual.ComentariosProducto.Count == 0 ? 0 : actual.ComentariosProducto.Average(b => b.estrellas)
@@ -169,7 +169,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     productos = a.CompraProducto.ToList().Select(b => new ProductosComprados
                     {
                         idProducto = b.Productos.idProducto,
-                        nombre = b.Productos.nombre,
+                        nombre = b.Productos.producto,
                         cantidad = b.cantidad,
                         comentado = a.Comentarios.Count == 1 ? a.Comentarios.FirstOrDefault().ComentariosProducto.FirstOrDefault(cp => cp.productoId == b.productoId).Productos != null : false,
                         precioUnidad = b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio
@@ -210,7 +210,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 productos = a.CompraProducto.ToList().Select(b => new ProductosComprados
                 {
                     idProducto = b.Productos.idProducto,
-                    nombre = b.Productos.nombre,
+                    nombre = b.Productos.producto,
                     cantidad = b.cantidad,
                     precioUnidad = b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio
                 }).ToList()
@@ -332,7 +332,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             {
                 idCompra = a.idCompra,
                 nombre = a.Vecinos.nombres,
-                productos = string.Join("<br/>", a.CompraProducto.ToList().Select(b => "(" + b.cantidad + ") " + b.Productos.nombre)),
+                productos = string.Join("<br/>", a.CompraProducto.ToList().Select(b => "(" + b.cantidad + ") " + b.Productos.producto)),
                 precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio),
                 retiro = a.EstadosCompra.codigo
             });

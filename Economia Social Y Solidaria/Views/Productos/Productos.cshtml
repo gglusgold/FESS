@@ -8,9 +8,13 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <h2 style="margin-top: 0px">Productos</h2>
+            <h2 style="margin-top: 0">Productos</h2>
         </div>
         <div class="col-md-6">
+            @*<form action="/Productos/Muchos" enctype="multipart/form-data" method="post">
+                    <input class="" name="archivo" type="file" />
+                    <input class="btn btn-primary" type="submit" value="Muchos" />
+                </form>*@
             <a id="AgregarNuevo" class="btn btn-primary" style="float: right;"><span class="glyphicon glyphicon-plus"></span> Nuevo Producto</a>
         </div>
         <div class="col-md-12">
@@ -32,10 +36,11 @@
                    valign: 'middle',
                    visible: false,
                    edit: true,
+                   title: "Codigo",
                    opciones: {
-                       diseño: {
-                           cssDiv: { display: "none" }
-                       },
+                       editar: {
+                           atributos: { readonly: true }
+                       }
                    }
                },
                {
@@ -47,9 +52,21 @@
                    create: true,
                    edit: true,
                    opciones: {
-                       editar: {
-                           atributos: { readonly: true }
-                       }
+                       tipo: "input",
+                       atributos: { input: { required: true } }
+                   }
+               },
+               {
+                   field: "marca",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Marca",
+                   sortable: "true",
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "input",
+                       //atributos: { input: { required: true } }
                    }
                },
                {
@@ -62,23 +79,7 @@
                    edit: true,
                    opciones: {
                        tipo: "multilinea",
-                       atributos: { input: { required: true } }
-                   }
-               },
-               {
-                   field: "imagen",
-                   align: 'center',
-                   valign: 'middle',
-                   title: "Imagen",
-                   formatter: function (val, row, i) {
-                       return '<img height="auto" width="150px" style="max-height: 200px;width: auto;max-width: 200px;" src="/Imagenes/Producto-' + row.idProducto + '.jpg"/>';
-                   },
-                   create: true,
-                   edit: true,
-                   opciones: {
-                       tipo: "imagen",
-                       fileId: "BtnBuscar",
-                       atributos: { input: { required: true } }
+                       //atributos: { input: { required: true } },
                    }
                },
                {
@@ -91,6 +92,23 @@
                    edit: true,
                    opciones: {
                        tipo: "input",
+                       atributos: { input: { required: true } }
+                   }
+               },
+               {
+                   field: "imagen",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Imagen",
+                   formatter: function (val, row, i) {
+                       var nombre = "/Imagenes/Producto-" + row.idProducto + ".jpg";
+                       return '<img onerror="this.src=\'/Imagenes/Fijas/pp.jpeg\'" height="auto" width="150px" style="max-height: 200px;width: auto;max-width: 200px;" src=' + nombre + ' />';
+                   },
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "imagen",
+                       fileId: "BtnBuscar",
                        atributos: { input: { required: true } }
                    }
                },
@@ -163,21 +181,26 @@
                },
                {
                    field: 'borrar',
-                   title: 'Borrar',
+                   title: 'Activo',
                    valign: 'middle',
                    align: 'center',
                    width: '5%',
                    events: {
-                       'click .Borrar': function (e, value, row, index) {
-                           confirm("¿Estas seguro que queres borrar el producto '" + row.nombre + "'?", function () {
-                               $.post("/Productos/Borrar", row, function () {
-                                   tabla.bootstrapTable('remove', { field: 'idProducto', values: [row.idProducto] });
-                               });
-                           })
+                       'click .Activo': function (e, value, row, index) {
+
+                           var que = $(e.target).hasClass("glyphicon-ok");
+                           $(e.target).removeClass("glyphicon-remove").removeClass("glyphicon-ok")
+
+                           $.post("/Productos/Borrar", { idProducto: row.idProducto, activar: !que }, function (devuelta) {
+                               $(e.target).addClass(devuelta ? "glyphicon-ok" : "glyphicon-remove");
+                           });
+
+
                        }
                    },
                    formatter: function operateFormatter(value, row, index) {
-                       return "<a style='cursor:pointer' class='Borrar' title='Borrar'><i class='glyphicon glyphicon-trash'></i></a>";
+                       return "<a style='cursor:pointer' class='Activo' title='Activar'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
+                       //return "<a style='cursor:pointer' class='Borrar' title='Borrar'><i class='glyphicon glyphicon-trash'></i></a>";
 
                    }
                }
@@ -187,7 +210,12 @@
         tabla.bootstrapTable({
             url: "/Productos/Lista",
             method: "POST",
-            columns: columnas
+            columns: columnas,
+            //pagination: true,
+            //sidePagination: 'client',
+            //method: "post",
+            //pageList: [10, 25, 50, 100],
+            //pageSize: 10
         });
 
         var abm = $("#abm").Magyp({

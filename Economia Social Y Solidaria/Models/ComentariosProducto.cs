@@ -19,6 +19,7 @@ namespace Economia_Social_Y_Solidaria.Models
         public int productoId { get; set; }
         public string comentario { get; set; }
         public int estrellas { get; set; }
+        public bool visible { get; set; }
     
         public virtual Comentarios Comentarios { get; set; }
         public virtual Productos Productos { get; set; }

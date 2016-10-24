@@ -23,9 +23,10 @@ namespace Economia_Social_Y_Solidaria.Models
         }
     
         public int idProducto { get; set; }
-        public string nombre { get; set; }
+        public string producto { get; set; }
         public string descripcion { get; set; }
-        public string cantidad { get; set; }
+        public string marca { get; set; }
+        public string presentacion { get; set; }
         public bool activo { get; set; }
         public Nullable<int> categoriaId { get; set; }
     

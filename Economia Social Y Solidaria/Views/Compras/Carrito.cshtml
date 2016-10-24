@@ -204,9 +204,9 @@
             });;
         });
 
-        var editarCompra = null;
-        editarCompra = Cookies.getJSON('editar');
-        console.log(editarCompra);
+        var editarCompra = Cookies.getJSON('editar');
+        if ( editarCompra == undefined )
+            editarCompra = null;
 
         var checkTanda = @Model.locales.Count;
         var cerrado = checkTanda == 0;
@@ -216,6 +216,7 @@
             $.toast({
                 heading: 'Reservas cerradas',
                 text: 'No se encuentra abierto el formulario para pedidos',
+                position : 'top-right' ,
                 icon: 'warning',
                 loader: false,
             })
@@ -229,6 +230,7 @@
             $.toast({
                 heading: 'Información',
                 text: "Ya realizaste una compra! Haciendo <a href='/Compras/Historial'>click acá</a>, la podés modificar.",
+                position : 'top-right' ,
                 icon: 'info',
                 loader: false,
                 hideAfter: 10000
@@ -240,6 +242,7 @@
                 heading: 'Información',
                 text: "Se encuentra editando un pedido<br/>Cuando se vaya de la página, si no lo confirma, no se realizaran cambios",
                 icon: 'info',
+                position : 'top-right' ,
                 loader: false,
                 hideAfter: null,
             })
@@ -408,8 +411,17 @@
             var nueva = $("#producto").clone();
             var link = "/Compras/Detalle?id=" + producto.idProducto;
 
-            nueva.find(".imagen").attr('src','/Imagenes/producto-' + producto.idProducto + '.jpg');
-            nueva.find(".pnombre").append($("<a/>").attr("href",link).text(producto.nombre));
+            var nombre = "/Imagenes/Producto-" + producto.idProducto + ".jpg";
+            /*if (!imageExists(nombre))
+                nombre = "/Imagenes/Fijas/pp.jpeg";*/
+
+            nueva.find(".imagen").attr('src',nombre).attr("onerror", "this.src='/Imagenes/Fijas/pp.jpeg';");
+
+            var prodNombre = producto.nombre;
+            if ( prodNombre.indexOf("\n") > -1)
+                prodNombre = prodNombre.replace(new RegExp("\n", 'g'), "<br/>");
+
+            nueva.find(".pnombre").append($("<a/>").attr("href",link).html(prodNombre));
             nueva.find(".pprecio").text("$" + producto.precio);
 
             var vermas = $("<a/>").attr({"href":link, "target":"_blank"}).text("Ver más")
@@ -453,6 +465,7 @@
                         heading: 'Reserva agregada!',
                         text: "Se añadio " + cantidad + " " + nombre + " a tu pedido",
                         icon: 'success',
+                        position : 'top-right' ,
                         stack: false,
                         loader:false
 
@@ -462,6 +475,7 @@
                         eading: 'Reserva agregada!',
                         text: "Se añadio " + cantidad + " " + nombre + " a tu pedido",
                         icon: 'success',
+                        position : 'top-right' ,
                         stack: false,
                         loader:false
                     });
