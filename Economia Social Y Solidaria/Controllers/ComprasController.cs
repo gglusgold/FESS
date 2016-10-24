@@ -48,6 +48,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
     {
         public int idCompra;
         public int comuna;
+        public int idLocal;
         public string local;
         public string barrio;
         public string fecha;
@@ -55,6 +56,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
         public bool comentar = false;
         public List<ProductosComprados> productos;
         public string estado;
+        public bool comentado { get; set; }
     }
 
     public class MisCompras
@@ -84,7 +86,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
             completo.proxFecha = ProximaEntrea.ToShortDateString();
 
-            return Json(new { lista= completo.changuito });
+            return Json(new { lista = completo.changuito });
         }
 
         public ChanguitoCompleta crearChango(ChanguitoCompleta completo, int idCategoria = -1)
@@ -149,17 +151,20 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
             EstadosCompra EstadoEntregado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
             EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 3);
+            EstadosCompra comentado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 4);
 
             MisCompras compras = new MisCompras();
-            compras.Compras = ctx.Compras.Where(a => a.vecinoId == vecino.idVecino).ToList().Select(a => new Comprados
+            compras.Compras = ctx.Compras.Where(a => a.vecinoId == vecino.idVecino).OrderByDescending(a => a.fecha).ToList().Select(a => new Comprados
                 {
                     idCompra = a.idCompra,
                     estado = a.EstadosCompra.nombre,
                     fecha = a.fecha.ToString("hh:mm dd/MM/yyyy"),
+                    idLocal = a.Locales.idLocal,
                     local = a.Locales.direccion,
                     barrio = a.Locales.barrio,
                     editar = a.estadoId == EstadoEntregado.idEstadoCompra,
                     comentar = a.estadoId == confirmado.idEstadoCompra,
+                    comentado = a.estadoId == comentado.idEstadoCompra,
                     comuna = a.Locales.comuna,
                     productos = a.CompraProducto.ToList().Select(b => new ProductosComprados
                     {
@@ -214,7 +219,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(compras);
         }
 
-        public ActionResult ConfirmarPedido(int local, int[] idProducto, int[] cantidad)
+        public ActionResult ConfirmarPedido(int local, int[] idProducto, int[] cantidad, int? idCompra = null)
         {
             string error = null;
 
@@ -236,12 +241,23 @@ namespace Economia_Social_Y_Solidaria.Controllers
             EstadosCompra estado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
 
             Compras compra = new Compras();
-            compra.fecha = DateTime.Now;
+            if (idCompra.HasValue)
+            {
+                compra = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra.Value);
+                compra.CompraProducto.ToList().ForEach(cs => ctx.CompraProducto.Remove(cs));
+            }
+            else
+            {
+                compra.fecha = DateTime.Now;
+            }
+
             compra.Locales = localCompro;
             compra.Vecinos = vecino;
             compra.Tandas = ultimaTanda;
             compra.EstadosCompra = estado;
-            ctx.Compras.Add(compra);
+
+            if (!idCompra.HasValue)
+                ctx.Compras.Add(compra);
 
 
             for (int x = 0; x < idProducto.Length; x++)
@@ -312,28 +328,27 @@ namespace Economia_Social_Y_Solidaria.Controllers
             Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
 
             Tandas ultima = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado != null);
-            EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 2);
-
             var lista = ctx.Compras.Where(a => a.tandaId == ultima.idTanda && a.Locales.comuna == vecino.comuna).ToList().Select(a => new
             {
                 idCompra = a.idCompra,
                 nombre = a.Vecinos.nombres,
                 productos = string.Join("<br/>", a.CompraProducto.ToList().Select(b => "(" + b.cantidad + ") " + b.Productos.nombre)),
                 precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio),
-                retiro = a.EstadosCompra != confirmado
+                retiro = a.EstadosCompra.codigo
             });
             return Json(lista, JsonRequestBehavior.DenyGet);
         }
 
-        public ActionResult EnregarPedido(int idCompra)
+        public ActionResult EnregarPedido(int idCompra, bool entregado)
         {
             TanoNEEntities ctx = new TanoNEEntities();
             Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
 
-            EstadosCompra entregado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 3);
+            EstadosCompra nopaso = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 5);
+            EstadosCompra entre = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 3);
             EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 2);
             Compras compra = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra && a.estadoId == confirmado.idEstadoCompra);
-            compra.EstadosCompra = entregado;
+            compra.EstadosCompra = entregado ? entre : nopaso;
             ctx.SaveChanges();
 
             return Json(new { error = false }, JsonRequestBehavior.DenyGet);

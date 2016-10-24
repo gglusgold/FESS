@@ -16,7 +16,8 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>
+    </IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -128,6 +129,7 @@
     <Compile Include="Controllers\ProductosController.cs" />
     <Content Include="Css\bootstrap-switch.css" />
     <Content Include="Css\estadisticas.css" />
+    <Content Include="Css\font-awesome.css" />
     <Content Include="Css\rating.css" />
     <Compile Include="Controllers\VecinosController.cs" />
     <Compile Include="Global.asax.cs">
@@ -207,6 +209,7 @@
     <Content Include="Css\carrito.css" />
     <Content Include="Css\detalle.css" />
     <Content Include="Css\toastr.css" />
+    <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Imagenes\Fijas\contact-form.png" />
@@ -217,6 +220,11 @@
     <Content Include="Js\bootstrap-table-es-ES.js" />
     <Content Include="Js\bootstrap-table.js" />
     <Content Include="Js\bootstrap.js" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.woff2" />
+    <Content Include="fonts\FontAwesome.otf" />
     <None Include="Js\comunas.json" />
     <Content Include="Js\drilldown.js" />
     <Content Include="Js\highcharts.js" />

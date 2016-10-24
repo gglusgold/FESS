@@ -83,15 +83,20 @@
         </div>
         <div class="row btneditar" style="display:none">
             <div class="col-md-4 col-md-offset-2">
-                <button class="btn btn-card form-control modificar" data-loading-text="Borrando..."><span class="glyphicon glyphicon-edit"></span> Modificar</button>
+                <button class="btn btn-card form-control modificar" data-loading-text="Espere..."><span class="glyphicon glyphicon-edit"></span> Modificar</button>
             </div>
             <div class="col-md-4">
-                <button class="btn btn-card form-control borrar" data-loading-text="Borrando..."><span class="glyphicon glyphicon-trash"></span> Cancelar</button>
+                <button class="btn btn-card form-control borrar" data-loading-text="Espere..."><span class="glyphicon glyphicon-trash"></span> Cancelar</button>
             </div>
         </div>
         <div class="row btncomentar" style="display:none">
             <div class="col-md-5 col-md-offset-3">
                 <button class="btn btn-card form-control comentar" data-loading-text="Espere..."><span class="glyphicon glyphicon-pencil"></span> Comentar</button>
+            </div>
+        </div>
+        <div class="row btnrepetir" style="display:none">
+            <div class="col-md-5 col-md-offset-3">
+                <button class="btn btn-card form-control repetir" data-loading-text="Espere..."><span class="fa fa-repeat"></span> Repetir</button>
             </div>
         </div>
     </div>
@@ -136,6 +141,9 @@
                 nueva.find(".btneditar").show();
             if (comprado.comentar )
                 nueva.find(".btncomentar").show();
+            if (comprado.comentado )
+                nueva.find(".btnrepetir").show();
+            
 
             nueva.removeAttr('id');
 
@@ -154,6 +162,33 @@
             $.post("/Compras/CancelarPedido", {idCompra: id}, function(data){
                 cargarDatos(data.Compras);
             });
+
+        });
+
+        $(document).on("click", ".modificar", function(e){
+            $(e.currentTarget).closest('.row').find('button').button('loading')
+
+            var id = $(".borrar").closest('.card').data("idcompra");
+
+            var todo = {};
+            var compra = returnObj(compras, id);
+            todo.idCompra = compra.idCompra;
+            todo.idLocal = compra.idLocal;
+            todo.productos = [];
+            $.each(compra.productos, function(i,val){
+                console.log(val);
+                var prod = {};
+                prod["id"] = val.idProducto;
+                prod["nombre"] = val.nombre;
+                prod["precio"] = val.precioUnidad;
+                prod["cantidad"] = val.cantidad;
+                todo.productos.push(prod);
+            });
+
+            
+
+            Cookies.set('editar', todo, { path: '/' });
+            window.location.href = "/Compras/Carrito";
 
         });
 
@@ -225,6 +260,15 @@
             $("#comentarmodal").modal('show');
         });
 
+        $(document).on("click", ".repetir", function(e){
+
+            boton = $(e.currentTarget);
+            boton.closest('.row').find('button').button('loading');
+            var idCompra = boton.closest('.card').data('idcompra');
+
+           
+        });
+
         $("#comentarmodal").on('hidden.bs.modal', function () {
             boton.closest('.row').find('button').button('reset')
             $(".validacionerror").hide();
@@ -252,190 +296,32 @@
             caract.find(".totalcaracteres").text("Caracteres restantes: " + (total - actuales));
         });
 
-        //var boton = null;
-        //$(document).on("click", ".comentar", function(e){
-
-        //    boton = $(e.currentTarget);
-        //    boton.closest('.row').find('button').button('loading');
-        //    var idCompra = boton.closest('.card').data('idcompra');
-
-        //    var compra = returnObj(compras, idCompra);
-
-        //    $("#comentarmodal").find(".modal-body").empty();
-
-        //    $.each(compra.productos, function(i,val){
-        //        var nuevo = $("#comentarproducto").clone();
-
-        //        nuevo.find(".nombre").text("Item " + (i + 1) + ": " + val.nombre);
-        //        nuevo.find(".tComentarios").val("");
-        //        //nuevo.find(".rating").rating('update', val.rating);
-
-        //        $("#comentarmodal").find(".modal-body").append(nuevo.show());
-
-        //    });
-
-        //    $("#comentarmodal").find('#idCompra').val(idCompra);
-        //    $("#comentarmodal").modal('show');
-        //});
-
-        //$("#comentarmodal").on('hidden.bs.modal', function () {
-        //    boton.closest('.row').find('button').button('reset')
-        //    comentarios= [];
-        //});
-
-        //$("#comentarmodal").on('show.bs.modal', function () {
-        //    $.each($("#comentarmodal").find(".rating"), function(i,val){
-        //        var myRating = rating(val, 0, 5);
-        //    })
-
-        //});
-
-        /*var comentarios = [];
-        var boton = null;
-        $(document).on("click", ".comentar", function(e){
-
-            boton = $(e.currentTarget);
-            boton.closest('.row').find('button').button('loading');
-            var idCompra = boton.closest('.card').data('idcompra');
-
-
-            var compra = returnObj(compras, idCompra);
-
-            comentarios = [];
-            var prodcom = {};
-            $.each(compra.productos, function(i,val){
-                prodcom["idProducto"] = val.idProducto;
-                prodcom["nombre"] = val.nombre;
-                prodcom["comentario"] = "";
-                prodcom["rating"] = 5;
-                comentarios.push(prodcom);
-            });
-
-
-            $("#comentarmodal").find('#idCompra').val(idCompra);
-            $("#comentarmodal").modal('show');
-        });
-
-        $("#comentarmodal").on('hidden.bs.modal', function () {
-            boton.closest('.row').find('button').button('reset')
-            comentarios= [];
-        });
-
-        //        <div class="col-md-3 col-sm-offset-6">
-        //    <input type="button" data-dismiss="modal" data-loading-text="Espere..." tabindex="3" class="form-control btn btn-warning" value="Cancelar">
-        //</div>
-        //<div class="col-md-3">
-        //    <input type="submit" data-loading-text="Espere..." tabindex="4" class="form-control btn btn-success" value="Enviar">
-        //</div>
-
-        var actual = 0;
-        $("#comentarmodal").on('show.bs.modal', function () {
-
-
-            actual = 0;
-            crearComentario(actual)
-        });
-
-        function llenarComentario(nuevo, actual){
-
-            var total = parseInt(nuevo.find("#tComentarios").attr("maxlength"));
-            var actuales = comentarios[actual].comentario.length;
-
-            nuevo.find("#nombre").text("Item " + (actual + 1) + ": " + comentarios[actual].nombre);
-            nuevo.find("#totalcaracteres").text("Caracteres restantes: " + (total - actuales));
-            nuevo.find("#tComentarios").val(comentarios[actual].comentario);
-            nuevo.find("#rating").rating({'size':'xs'});
-            nuevo.find("#rating").rating('update', comentarios[actual].rating);
-
-            return nuevo;
-        }
-
-        //        <div class="col-md-3 col-sm-offset-6">
-        //    <input type="button" data-dismiss="modal" data-loading-text="Espere..." tabindex="3" class="form-control btn btn-warning" value="Cancelar">
-        //</div>
-        //<div class="col-md-3">
-        //    <input type="submit" data-loading-text="Espere..." tabindex="4" class="form-control btn btn-success" value="Enviar">
-        //</div>
-
-        function crearComentario(actual){
-            var nuevo = $("#comentarproducto");
-
-            $("#comentarmodal").find(".modal-body").empty();
-            $("#comentarmodal").find(".modal-body").append(llenarComentario(nuevo, actual));
-
-            $("#comentarmodal").find(".modal-footer").empty();
-            $("#comentarmodal").find(".modal-footer").append(crearBotones(actual));
-            nuevo.show();
-        }
-
-        function crearBotones(actual){
-            var row = $("<div/>").addClass("row col-md-12");
-
-            var botonGenerico = $("<input/>").addClass("btn").attr({ "type":"button", "data-loading-text":"Espere..." });
-
-            var total = comentarios.length
-            if ( actual == 0 ){
-                //SIN ANTERIOR
-                var siguiente = botonGenerico.clone();
-                siguiente.val("Siguiente");
-                siguiente.addClass("btn-primary siguiente");
-                siguiente.appendTo(row);
-
-            }
-            else if ( actual == total )
-            {
-                //SIN SIGUIENTE -- CON GUARDAR
-            }
-            else{
-                var siguiente = botonGenerico.clone();
-                siguiente.val("Anterior");
-                siguiente.addClass("btn-warning anterior");
-                siguiente.appendTo(row);
-            }
-
-            return row;
-        }
-
-        $(document).on("click", ".siguiente", function(){
-            actual++;
-            crearComentario(actual);
-        });
-
-        $(document).on("click", ".anterior", function(){
-            actual--;
-            crearComentario(actual);
-        });
-
-
-
-        $(document).on("keyup", "#tComentarios", function(){
-            var total = parseInt($(this).attr("maxlength"));
-            var actuales = $(this).val().length;
-            $("#totalcaracteres").text("Caracteres restantes: " + (total - actuales));
-        });
-
-        $("#calificarform").submit(function(e){
-            e.preventDefault();
-            $("#comentarmodal").modal('hide');
-            var form = $(this);
-            var idCompra = form.find("#idCompra").val();
-            var coment = form.find("#tComentarios").val();
-            var rating = form.find("#rating").val();
-
-
-            $.post("/Compras/Calificar", {idCompra: idCompra, tComentarios:coment, rating:rating}, function(vuelta){
-                $("[data-idcompra=" + idCompra + "]").find(".btncomentar").hide();
-                $("[data-idcompra=" + idCompra + "]").find(".estado").text(vuelta);
-            });
-
-            return false;
-        });*/
-
         function returnObj(arr,r){
             return $.grep(arr, function(elem,index){
                 return elem ? elem.idCompra == r : false;
             })[0];
         }
+
+        $.extend(
+        {
+            redirectPost: function(location, args)
+            {
+                var form = $('<form></form>');
+                form.attr("method", "post");
+                form.attr("action", location);
+
+                $.each( args, function( key, value ) {
+                    var field = $('<input></input>');
+
+                    field.attr("type", "hidden");
+                    field.attr("name", key);
+                    field.attr("value", value);
+
+                    form.append(field);
+                });
+                $(form).appendTo('body').submit();
+            }
+        });
 
 
     </script>

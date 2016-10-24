@@ -105,7 +105,7 @@
                 <div class="modal-body" id="parte_dos" style="display:none">
                     <h3>Elegir el local por donde retirar</h3>
                     <h3>El pedido debe retirarse el dia @(Model.proxFecha)</h3>
-                    <div class="radio">
+                    <div class="radio locales">
                         @foreach (var local in Model.locales)
                         {
                             <label style="padding-top: 5px;padding-bottom: 5px;"><input type="radio" name="local" value="@(local.idLocal)" required>@(local.direccion) (Comuna @(local.comuna) - @(local.barrio)) - de @(local.horario).</label>
@@ -204,6 +204,187 @@
             });;
         });
 
+        var editarCompra = null;
+        editarCompra = Cookies.getJSON('editar');
+        console.log(editarCompra);
+
+        var checkTanda = @Model.locales.Count;
+        var cerrado = checkTanda == 0;
+        if ( checkTanda == 0 && editarCompra == null ){
+            Cookies.remove("listado");
+
+            $.toast({
+                heading: 'Reservas cerradas',
+                text: 'No se encuentra abierto el formulario para pedidos',
+                icon: 'warning',
+                loader: false,
+            })
+
+            $(".pedido").hide();
+        }
+
+        var totalCompras = @Model.totalCompraTandaUsuario;
+        if ( totalCompras > 0 && editarCompra == null ){
+
+            $.toast({
+                heading: 'Información',
+                text: "Ya realizaste una compra! Haciendo <a href='/Compras/Historial'>click acá</a>, la podés modificar.",
+                icon: 'info',
+                loader: false,
+                hideAfter: 10000
+            })
+        }
+
+        if ( editarCompra != null ){
+            $.toast({
+                heading: 'Información',
+                text: "Se encuentra editando un pedido<br/>Cuando se vaya de la página, si no lo confirma, no se realizaran cambios",
+                icon: 'info',
+                loader: false,
+                hideAfter: null,
+            })
+        }
+
+        var cookieProd = Cookies.getJSON('listado');
+        if (cookieProd != undefined) {
+            $.each(cookieProd, function (i, val) {
+                agregarItem(val.id, val.precio, val.nombre, val.cantidad, false);
+            });
+            //calcularTotal();
+        }
+
+        if (editarCompra != null) {
+            $.each(editarCompra.productos, function (i, val) {
+                agregarItem(val.id, val.precio, val.nombre, val.cantidad, false);
+            });
+            calcularTotal();
+        }
+
+        $("a[href='/Compras/Carrito']").closest("li").addClass("active");
+
+        $(document).on('click', '.cantidad', function (e) {
+            e.preventDefault();
+            var cantidad = $(this).text();
+            $(this).closest('div').find(".badge").text(cantidad);
+        });
+
+        $(document).on('click', '.cerrar', function (e) {
+            e.preventDefault();
+            var item = $(this).closest(".itemp");
+            var cantidad = parseInt(item.find(".badge").text());
+            if (cantidad == 1)
+                item.remove();
+            else {
+                cantidad = cantidad - 1;
+                item.find(".badge").text(cantidad);
+            }
+            calcularTotal();
+        });
+
+        $(document).on('click', ".reservar", function (e) {
+            var btn = $(this);
+
+            var id = btn.closest(".arriba").data('idproducto');
+            var producto = returnObj(productos, id);
+            var cantidad = parseInt(btn.find('.badge').text());
+
+            agregarItem(id, producto.precio, producto.nombre, cantidad, true);
+            calcularTotal();
+
+        });
+
+        $("#btn_confirmar").click(function (e) {
+            e.preventDefault();
+
+            $.post("/Inicio/Logueado", function (vuelta) {
+                if (vuelta.logueado == true)
+                    $("#confirmarCompra").modal('show');
+                else
+                    alert("Hay que iniciar sesión para realizar un pedido", "Frente de Economia Social y Solidaria - Nuevo Encuentro");
+            });
+        });
+
+        $("#confirmarCompra").on('show.bs.modal', function () {
+
+            //Cookies.remove('productos');
+
+            var items = $("#listado").find(".itemp");
+
+            $("#tabla_listado tbody").empty();
+            $("#tabla_listado tfoot").empty();
+            $.each(items, function (i, val) {
+                var item = $(val);
+                var idProd = item.data("idprod");
+                var precio = parseFloat(item.data("precio"));
+                var cantidad = parseFloat(item.find(".badge").text());
+                var prodcuto = item.contents().filter(function () {
+                    return this.nodeType == 3;
+                }).text();
+
+                $("#tabla_listado tbody").append("<tr><th>" + (i + 1) + "</th><td>" + prodcuto + "</td><td>" + cantidad + "</td></tr>");
+            });
+
+            var total = $("#total").find("span").text();
+            $("#tabla_listado tfoot").append("<tr><th style='text-align: right;'  colspan='3'>Total gastado: " + total + "</th></tr>");
+
+        });
+
+        $('#btn_anterior_compra').click(function (e) {
+            $("#btn_anterior_compra").hide();
+            $("#btn_siguiente_compra").show();
+            $("#confirmada").hide();
+
+            $("#parte_dos").hide();
+            $("#parte_uno").show();
+            e.preventDefault();
+        });
+
+        $('#btn_siguiente_compra').click(function (e) {
+            $("#btn_anterior_compra").show();
+            $("#btn_siguiente_compra").hide();
+            $("#confirmada").show();
+
+            $("#parte_dos").show();
+            $("#parte_uno").hide();
+            e.preventDefault();
+
+            if ( editarCompra != null ){
+                $(".locales").find('input[value=' + editarCompra.idLocal + ']').attr('checked', 'checked');
+            }
+        });
+
+        $("#confirmarCompra").on('hidden.bs.modal', function () {
+            $("#parte_uno").show();
+            $("#parte_dos").hide();
+            $("#btn_anterior_compra").hide();
+            $("#confirmada").hide();
+            $("#btn_siguiente_compra").show();
+
+        });
+
+        $(document).on("submit", "#form_confirmar", function(e){
+            $("#form_confirmar .modal-footer").find("button").button('loading');
+            var listadoo = Cookies.getJSON('listado');
+            if ( editarCompra != null ){
+                listadoo = editarCompra.productos;
+                $("#form_confirmar").addHidden('idCompra', editarCompra.idCompra);
+            }
+
+            var cantidad = [];
+            var id = [];
+
+            $.each(listadoo, function (i, val) {
+                $("#form_confirmar").addHidden('idProducto', val.id);
+                $("#form_confirmar").addHidden('cantidad', val.cantidad);
+            });
+
+            if ( editarCompra != null )
+                Cookies.remove("editar");
+
+            Cookies.remove("listado");
+            return true;
+        });
+
         function cargarDatos(productos){
             var container = $(".cont");
             container.empty();
@@ -250,72 +431,7 @@
             return nueva;
         }
 
-
-        //$('html, body').animate({ scrollTop: $('#listado_texto').offset().top - 60 }, 'slow');
-
-        var checkTanda = @Model.locales.Count;
-        var cerrado = checkTanda == 0;
-        if ( checkTanda == 0 ){
-            Cookies.remove("listado");
-
-            $.toast({
-                heading: 'Reservas cerradas',
-                text: 'No se encuentra abierto el formulario para pedidos',
-                icon: 'warning',
-                loader: false,
-            })
-
-            $(".pedido").hide();
-        }
-
-        var totalCompras = @Model.totalCompraTandaUsuario;
-        if ( totalCompras > 0  ){
-
-            $.toast({
-                heading: 'Información',
-                text: "Ya realizaste una compra! Haciendo <a href='/Compras/Historial'>click acá</a>, la podés modificar.",
-                icon: 'info',
-                loader: false,
-                hideAfter: 10000
-            })
-        }
-
-        $("a[href='/Compras/Carrito']").closest("li").addClass("active");
-
-        $(document).on('click', '.cantidad', function (e) {
-            e.preventDefault();
-            var cantidad = $(this).text();
-            $(this).closest('div').find(".badge").text(cantidad);
-        });
-
-        $(document).on('click', '.cerrar', function (e) {
-            e.preventDefault();
-            var item = $(this).closest(".itemp");
-            var cantidad = parseInt(item.find(".badge").text());
-            if (cantidad == 1)
-                item.remove();
-            else {
-                cantidad = cantidad - 1;
-                item.find(".badge").text(cantidad);
-            }
-            calcularTotal();
-        });
-
-        $(document).on('click', ".reservar", function (e) {
-            var btn = $(this);
-
-            var id = btn.closest(".arriba").data('idproducto');
-            var producto = returnObj(productos, id);
-            var cantidad = parseInt(btn.find('.badge').text());
-
-            console.log(id, productos);
-            agregarItem(id, producto.precio, producto.nombre, cantidad, true);
-            calcularTotal();
-
-        });
-
         var toastAgregar;
-
         function agregarItem(id, precio, nombre, cantidad, mostrar) {
             var listado = $("#listado");
             var check = listado.find("li[data-idprod='" + id + "']")
@@ -388,96 +504,13 @@
                 $("#btn_confirmar").hide('slow');
             }
 
-            Cookies.set('listado', productos, { path: '/' });
-        }
+            if ( editarCompra == null)
+                Cookies.set('listado', productos, { path: '/' });
+            else{
+                editarCompra.productos = productos;
+                Cookies.set('editar', editarCompra, { path: '/' });
+            }
 
-        $("#btn_confirmar").click(function (e) {
-            e.preventDefault();
-
-            $.post("/Inicio/Logueado", function (vuelta) {
-                if (vuelta.logueado == true)
-                    $("#confirmarCompra").modal('show');
-                else
-                    alert("Hay que iniciar sesión para realizar un pedido", "Frente de Economia Social y Solidaria - Nuevo Encuentro");
-            });
-        });
-
-        $("#confirmarCompra").on('show.bs.modal', function () {
-
-            //Cookies.remove('productos');
-
-            var items = $("#listado").find(".itemp");
-
-            $("#tabla_listado tbody").empty();
-            $("#tabla_listado tfoot").empty();
-            $.each(items, function (i, val) {
-                var item = $(val);
-                var idProd = item.data("idprod");
-                var precio = parseFloat(item.data("precio"));
-                var cantidad = parseFloat(item.find(".badge").text());
-                var prodcuto = item.contents().filter(function () {
-                    return this.nodeType == 3;
-                }).text();
-
-                $("#tabla_listado tbody").append("<tr><th>" + (i + 1) + "</th><td>" + prodcuto + "</td><td>" + cantidad + "</td></tr>");
-            });
-
-            var total = $("#total").find("span").text();
-            $("#tabla_listado tfoot").append("<tr><th style='text-align: right;'  colspan='3'>Total gastado: " + total + "</th></tr>");
-
-        });
-
-        $('#btn_anterior_compra').click(function (e) {
-            $("#btn_anterior_compra").hide();
-            $("#btn_siguiente_compra").show();
-            $("#confirmada").hide();
-
-            $("#parte_dos").hide();
-            $("#parte_uno").show();
-            e.preventDefault();
-        });
-
-        $('#btn_siguiente_compra').click(function (e) {
-            $("#btn_anterior_compra").show();
-            $("#btn_siguiente_compra").hide();
-            $("#confirmada").show();
-
-            $("#parte_dos").show();
-            $("#parte_uno").hide();
-            e.preventDefault();
-        });
-
-        $("#confirmarCompra").on('hidden.bs.modal', function () {
-            $("#parte_uno").show();
-            $("#parte_dos").hide();
-            $("#btn_anterior_compra").hide();
-            $("#confirmada").hide();
-            $("#btn_siguiente_compra").show();
-
-        });
-
-        $(document).on("submit", "#form_confirmar", function(e){
-            $("#form_confirmar .modal-footer").find("button").button('loading');
-            var listadoo = Cookies.getJSON('listado');
-
-            var cantidad = [];
-            var id = [];
-
-            $.each(listadoo, function (i, val) {
-                $("#form_confirmar").addHidden('idProducto', val.id);
-                $("#form_confirmar").addHidden('cantidad', val.cantidad);
-            });
-
-            Cookies.remove("listado");
-            return true;
-        });
-
-        var cookieProd = Cookies.getJSON('listado');
-        if (cookieProd != undefined) {
-            $.each(cookieProd, function (i, val) {
-                agregarItem(val.id, val.precio, val.nombre, val.cantidad, false);
-            });
-            calcularTotal();
         }
 
         function returnObj(arr,r){

@@ -52,20 +52,28 @@
                    width: '5%',
                    events: {
                        'click .Retiro': function (e, value, row, index) {
-
-                           if ($(e.target).hasClass("glyphicon-remove")) {
-                               $(e.target).removeClass("glyphicon-remove").addClass("glyphicon-ok");
-                               $.post("/Compras/EnregarPedido", { idCompra: row.idCompra }, function (devuelta) {
-                                   if (devuelta.error == true) {
-                                       $(e.target).removeClass("glyphicon-ok").addClass("glyphicon-remove");
-                                   }
-                               });
-                           }
-
-                       }
+                           $(e.target).closest('td').html('');
+                           $.post("/Compras/EnregarPedido", { idCompra: row.idCompra, entregado: true }, function (devuelta) {
+                               $(e.target).closest('td').html('<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>');
+                           });
+                       },
+                       'click .Colgo': function (e, value, row, index) {
+                           $(e.target).closest('td').html('');
+                           $.post("/Compras/EnregarPedido", { idCompra: row.idCompra, entregado: false }, function (devuelta) {
+                               $(e.target).closest('td').html('<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>');
+                           });
+                       },
                    },
                    formatter: function operateFormatter(value, row, index) {
-                       return "<a style='cursor:pointer' class='Retiro' title='Retiro'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
+                       console.log(value);
+                       if (value != 3 && value != 5 )
+                       {
+                           return "<a style='cursor:pointer' class='Retiro' title='Retiro'>Si</a> - <a style='cursor:pointer' class='Colgo' title='Colgo'>No</a>";
+                       }
+                       else if (value == 3)
+                           return '<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>'
+                       else
+                           return '<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>'
 
                    }
                }
