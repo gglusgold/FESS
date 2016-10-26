@@ -26,37 +26,6 @@
 
         <div class="col-md-9">
 
-            @*<div class="row carousel-holder">
-
-                    <div class="col-md-12">
-                        <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-                            <ol class="carousel-indicators">
-                                <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-                                <li data-target="#carousel-example-generic" data-slide-to="1"></li>
-                                <li data-target="#carousel-example-generic" data-slide-to="2"></li>
-                            </ol>
-                            <div class="carousel-inner">
-                                <div class="item active">
-                                    <img class="slide-image" src="~/Imagenes/Fijas/ESS_1.jpg" alt="">
-                                </div>
-                                <div class="item">
-                                    <img class="slide-image" src="~/Imagenes/Fijas/ESS_2.jpg" alt="">
-                                </div>
-                                <div class="item">
-                                    <img class="slide-image" src="~/Imagenes/Fijas/ESS_3.jpg" alt="">
-                                </div>
-                            </div>
-                            <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
-                                <span class="glyphicon glyphicon-chevron-left"></span>
-                            </a>
-                            <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
-                                <span class="glyphicon glyphicon-chevron-right"></span>
-                            </a>
-                        </div>
-                    </div>
-
-                </div>*@
-
             <div class="row" style="margin-bottom:20px">
                 <select id="scat" class=" pull-right">
                     @foreach (var categoria in Model.categorias)
@@ -191,7 +160,7 @@
         var productos = @Html.Raw(Json.Encode(Model.changuito));
         cargarDatos(productos);
 
-        $("#scat").val(1);
+        $("#scat").val(@ViewBag.categoria);
         $("#scat").change(function(e){
             $.blockUI({ message: null });
             $.post("/Compras/cambioCategoria", {idCategoria:$(this).val()}, function(e){
@@ -253,7 +222,7 @@
             $.each(cookieProd, function (i, val) {
                 agregarItem(val.id, val.precio, val.nombre, val.cantidad, false);
             });
-            //calcularTotal();
+            calcularTotal();
         }
 
         if (editarCompra != null) {
@@ -388,6 +357,10 @@
             return true;
         });
 
+        $(document).on("click", ".detalle",function(i){
+            $.redirectPost("/Compras/Detalle", { id:$(i.target).closest(".arriba").data("idproducto")})
+        });
+
         function cargarDatos(productos){
             var container = $(".cont");
             container.empty();
@@ -409,7 +382,7 @@
         function agregarProducto(col, producto){
             //imagen local fecha estado
             var nueva = $("#producto").clone();
-            var link = "/Compras/Detalle?id=" + producto.idProducto;
+            nueva.attr({"data-idproducto":producto.idProducto});
 
             var nombre = "/Imagenes/Producto-" + producto.idProducto + ".jpg";
             /*if (!imageExists(nombre))
@@ -421,10 +394,10 @@
             if ( prodNombre.indexOf("\n") > -1)
                 prodNombre = prodNombre.replace(new RegExp("\n", 'g'), "<br/>");
 
-            nueva.find(".pnombre").append($("<a/>").attr("href",link).html(prodNombre));
+            nueva.find(".pnombre").append($("<a/>").attr("href","#").html(prodNombre)).addClass("detalle");
             nueva.find(".pprecio").text("$" + producto.precio);
 
-            var vermas = $("<a/>").attr({"href":link, "target":"_blank"}).text("Ver más")
+            var vermas = $("<a/>").attr({"href":"#"}).text("Ver más").addClass("detalle");
 
             var max = 125;
             if ( producto.descripcion.length > max ){

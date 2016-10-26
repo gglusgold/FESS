@@ -18,6 +18,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
         public int comentarios = 0;
         public double rating = 0;
+
+        public int categoria { get; set; }
     }
 
     public class ChanguitoCompleta
@@ -66,14 +68,16 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
     public class ComprasController : Controller
     {
-        public ActionResult Carrito()
+        public ActionResult Carrito(int idCategoria = 1)
         {
 
             ChanguitoCompleta completo = new ChanguitoCompleta();
-            crearChango(completo);
+            crearChango(completo, idCategoria);
 
             DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
             completo.proxFecha = ProximaEntrea.ToShortDateString();
+
+            ViewBag.categoria = idCategoria;
 
             return View(completo);
         }
@@ -138,7 +142,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 descripcion = actual.descripcion == null ? "" : actual.descripcion.Replace("\n", "<br/>"),
                 precio = actual.Precios.LastOrDefault().precio,
                 comentarios = actual.ComentariosProducto.Count,
-                rating = actual.ComentariosProducto.Count == 0 ? 0 : actual.ComentariosProducto.Average(b => b.estrellas)
+                rating = actual.ComentariosProducto.Count == 0 ? 0 : actual.ComentariosProducto.Average(b => b.estrellas),
+                categoria = actual.Categorias.idCategoria
             });
         }
 

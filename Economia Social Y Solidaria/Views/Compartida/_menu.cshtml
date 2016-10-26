@@ -21,7 +21,11 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Nuevo Encuentro</a>
+            @if (ViewBag.Title == "Detalle")
+            {
+                <a class="btn btn-link" id="volver_atras" style="float:left; vertical-align:middle" href="#"><i class="fa fa-arrow-left fa-2x"></i></a>
+            }
+            <a class="navbar-brand" style="float:left; vertical-align:middle" href="#">Nuevo Encuentro</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">

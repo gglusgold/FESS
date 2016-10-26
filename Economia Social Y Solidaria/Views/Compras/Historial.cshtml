@@ -50,7 +50,7 @@
 <div id="compra" style="display:none">
     <div class="card">
         <div class="row">
-            <img class="slide-image imagen" alt="">
+            @*<img class="slide-image imagen" alt="">*@
         </div>
         <div class="container col-md-12">
             <div class="row">
@@ -147,9 +147,13 @@
 
             nueva.removeAttr('id');
 
+            var precioTotal = 0;
             $.each(comprado.productos, function(i,val){
+                precioTotal += val.precioUnidad;
                 nueva.find(".productos").append("<tr data-idproducto='" + comprado.productos.idProducto + "'><td>" + val.nombre+ "</td><td>" +val.cantidad+ "</td><td>$" +val.precioUnidad+ "</td></tr>");
             });
+            nueva.find(".productos").append("<tr><td></td><td  style='text-align:right;' colspan=2 ><b>Total: $" + precioTotal+ "</b></td></tr>");
+            console.log(precioTotal);
             nueva.show();
 
             return nueva;
@@ -301,28 +305,6 @@
                 return elem ? elem.idCompra == r : false;
             })[0];
         }
-
-        $.extend(
-        {
-            redirectPost: function(location, args)
-            {
-                var form = $('<form></form>');
-                form.attr("method", "post");
-                form.attr("action", location);
-
-                $.each( args, function( key, value ) {
-                    var field = $('<input></input>');
-
-                    field.attr("type", "hidden");
-                    field.attr("name", key);
-                    field.attr("value", value);
-
-                    form.append(field);
-                });
-                $(form).appendTo('body').submit();
-            }
-        });
-
 
     </script>
 }

@@ -52,7 +52,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 }
                 else
                 {
-                    conf.leyenda = "Circuito Abierto el " + ultima.fechaAbierto.ToShortDateString()  + " por : " + ultima.Vecinos.nombres;
+                    conf.leyenda = "Circuito Abierto el " + ultima.fechaAbierto.ToShortDateString() + " por : " + ultima.Vecinos.nombres;
                     conf.idCircuito = ultima.Circuitos.idCircuito;
                     conf.abrir = false;
                 }
@@ -60,7 +60,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 conf.idTanda = ultima.idTanda;
                 conf.circuito = ultima.Circuitos.nombre;
                 conf.fechaAbierto = ultima.fechaAbierto.ToShortDateString();
-                
+
             }
 
             return View(conf);
@@ -132,8 +132,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
                             foreach (var compraEnTanda in tanda.Compras)
                             {
                                 compraEnTanda.EstadosCompra = confirmado;
-                                MandarMailConfirmandoCompra(compraEnTanda.Vecinos.correo, compraEnTanda);
                             }
+
+                            MandarMailConfirmandoCompra(tanda);
 
                             ctx.SaveChanges();
                         }
@@ -150,7 +151,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
         public JsonResult Lista()
         {
             TanoNEEntities ctx = new TanoNEEntities();
-            var lista = ctx.Tandas.OrderByDescending( a => a.idTanda).ToList().Select(a => new
+            var lista = ctx.Tandas.OrderByDescending(a => a.idTanda).ToList().Select(a => new
             {
                 idTanda = a.idTanda,
                 fechaAbierto = a.fechaAbierto.ToShortDateString(),
@@ -161,37 +162,58 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(lista, JsonRequestBehavior.DenyGet);
         }
 
-        private void MandarMailConfirmandoCompra(string email, Compras actual)
+        private void MandarMailConfirmandoCompra(Tandas tandaActual)
         {
-
             DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
-            string fecha = ProximaEntrea.ToShortDateString() + " - " + actual.Locales.horario;
 
-            using (MailMessage mail = new MailMessage())
+
+            TanoNEEntities ctx = new TanoNEEntities();
+            EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 2);
+            var vecinosQueCompraron = tandaActual.Compras.Where(a => a.EstadosCompra.idEstadoCompra == confirmado.idEstadoCompra).GroupBy(a => a.vecinoId).Select(a => a.FirstOrDefault(b => b.vecinoId == a.Key));
+            foreach (var actualTanda in vecinosQueCompraron)
             {
-                mail.From = new MailAddress("racinglocura07@gmail.com", "Economía Social y Solidaria");
-                mail.To.Add(email);
-                mail.Subject = "Economia Social y Solidaria -- Nuevo Encuentro";
-                mail.Body = "<p>Se ha confirmado la compra de los siguientes productos</p>";
-                mail.Body += "<p>-------------------</p>";
-                foreach (CompraProducto prod in actual.CompraProducto)
-                {
-                    mail.Body += "<p>" + prod.Productos.producto + " - Cantidad: " + prod.cantidad + "</p>";
-                }
-                mail.Body += "<p>-------------------</p>";
-               
-                mail.Body += "<p>Lo tenés que pasar a retirar el dia " + fecha + " Por nuestrno local en " + actual.Locales.direccion + "</p>";
-                mail.Body += "<p>Muchas gracias! Te esperamos</p>";
-                mail.IsBodyHtml = true;
+                string fecha = ProximaEntrea.ToShortDateString() + " - " + actualTanda.Locales.horario;
+                string nombre = actualTanda.Vecinos.nombres;
+                string correo = actualTanda.Vecinos.correo;
 
-                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                using (MailMessage mail = new MailMessage())
                 {
-                    smtp.Credentials = new NetworkCredential("racinglocura07@gmail.com", "kapanga34224389,");
-                    smtp.EnableSsl = true;
-                    smtp.Send(mail);
+
+                    mail.From = new MailAddress("racinglocura07@gmail.com", "Economía Social y Solidaria");
+                    mail.To.Add(correo);
+                    mail.Subject = "Economia Social y Solidaria -- Nuevo Encuentro";
+                    mail.Body = "<p>Se han confirmado las siguientes compras</p>";
+                    mail.BodyEncoding = System.Text.Encoding.UTF8;
+
+                    List<Compras> totalCompras = ctx.Compras.Where(a => a.tandaId == actualTanda.tandaId && a.vecinoId == actualTanda.Vecinos.idVecino && a.EstadosCompra.idEstadoCompra == confirmado.idEstadoCompra).ToList();
+                    foreach (var compras in totalCompras)
+                    {
+                        mail.Body += "<p>-------------------</p>";
+                        mail.Body += "<p>Compra N° " + (totalCompras.IndexOf(compras)+1) + "</p>";
+                        mail.Body += "<p><b>Lo tenés que pasar a retirar el dia " + fecha + " Por nuestrno local en " + actualTanda.Locales.direccion + "</b></p>";
+                        
+                        foreach (CompraProducto prod in compras.CompraProducto)
+                        {
+                            mail.Body += "<p>" + prod.Productos.producto + " - Cantidad: " + prod.cantidad + "</p>";
+                        }
+                        mail.Body += "<p>-------------------</p>";
+                        mail.Body += "<br/><br/>"; 
+                    }
+
+                    mail.Body += "<p>Muchas gracias! Te esperamos</p>";
+                    mail.IsBodyHtml = true;
+
+                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    {
+                        smtp.Credentials = new NetworkCredential("racinglocura07@gmail.com", "kapanga34224389,");
+                        smtp.EnableSsl = true;
+                        smtp.Send(mail);
+                    }
                 }
             }
         }
+
+
 
         public static DateTime GetNextWeekday(DateTime start, DayOfWeek day)
         {

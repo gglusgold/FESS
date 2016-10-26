@@ -9,13 +9,13 @@
 
     <div class="row">
 
-        <div class="col-md-3">
+        <div class="col-md-3" style="margin-bottom:30px">
         </div>
 
         <div class="col-md-9">
 
             <div class="thumbnail">
-                <img class="img-responsive" src="~/Imagenes/producto-@(Model.idProducto).jpg" alt="">
+                <img class="img-responsive" src="~/Imagenes/producto-@(Model.idProducto).jpg" style="max-height:450px" alt="">
                 <div class="caption-full">
                     <h4 class="pull-right">$@(Model.precio)</h4>
                     <h4>
@@ -38,3 +38,18 @@
     </div>
 
 </div>
+
+@section scripts{
+    <script type="text/javascript">
+
+        var compras = @Html.Raw(Json.Encode(Model));
+
+        $(document).on("click","#volver_atras", function(){
+            $.redirectPost("/Compras/Carrito", { idCategoria:compras.categoria})
+        });
+
+      
+
+
+    </script>
+}
