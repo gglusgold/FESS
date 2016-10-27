@@ -131,6 +131,7 @@
     <Content Include="Css\estadisticas.css" />
     <Content Include="Css\font-awesome.css" />
     <Content Include="Css\rating.css" />
+    <Compile Include="Controllers\TiendaController.cs" />
     <Compile Include="Controllers\VecinosController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -208,6 +209,7 @@
     <Content Include="Css\jquery.toast.min.css" />
     <Content Include="Css\carrito.css" />
     <Content Include="Css\detalle.css" />
+    <Content Include="Css\tienda.css" />
     <Content Include="Css\toastr.css" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -254,6 +256,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Vecinos\Vecino.cshtml" />
+    <Content Include="Views\Tienda\Tienda.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
