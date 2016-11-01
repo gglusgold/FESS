@@ -26,6 +26,7 @@ namespace Economia_Social_Y_Solidaria.Models
         public string horario { get; set; }
         public int comuna { get; set; }
         public int circuitoId { get; set; }
+        public bool activo { get; set; }
     
         public virtual Circuitos Circuitos { get; set; }
         public virtual ICollection<Compras> Compras { get; set; }

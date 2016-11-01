@@ -77,7 +77,7 @@
                     <div class="radio locales">
                         @foreach (var local in Model.locales)
                         {
-                            <label style="padding-top: 5px;padding-bottom: 5px;"><input type="radio" name="local" value="@(local.idLocal)" required>@(local.direccion) (Comuna @(local.comuna) - @(local.barrio)) - de @(local.horario).</label>
+                            <label style="padding-top: 5px;padding-bottom: 5px;"><input type="radio" name="local" id="local" value="@(local.idLocal)" required>@(local.direccion) (Comuna @(local.comuna) - @(local.barrio)) - de @(local.horario).</label>
                         }
                     </div>
                 </div>
@@ -337,24 +337,50 @@
         $(document).on("submit", "#form_confirmar", function(e){
             $("#form_confirmar .modal-footer").find("button").button('loading');
             var listadoo = Cookies.getJSON('listado');
+            var idCompra = null;
             if ( editarCompra != null ){
                 listadoo = editarCompra.productos;
-                $("#form_confirmar").addHidden('idCompra', editarCompra.idCompra);
+                idCompra = editarCompra.idCompra;
             }
 
+            var local = $(this).find("input[name=local]:checked").val();
             var cantidad = [];
             var id = [];
 
             $.each(listadoo, function (i, val) {
-                $("#form_confirmar").addHidden('idProducto', val.id);
-                $("#form_confirmar").addHidden('cantidad', val.cantidad);
+                id.push(val.id);
+                cantidad.push(val.cantidad);
             });
 
-            if ( editarCompra != null )
-                Cookies.remove("editar");
+            var data = { local:parseInt(local), idCompra: idCompra, cantidad: cantidad, idProducto: id };
+            console.log(data);
 
-            Cookies.remove("listado");
-            return true;
+            $.ajax({
+                type: "POST",
+                url: "/Compras/ConfirmarPedido",
+                data: data,
+                dataType: "json",
+                traditional: true,
+                success: function(response){
+                    
+                    console.log(response.error == null );
+                    if ( response.error == null ){
+                        alert("Gracias!");
+                        if ( editarCompra != null )
+                            Cookies.remove("editar");
+
+                        Cookies.remove("listado");
+                        location.href = "/Compras/Historial";
+                    }
+                    else
+                    {
+                        $("#form_confirmar .modal-footer").find("button").button('reset');
+                        alert(response.error);
+                    }
+                }
+            });
+
+            return false;
         });
 
         $(document).on("click", ".detalle",function(i){
@@ -383,6 +409,7 @@
             //imagen local fecha estado
             var nueva = $("#producto").clone();
             nueva.attr({"data-idproducto":producto.idProducto});
+            nueva.attr({"data-stock":producto.stock});
 
             var nombre = "/Imagenes/Producto-" + producto.idProducto + ".jpg";
             /*if (!imageExists(nombre))

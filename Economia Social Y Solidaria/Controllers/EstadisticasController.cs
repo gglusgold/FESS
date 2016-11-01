@@ -37,7 +37,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
     }
 
-
+    [Authorize]
     public class EstadisticasController : Controller
     {
 

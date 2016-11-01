@@ -77,10 +77,9 @@
                        'click .Retiro': function (e, value, row, index) {
 
                            var que = $(e.target).hasClass("glyphicon-ok");
-                           $(e.target).removeClass("glyphicon-remove").removeClass("glyphicon-ok")
-
+                           $(e.target).removeAttr("class").addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
                            $.post("/Vecinos/Editar", { idVecino: row.idVecino, administrador: !que }, function (devuelta) {
-                               $(e.target).addClass(devuelta.admin ? "glyphicon-ok" : "glyphicon-remove");
+                               $(e.target).removeAttr("class").addClass(devuelta.admin ? "glyphicon glyphicon-ok" : "glyphicon glyphicon-remove").closest("a").removeClass("notactive");
                            });
 
                        }
@@ -100,10 +99,9 @@
                        'click .Retiro': function (e, value, row, index) {
 
                            var que = $(e.target).hasClass("glyphicon-ok");
-                           $(e.target).removeClass("glyphicon-remove").removeClass("glyphicon-ok")
-
+                           $(e.target).removeAttr("class").addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
                            $.post("/Vecinos/Editar", { idVecino: row.idVecino, contador: !que }, function (devuelta) {
-                               $(e.target).addClass(devuelta.contador ? "glyphicon-ok" : "glyphicon-remove");
+                               $(e.target).removeAttr("class").addClass(devuelta.contador ? "glyphicon glyphicon-ok" : "glyphicon glyphicon-remove").closest("a").removeClass("notactive");
                            });
 
                        }
@@ -124,10 +122,9 @@
                        'click .Retiro': function (e, value, row, index) {
 
                            var que = $(e.target).hasClass("glyphicon-ok");
-                           $(e.target).removeClass("glyphicon-remove").removeClass("glyphicon-ok")
-
+                           $(e.target).removeAttr("class").addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
                            $.post("/Vecinos/Editar", { idVecino: row.idVecino, encargado: !que }, function (devuelta) {
-                               $(e.target).addClass(devuelta.encargado ? "glyphicon-ok" : "glyphicon-remove");
+                               $(e.target).removeAttr("class").addClass(devuelta.encargado ? "glyphicon glyphicon-ok" : "glyphicon glyphicon-remove").closest("a").removeClass("notactive");
                            });
 
                        }

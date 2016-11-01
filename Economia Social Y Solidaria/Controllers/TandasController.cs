@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -189,15 +191,15 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     foreach (var compras in totalCompras)
                     {
                         mail.Body += "<p>-------------------</p>";
-                        mail.Body += "<p>Compra N° " + (totalCompras.IndexOf(compras)+1) + "</p>";
+                        mail.Body += "<p>Compra N° " + (totalCompras.IndexOf(compras) + 1) + "</p>";
                         mail.Body += "<p><b>Lo tenés que pasar a retirar el dia " + fecha + " Por nuestrno local en " + actualTanda.Locales.direccion + "</b></p>";
-                        
+
                         foreach (CompraProducto prod in compras.CompraProducto)
                         {
                             mail.Body += "<p>" + prod.Productos.producto + " - Cantidad: " + prod.cantidad + "</p>";
                         }
                         mail.Body += "<p>-------------------</p>";
-                        mail.Body += "<br/><br/>"; 
+                        mail.Body += "<br/><br/>";
                     }
 
                     mail.Body += "<p>Muchas gracias! Te esperamos</p>";
@@ -210,6 +212,61 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         smtp.Send(mail);
                     }
                 }
+            }
+        }
+
+        public ActionResult CrearExcel(int idTanda)
+        {
+
+            string handle = Guid.NewGuid().ToString();
+
+            StringBuilder csv = new StringBuilder();
+            string Columnas = string.Format("{0};{1};{2};{3}", "N", "Producto", "Presentacion", "Cantidad", "Costo(Aprox)");
+            csv.AppendLine(Columnas);
+
+            decimal costoTotal = 0;
+            TanoNEEntities ctx = new TanoNEEntities();
+            Tandas actual = ctx.Tandas.FirstOrDefault(a => a.idTanda == idTanda);
+            var listado = ctx.CompraProducto.Where(a => a.Compras.tandaId == idTanda).GroupBy(a => a.productoId).Select(a => new { idProducto = a.Key, Cantidad = a.Sum(b => b.cantidad) }).ToArray();
+            for (int x = 0; x < listado.Count(); x++)
+            {
+                var compra = listado[x];
+                Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == compra.idProducto);
+                decimal costo = prod.Costos.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).costo;
+                costoTotal += costo;
+                string filas = string.Format("{0};{1};{2};{3};${4}", x + 1, prod.producto, prod.presentacion, compra.Cantidad, costo.ToString("0.00"));
+                csv.AppendLine(filas);
+            }
+
+            string cierre = string.Format("{0};{1};{2};{3};${4}", "", "", "", "", costoTotal.ToString("0.00"));
+            csv.AppendLine(cierre);
+
+
+            using (MemoryStream memoryStream = new MemoryStream(Encoding.Default.GetBytes(csv.ToString())))
+            {
+                memoryStream.Position = 0;
+                TempData[handle] = memoryStream.ToArray();
+            }
+
+            return Json(new { FileGuid = handle, FileName = "Reporte.csv" });
+
+        }
+
+
+
+        [HttpGet]
+        public virtual ActionResult Descargar(string fileGuid, string fileName)
+        {
+            if (TempData[fileGuid] != null)
+            {
+                byte[] data = TempData[fileGuid] as byte[];
+                return File(data, "application/vnd.ms-excel", fileName);
+            }
+            else
+            {
+                // Problem - Log the error, generate a blank file,
+                //           redirect to another controller action - whatever fits with your application
+                return new EmptyResult();
             }
         }
 

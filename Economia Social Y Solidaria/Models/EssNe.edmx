@@ -88,6 +88,7 @@
           <Property Name="horario" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="comuna" Type="int" Nullable="false" />
           <Property Name="circuitoId" Type="int" Nullable="false" />
+          <Property Name="activo" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="Precios">
           <Key>
@@ -107,6 +108,7 @@
           <Property Name="descripcion" Type="varchar" MaxLength="255" />
           <Property Name="marca" Type="varchar" MaxLength="255" />
           <Property Name="presentacion" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="stock" Type="int" Nullable="false" />
           <Property Name="activo" Type="bit" Nullable="false" />
           <Property Name="categoriaId" Type="int" />
         </EntityType>
@@ -650,6 +652,7 @@
           <Property Name="horario" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="comuna" Type="Int32" Nullable="false" />
           <Property Name="circuitoId" Type="Int32" Nullable="false" />
+          <Property Name="activo" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Circuitos" Relationship="TanoNEModel.FK_Locales_Circuitos" FromRole="Locales" ToRole="Circuitos" />
           <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Compras_Locales" FromRole="Locales" ToRole="Compras" />
         </EntityType>
@@ -672,6 +675,7 @@
           <Property Name="descripcion" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="marca" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="presentacion" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="stock" Type="Int32" Nullable="false" />
           <Property Name="activo" Type="Boolean" Nullable="false" />
           <Property Name="categoriaId" Type="Int32" />
           <NavigationProperty Name="Categorias" Relationship="TanoNEModel.FK_Productos_Categorias" FromRole="Productos" ToRole="Categorias" />
@@ -1036,6 +1040,7 @@
           <EntitySetMapping Name="Locales">
             <EntityTypeMapping TypeName="TanoNEModel.Locales">
               <MappingFragment StoreEntitySet="Locales">
+                <ScalarProperty Name="activo" ColumnName="activo" />
                 <ScalarProperty Name="circuitoId" ColumnName="circuitoId" />
                 <ScalarProperty Name="comuna" ColumnName="comuna" />
                 <ScalarProperty Name="horario" ColumnName="horario" />
@@ -1061,6 +1066,7 @@
               <MappingFragment StoreEntitySet="Productos">
                 <ScalarProperty Name="categoriaId" ColumnName="categoriaId" />
                 <ScalarProperty Name="activo" ColumnName="activo" />
+                <ScalarProperty Name="stock" ColumnName="stock" />
                 <ScalarProperty Name="presentacion" ColumnName="presentacion" />
                 <ScalarProperty Name="marca" ColumnName="marca" />
                 <ScalarProperty Name="descripcion" ColumnName="descripcion" />

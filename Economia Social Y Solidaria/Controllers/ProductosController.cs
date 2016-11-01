@@ -28,6 +28,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             {
                 idProducto = a.idProducto,
                 nombre = a.producto,
+                stock = a.stock,
                 marca = a.marca,
                 descripcion = a.descripcion != null ? a.descripcion.Replace("\n", "<br/>") : "",
                 cantidad = a.presentacion,
@@ -42,7 +43,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(lista, JsonRequestBehavior.DenyGet);
         }
 
-        public JsonResult Crear(string nombre, string marca, string descripcion, HttpPostedFileBase imagen_img, string cantidad, int idCategoria, decimal precio, decimal costo)
+        public JsonResult Crear(string nombre, string marca, string descripcion, HttpPostedFileBase imagen_img, string cantidad, int idCategoria, decimal precio, decimal costo, int stock)
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
@@ -54,6 +55,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 item.producto = nombre;
                 item.marca = marca;
                 item.descripcion = descripcion;
+                item.stock = stock;
                 item.presentacion = cantidad;
                 item.Categorias = categoria;
                 item.activo = true;
@@ -85,7 +87,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(new { error = false, mensaje = "Producto grabado satisfactoriamente" }, JsonRequestBehavior.DenyGet);
         }
 
-        public JsonResult Editar(int idProducto, string nombre, string marca, string descripcion, HttpPostedFileBase imagen_img, string cantidad, int idCategoria, decimal precio, decimal costo)
+        public JsonResult Editar(int idProducto, string nombre, string marca, string descripcion, HttpPostedFileBase imagen_img, string cantidad, int idCategoria, decimal precio, decimal costo, int stock)
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
@@ -101,6 +103,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 item.marca = marca;
                 item.descripcion = descripcion;
                 item.presentacion = cantidad;
+                item.stock = stock;
                 item.Categorias = categoria;
 
                 Precios pre = new Precios();

@@ -1,7 +1,9 @@
 ﻿using Economia_Social_Y_Solidaria.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -20,6 +22,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
         public double rating = 0;
 
         public int categoria { get; set; }
+
+        public int stock { get; set; }
     }
 
     public class ChanguitoCompleta
@@ -98,7 +102,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             TanoNEEntities ctx = new TanoNEEntities();
             Tandas ultima = ctx.Tandas.ToList().LastOrDefault();
             if (ultima != null && ultima.fechaCerrado == null)
-                completo.locales = ultima.Circuitos.Locales.ToList();
+                completo.locales = ultima.Circuitos.Locales.Where(a => a.activo).ToList();
 
             completo.categorias = ctx.Categorias.Select(a => new Cat { idCategoria = a.idCategoria, nombre = a.nombre }).OrderBy(a => a.nombre).ToList();
 
@@ -119,6 +123,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             completo.changuito = ctx.Productos.Where(a => a.categoriaId == cat.idCategoria).ToList().Where(a => a.activo).Select(a => new Changuito()
             {
                 idProducto = a.idProducto,
+                stock = a.stock,
                 nombre = a.producto + " - " + a.presentacion + (a.marca != null ? "\n" + a.marca : ""),
                 descripcion = a.descripcion == null ? "" : a.descripcion,//.Replace("\n", "<br/>"),
                 precio = a.Precios.LastOrDefault().precio,
@@ -271,6 +276,18 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 int cantActual = cantidad[x];
 
                 Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == prodActual);
+                if (prod.stock != -1)
+                {
+                    int stockrestante = prod.stock - cantActual;
+                    if (stockrestante < 0)
+                    {
+                        error = string.Format("{0} del siguiente producto:<br/>{1} - {2} - {3}", prod.stock == 0 ? "No contamos con stock" : "Solo contamos con " + prod.stock + " articulos", prod.producto, prod.presentacion, prod.marca);
+                        break;
+                    }
+                    else
+                        prod.stock = stockrestante;
+                }
+
 
                 CompraProducto productos = new CompraProducto();
                 productos.Productos = prod;
@@ -283,9 +300,11 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
 
             if (string.IsNullOrEmpty(error))
+            {
                 ctx.SaveChanges();
+            }
 
-            return RedirectToAction("Historial", "Compras");
+            return Json(new { error = error }, JsonRequestBehavior.DenyGet);
         }
 
         public ActionResult Calificar(int idCompra, int[] idProducto, string[] tComentarios, int[] rating)
@@ -342,6 +361,43 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 retiro = a.EstadosCompra.codigo
             });
             return Json(lista, JsonRequestBehavior.DenyGet);
+        }
+
+        public FileResult ExportarEncargado()
+        {
+            StringBuilder csv = new StringBuilder();
+            string Columnas = string.Format("{0};{1};{2};{3};{4}", "N", "Nombre", "Productos", "Precio", "Local");
+            csv.AppendLine(Columnas);
+
+            decimal costoTotal = 0;
+            TanoNEEntities ctx = new TanoNEEntities();
+            Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
+
+            Tandas ultima = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado != null);
+            var lista = ctx.Compras.Where(a => a.tandaId == ultima.idTanda && a.Locales.comuna == vecino.comuna).OrderBy(a => new { a.Locales.idLocal, a.Vecinos.nombres }).ToList().Select(a => new
+            {
+                idCompra = a.idCompra,
+                nombre = a.Vecinos.nombres,
+                productos = string.Join(" - ", a.CompraProducto.ToList().Select(b => "(" + b.cantidad + ") " + b.Productos.producto)),
+                precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio),
+                retiro = a.EstadosCompra.codigo,
+                local = a.Locales.direccion
+            }).ToArray();
+
+            for (int x = 0; x < lista.Count(); x++)
+            {
+                var compra = lista[x];
+                string filas = string.Format("{0};{1};{2};${3};{4}", compra.idCompra, compra.nombre, compra.productos, compra.precio, compra.local);
+                csv.AppendLine(filas);
+            }
+
+            using (MemoryStream memoryStream = new MemoryStream(Encoding.Default.GetBytes(csv.ToString())))
+            {
+                memoryStream.Position = 0;
+                return File(memoryStream.ToArray() as byte[], "application/vnd.ms-excel", "Reporte");
+            }
+
+
         }
 
         public ActionResult EnregarPedido(int idCompra, bool entregado)

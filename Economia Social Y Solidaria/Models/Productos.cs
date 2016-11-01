@@ -27,6 +27,7 @@ namespace Economia_Social_Y_Solidaria.Models
         public string descripcion { get; set; }
         public string marca { get; set; }
         public string presentacion { get; set; }
+        public int stock { get; set; }
         public bool activo { get; set; }
         public Nullable<int> categoriaId { get; set; }
     
