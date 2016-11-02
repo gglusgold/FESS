@@ -95,7 +95,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     using (MailMessage mail = new MailMessage())
                     {
                         //string datos = "Datos para entrar:<br/>Usuario: " + email;
-                        string datos = "Datos para entrar:<br/>Usuario: " + email + " Contraseña :" + pass ;
+                        string datos = "Datos para entrar:<br/>Usuario: " + email + " Contraseña :" + password;
                         mail.From = new MailAddress("economiasocial@encuentrocapital.com.ar", "Economía Social y Solidaria");
                         mail.To.Add(email);
                         mail.Subject = "Economia Social y Solidaria -- Nuevo Encuentro";
@@ -105,8 +105,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         mail.IsBodyHtml = true;
 
                         using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                        //using (SmtpClient smtp = new SmtpClient("smtp.encuentrocapital.com.ar", 587))
                         {
-                            //smtp.Credentials = new NetworkCredential("racinglocura07@gmail.com", "kapanga34224389,");
+                           // smtp.Credentials = new NetworkCredential("racinglocura07@gmail.com", "kapanga34224389,");
                             smtp.Credentials = new NetworkCredential("economiasocial@encuentrocapital.com.ar", "Frent3355");
                             smtp.EnableSsl = true;
                             smtp.Send(mail);
