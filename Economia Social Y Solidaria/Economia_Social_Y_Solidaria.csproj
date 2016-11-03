@@ -21,6 +21,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -47,9 +48,29 @@
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net40\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
@@ -58,6 +79,14 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.30506.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -67,37 +96,13 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Web.Mvc.FixedDisplayModes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.0\lib\net40\Microsoft.Web.Mvc.FixedDisplayModes.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.Net.Http.2.0.30506.0\lib\net40\System.Net.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.Net.Http.2.0.30506.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.30506.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -132,6 +137,45 @@
     <Content Include="Css\bootstrap-switch.css" />
     <Content Include="Css\estadisticas.css" />
     <Content Include="Css\font-awesome.css" />
+    <Content Include="Css\metro\add.png" />
+    <Content Include="Css\metro\blue\jtable.css" />
+    <Content Include="Css\metro\blue\jtable.min.css" />
+    <Content Include="Css\metro\blue\loading.gif" />
+    <Content Include="Css\metro\brown\jtable.css" />
+    <Content Include="Css\metro\brown\jtable.min.css" />
+    <Content Include="Css\metro\brown\loading.gif" />
+    <Content Include="Css\metro\close.png" />
+    <Content Include="Css\metro\column-asc.png" />
+    <Content Include="Css\metro\column-desc.png" />
+    <Content Include="Css\metro\column-sortable.png" />
+    <Content Include="Css\metro\crimson\jtable.css" />
+    <Content Include="Css\metro\crimson\jtable.min.css" />
+    <Content Include="Css\metro\crimson\loading.gif" />
+    <Content Include="Css\metro\darkgray\jtable.css" />
+    <Content Include="Css\metro\darkgray\jtable.min.css" />
+    <Content Include="Css\metro\darkgray\loading.gif" />
+    <Content Include="Css\metro\darkorange\jtable.css" />
+    <Content Include="Css\metro\darkorange\jtable.min.css" />
+    <Content Include="Css\metro\darkorange\loading.gif" />
+    <Content Include="Css\metro\delete.png" />
+    <Content Include="Css\metro\edit.png" />
+    <Content Include="Css\metro\green\jtable.css" />
+    <Content Include="Css\metro\green\jtable.min.css" />
+    <Content Include="Css\metro\green\loading.gif" />
+    <Content Include="Css\metro\jtable_metro_base.css" />
+    <Content Include="Css\metro\jtable_metro_base.min.css" />
+    <Content Include="Css\metro\lightgray\jtable.css" />
+    <Content Include="Css\metro\lightgray\jtable.min.css" />
+    <Content Include="Css\metro\lightgray\loading.gif" />
+    <Content Include="Css\metro\pink\jtable.css" />
+    <Content Include="Css\metro\pink\jtable.min.css" />
+    <Content Include="Css\metro\pink\loading.gif" />
+    <Content Include="Css\metro\purple\jtable.css" />
+    <Content Include="Css\metro\purple\jtable.min.css" />
+    <Content Include="Css\metro\purple\loading.gif" />
+    <Content Include="Css\metro\red\jtable.css" />
+    <Content Include="Css\metro\red\jtable.min.css" />
+    <Content Include="Css\metro\red\loading.gif" />
     <Content Include="Css\rating.css" />
     <Compile Include="Controllers\VecinosController.cs" />
     <Compile Include="Global.asax.cs">
@@ -228,6 +272,17 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.woff2" />
     <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="Css\metro\blue\jtable.less" />
+    <Content Include="Css\metro\brown\jtable.less" />
+    <Content Include="Css\metro\crimson\jtable.less" />
+    <Content Include="Css\metro\darkgray\jtable.less" />
+    <Content Include="Css\metro\darkorange\jtable.less" />
+    <Content Include="Css\metro\green\jtable.less" />
+    <Content Include="Css\metro\jtable_metro_base.less" />
+    <Content Include="Css\metro\lightgray\jtable.less" />
+    <Content Include="Css\metro\pink\jtable.less" />
+    <Content Include="Css\metro\purple\jtable.less" />
+    <Content Include="Css\metro\red\jtable.less" />
     <None Include="Js\comunas.json" />
     <Content Include="Js\drilldown.js" />
     <Content Include="Js\highcharts.js" />
@@ -237,6 +292,8 @@
     <Content Include="Js\jquery-bootstrap-modal-steps.min.js" />
     <Content Include="Js\jquery-ui.js" />
     <Content Include="Js\jquery.blockUI.min.js" />
+    <Content Include="Js\jquery.jtable.es.js" />
+    <Content Include="Js\jquery.jtable.js" />
     <Content Include="Js\jquery.toast.min.js" />
     <Content Include="Js\js.cookie.js" />
     <Content Include="Js\magyp.js" />
@@ -257,10 +314,10 @@
     </Content>
     <Content Include="Views\Vecinos\Vecino.cshtml" />
     <Content Include="Views\Locales\Locales.cshtml" />
+    <Content Include="Views\Tandas\VerCompras.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Tienda\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

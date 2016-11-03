@@ -30,9 +30,11 @@ namespace Economia_Social_Y_Solidaria.Models
         public string contrasena { get; set; }
         public string hash { get; set; }
         public bool verificado { get; set; }
+        public Nullable<int> localId { get; set; }
     
         public virtual ICollection<Comentarios> Comentarios { get; set; }
         public virtual ICollection<Compras> Compras { get; set; }
+        public virtual Locales Locales { get; set; }
         public virtual ICollection<RolesVecinos> RolesVecinos { get; set; }
         public virtual ICollection<Tandas> Tandas { get; set; }
     }

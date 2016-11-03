@@ -55,20 +55,21 @@
                    width: '5%',
                    events: {
                        'click .Retiro': function (e, value, row, index) {
-                           $(e.target).closest('td').html('');
+
+                           $(e.target).removeAttr("class").addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
                            $.post("/Compras/EnregarPedido", { idCompra: row.idCompra, entregado: true }, function (devuelta) {
-                               $(e.target).closest('td').html('<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>');
+                               $(e.target).removeAttr("class").addClass("fa fa-thumbs-o-up").closest("a").removeClass("notactive");
                            });
                        },
                        'click .Colgo': function (e, value, row, index) {
-                           $(e.target).closest('td').html('');
+
+                           $(e.target).removeAttr("class").addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
                            $.post("/Compras/EnregarPedido", { idCompra: row.idCompra, entregado: false }, function (devuelta) {
-                               $(e.target).closest('td').html('<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>');
+                               $(e.target).removeAttr("class").addClass("fa fa-thumbs-o-down").closest("a").removeClass("notactive");
                            });
                        },
                    },
                    formatter: function operateFormatter(value, row, index) {
-                       console.log(value);
                        if (value != 3 && value != 5 )
                        {
                            return "<a style='cursor:pointer' class='Retiro' title='Retiro'>Si</a> - <a style='cursor:pointer' class='Colgo' title='Colgo'>No</a>";

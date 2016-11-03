@@ -159,7 +159,7 @@
 
         var productos = @Html.Raw(Json.Encode(Model.changuito));
         cargarDatos(productos);
-
+        console.log(@ViewBag.categoria);
         $("#scat").val(@ViewBag.categoria);
         $("#scat").change(function(e){
             $.blockUI({ message: null });

@@ -5,13 +5,13 @@
 
 
 
-    $("#btn_iniciar").click(function(){
-		$("#login").modal("toggle")
-	});
+    $("#btn_iniciar").click(function () {
+        $("#login").modal("toggle")
+    });
 
-    $("#btn_registrarse").click(function(){
-		$("#registrarse").modal("toggle")
-	});
+    $("#btn_registrarse").click(function () {
+        $("#registrarse").modal("toggle")
+    });
 
 
 
@@ -22,7 +22,7 @@
     $('#btn_cerrar').on('click', function (e) {
         Cookies.remove("listado");
     });
-    
+
 
     $('#btn_registrarse').on('click', function (e) {
         $('#btn_iniciar').popover('hide');
@@ -56,6 +56,11 @@
         Cookies.remove('Info');
         Cookies.remove('Mensaje');
     }
+
+    $("#ComprasTanda").click(function (e) {
+        $.redirectPost("/Tandas/VerCompras", { admin: true })
+    })
+
 
 
     var password = document.getElementById("password"), confirm_password = document.getElementById("confirmpassword");
@@ -102,6 +107,6 @@
             }
         });
 
-    
+
 
 })();

@@ -17,6 +17,7 @@ namespace Economia_Social_Y_Solidaria.Models
         public Locales()
         {
             this.Compras = new HashSet<Compras>();
+            this.Vecinos = new HashSet<Vecinos>();
         }
     
         public int idLocal { get; set; }
@@ -30,5 +31,6 @@ namespace Economia_Social_Y_Solidaria.Models
     
         public virtual Circuitos Circuitos { get; set; }
         public virtual ICollection<Compras> Compras { get; set; }
+        public virtual ICollection<Vecinos> Vecinos { get; set; }
     }
 }

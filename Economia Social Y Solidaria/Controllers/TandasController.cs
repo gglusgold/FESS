@@ -181,7 +181,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 using (MailMessage mail = new MailMessage())
                 {
 
-                    mail.From = new MailAddress("racinglocura07@gmail.com", "Economía Social y Solidaria");
+                    mail.From = new MailAddress("economiasocial@encuentrocapital.com.ar", "Economía Social y Solidaria");
                     mail.To.Add(correo);
                     mail.Subject = "Economia Social y Solidaria -- Nuevo Encuentro";
                     mail.Body = "<p>Se han confirmado las siguientes compras</p>";
@@ -207,12 +207,40 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                     using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
                     {
-                        smtp.Credentials = new NetworkCredential("racinglocura07@gmail.com", "kapanga34224389,");
+                        smtp.Credentials = new NetworkCredential("economiasocial@encuentrocapital.com.ar", "Frent3355");
                         smtp.EnableSsl = true;
                         smtp.Send(mail);
                     }
                 }
             }
+        }
+
+        public ActionResult VerCompras(bool admin = false)
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+            Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
+            ViewBag.Admin = vecino.RolesVecinos.Any(a => a.Roles.codigoRol == 2) && admin;
+            return View();
+        }
+
+        public JsonResult ListaCompras(bool ad)
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+
+            Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
+            ad = vecino.RolesVecinos.Any(a => a.Roles.codigoRol == 2) && ad;
+
+            Tandas ultimaAbierta = ctx.Tandas.FirstOrDefault(a => a.fechaCerrado == null);
+            var lista = ctx.Compras.Where(a => a.tandaId == ultimaAbierta.idTanda && ad ? a.localId > 0 : a.localId == (vecino.localId == null ? a.Vecinos.comuna : a.Vecinos.localId) ).ToList().Select(a => new
+            {
+                idCompra = a.idCompra,
+                vecine = a.Vecinos.nombres,
+                productos = string.Join("<br/>", a.CompraProducto.Select(ab => string.Format("{0}: {1} {2} - {3}", ab.cantidad, ab.Productos.producto, ab.Productos.marca, ab.Productos.presentacion))),
+                local = a.Locales.direccion,
+                fecha = a.fecha.ToShortDateString()
+            });
+
+            return Json(new { Result = "OK", Records = lista }, JsonRequestBehavior.DenyGet);
         }
 
         public ActionResult CrearExcel(int idTanda)

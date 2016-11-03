@@ -81,7 +81,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
             completo.proxFecha = ProximaEntrea.ToShortDateString();
 
-            ViewBag.categoria = idCategoria;
+
 
             return View(completo);
         }
@@ -104,7 +104,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             if (ultima != null && ultima.fechaCerrado == null)
                 completo.locales = ultima.Circuitos.Locales.Where(a => a.activo).ToList();
 
-            completo.categorias = ctx.Categorias.Select(a => new Cat { idCategoria = a.idCategoria, nombre = a.nombre }).OrderBy(a => a.nombre).ToList();
+            completo.categorias = ctx.Categorias.Where(a => a.Productos.Any(b => b.activo)).Select(a => new Cat { idCategoria = a.idCategoria, nombre = a.nombre }).OrderBy(a => a.nombre).ToList();
 
             if (User.Identity.IsAuthenticated && ultima != null)
             {
@@ -115,10 +115,15 @@ namespace Economia_Social_Y_Solidaria.Controllers
             }
 
             Categorias cat = ctx.Categorias.FirstOrDefault(a => a.nombre == "Bolsones");
-            if (idCategoria != -1)
+            cat = ctx.Categorias.FirstOrDefault(a => a.idCategoria == idCategoria);
+            if (!cat.Productos.Any(a => a.activo))
             {
-                cat = ctx.Categorias.FirstOrDefault(a => a.idCategoria == idCategoria);
+                int cate = completo.categorias.ToArray()[0].idCategoria;
+                cat = ctx.Categorias.FirstOrDefault(a => a.idCategoria == cate);
             }
+
+
+            ViewBag.categoria = cat.idCategoria;
 
             completo.changuito = ctx.Productos.Where(a => a.categoriaId == cat.idCategoria).ToList().Where(a => a.activo).Select(a => new Changuito()
             {
@@ -165,26 +170,26 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
             MisCompras compras = new MisCompras();
             compras.Compras = ctx.Compras.Where(a => a.vecinoId == vecino.idVecino).OrderByDescending(a => a.fecha).ToList().Select(a => new Comprados
+            {
+                idCompra = a.idCompra,
+                estado = a.EstadosCompra.nombre,
+                fecha = a.fecha.ToString("hh:mm dd/MM/yyyy"),
+                idLocal = a.Locales.idLocal,
+                local = a.Locales.direccion,
+                barrio = a.Locales.barrio,
+                editar = a.estadoId == EstadoEntregado.idEstadoCompra,
+                comentar = a.estadoId == confirmado.idEstadoCompra,
+                comentado = a.estadoId == comentado.idEstadoCompra,
+                comuna = a.Locales.comuna,
+                productos = a.CompraProducto.ToList().Select(b => new ProductosComprados
                 {
-                    idCompra = a.idCompra,
-                    estado = a.EstadosCompra.nombre,
-                    fecha = a.fecha.ToString("hh:mm dd/MM/yyyy"),
-                    idLocal = a.Locales.idLocal,
-                    local = a.Locales.direccion,
-                    barrio = a.Locales.barrio,
-                    editar = a.estadoId == EstadoEntregado.idEstadoCompra,
-                    comentar = a.estadoId == confirmado.idEstadoCompra,
-                    comentado = a.estadoId == comentado.idEstadoCompra,
-                    comuna = a.Locales.comuna,
-                    productos = a.CompraProducto.ToList().Select(b => new ProductosComprados
-                    {
-                        idProducto = b.Productos.idProducto,
-                        nombre = b.Productos.producto,
-                        cantidad = b.cantidad,
-                        comentado = a.Comentarios.Count == 1 ? a.Comentarios.FirstOrDefault().ComentariosProducto.FirstOrDefault(cp => cp.productoId == b.productoId).Productos != null : false,
-                        precioUnidad = b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio
-                    }).ToList()
-                }).ToList();
+                    idProducto = b.Productos.idProducto,
+                    nombre = b.Productos.producto,
+                    cantidad = b.cantidad,
+                    comentado = a.Comentarios.Count == 1 ? a.Comentarios.FirstOrDefault().ComentariosProducto.FirstOrDefault(cp => cp.productoId == b.productoId).Productos != null : false,
+                    precioUnidad = b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio
+                }).ToList()
+            }).ToList();
 
             return View(compras);
         }
@@ -352,7 +357,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
 
             Tandas ultima = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado != null);
-            var lista = ctx.Compras.Where(a => a.tandaId == ultima.idTanda && a.Locales.comuna == vecino.comuna).ToList().Select(a => new
+            var lista = ctx.Compras.Where(a => a.tandaId == ultima.idTanda && vecino.localId == null ? ( a.Locales.comuna == vecino.comuna ) : ( a.localId == vecino.localId )).ToList().Select(a => new
             {
                 idCompra = a.idCompra,
                 nombre = a.Vecinos.nombres,

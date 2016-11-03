@@ -1,0 +1,192 @@
+﻿@{
+    ViewBag.Title = "Lista";
+    Layout = "~/Views/Compartida/_layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h2 style="margin-top: 0">Locales</h2>
+        </div>
+        <div class="col-md-6">
+            <a id="AgregarNuevo" class="btn btn-primary" style="float: right;"><span class="glyphicon glyphicon-plus"></span> Nuevo Local</a>
+        </div>
+        <div class="col-md-12">
+            <table id="tabla" class="table table-bordered bg_blanco table-hover"></table>
+            <div id="abm"></div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $("a[href='/Locales/Locales']").closest("li").addClass("active");
+
+        var columnas = [
+               {
+                   //estos son de bootstrap table
+                   field: "idLocal",
+                   valign: 'middle',
+                   visible: false,
+                   edit: true,
+                   title: "Codigo",
+                   opciones: {
+                       editar: {
+                           atributos: { readonly: true }
+                       }
+                   }
+               },
+               {
+                   field: "nombre",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Nombre",
+                   sortable: "true",
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "input",
+                       atributos: { input: { required: false } }
+                   }
+               },
+               {
+                   field: "direccion",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Direccion",
+                   sortable: "true",
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "input",
+                       atributos: { input: { required: true } }
+                   }
+               },
+               {
+                   field: "barrio",
+                   align: 'left',
+                   valign: 'middle',
+                   title: "Barrio",
+                   sortable: "true",
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "input",
+                       atributos: { input: { required: true } }
+                   }
+               },
+               {
+                   field: "horario",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Horario",
+                   sortable: "true",
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "input",
+                       atributos: { input: { required: true } }
+                   }
+               },
+               {
+                   field: "comuna",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Comuna",
+                   sortable: "true",
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "input",
+                       atributos: { input: { required: true } }
+                   }
+               },
+               {
+                   field: "circuitoId",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Categoría",
+                   visible: false,
+                   create: true,
+                   edit: true,
+                   opciones: {
+                       tipo: "select",
+                       source: "/Circuitos/Lista",
+                       atributos: { input: { required: true } }
+                   }
+               },
+               {
+                   field: "circuito",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Categoría",
+                   sortable: "true",
+                   create: false,
+                   edit: false,
+               },
+               {
+                   field: 'editar',
+                   title: 'Editar',
+                   valign: 'middle',
+                   align: 'center',
+                   width: '5%',
+                   events: {
+                       'click .Editar': function (e, value, row, index) {
+                           abm.Magyp("Mostrar", true, row, index);
+                       }
+                   },
+                   formatter: function operateFormatter(value, row, index) {
+                       return "<a style='cursor:pointer' class='Editar' title='Editar'><i class='glyphicon glyphicon-edit'></i></a>";
+
+                   }
+               },
+               {
+                   field: 'activo',
+                   title: 'Activo',
+                   valign: 'middle',
+                   align: 'center',
+                   width: '5%',
+                   events: {
+                       'click .Activo': function (e, value, row, index) {
+
+                           var que = $(e.target).hasClass("glyphicon-ok");
+                           $(e.target).removeAttr("class").addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
+                           $.post("/Locales/Desactivar", { idLocal: row.idLocal, activar: !que }, function (response) {
+                               $(e.target).removeAttr("class").addClass("glyphicon").addClass(response ? "glyphicon-ok" : "glyphicon-remove").closest("a").removeClass("notactive");
+                           });
+                       }
+                   },
+                   formatter: function operateFormatter(value, row, index) {
+                       return "<a style='cursor:pointer' class='Activo' title='Activar'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
+                       //return "<a style='cursor:pointer' class='Borrar' title='Borrar'><i class='glyphicon glyphicon-trash'></i></a>";
+
+                   }
+               }
+        ];
+
+        var tabla = $("#tabla");
+        tabla.bootstrapTable({
+            url: "/Locales/Lista",
+            method: "POST",
+            columns: columnas,
+        });
+
+        var abm = $("#abm").Magyp({
+            nombre: "Nuevo Local",
+            fields: columnas,
+            boostrap: true,
+            unico: true,
+            url: '/Locales/Crear',
+            urlEditar: '/Locales/Editar',
+            grabado: function (editando, data, index) {
+                tabla.bootstrapTable("refresh");
+            }
+        });
+
+        $("#AgregarNuevo").on("click", function () {
+            abm.Magyp("Mostrar", false);
+        });
+
+    </script>
+}
