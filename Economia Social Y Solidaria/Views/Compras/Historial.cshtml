@@ -4,7 +4,7 @@
     Layout = "~/Views/Compartida/_layout.cshtml";
 }
 
-<div class="container comprascon" style="margin-top:100px">
+<div class="container-fluid comprascon" style="margin-top:100px">
 </div>
 
 <div class="modal fade" id="comentarmodal" tabindex="-1" role="dialog">
@@ -45,7 +45,8 @@
     <div class="row col-md-12">
         <span class="help-block pull-right validacionerror" style="color:red; display:none"></span>
     </div>
-</div>
+    <div class="col-md-12"><span class="help-block">*No son obligatorios los comentarios</span></div>
+</div> 
 
 <div id="compra" style="display:none">
     <div class="card">
@@ -153,7 +154,6 @@
                 nueva.find(".productos").append("<tr data-idproducto='" + comprado.productos.idProducto + "'><td>" + val.nombre+ "</td><td>" +val.cantidad+ "</td><td>$" +val.precioUnidad+ "</td></tr>");
             });
             nueva.find(".productos").append("<tr><td></td><td  style='text-align:right;' colspan=2 ><b>Total: $" + precioTotal+ "</b></td></tr>");
-            console.log(precioTotal);
             nueva.show();
 
             return nueva;
@@ -180,7 +180,6 @@
             todo.idLocal = compra.idLocal;
             todo.productos = [];
             $.each(compra.productos, function(i,val){
-                console.log(val);
                 var prod = {};
                 prod["id"] = val.idProducto;
                 prod["nombre"] = val.nombre;
@@ -198,24 +197,24 @@
 
         $('#comentarmodal').modalSteps({
             completeCallback: function(){
-                console.log($('#comentarmodal').find("form").serialize());
-                $.post("/Compras/Calificar", $('#comentarmodal').find("form").serialize(), function(devuelta){
-                    if (devuelta.bien){
-                        $.toast({
-                            heading: 'Frente de Economía Social y Solidaria!',
-                            text: 'Gracias por dejarnos tus comentarios',
-                            icon: 'info',
-                            loader: false,
-                            hideAfter: 5000
-                        })
+                //$.post("/Compras/Calificar", $('#comentarmodal').find("form").serialize(), function(devuelta){
+                //    if (devuelta.bien){
+                //        $.toast({
+                //            heading: 'Frente de Economía Social y Solidaria!',
+                //            text: 'Gracias por dejarnos tus comentarios',
+                //            icon: 'info',
+                //            loader: false,
+                //            hideAfter: 5000
+                //        })
 
-                        $("[data-idcompra=" + devuelta.idCompra + "]").find(".btncomentar").hide();
-                        $("[data-idcompra=" + devuelta.idCompra + "]").find(".estado").text(devuelta.comentario);
-                    }
-                });
+                //        $("[data-idcompra=" + devuelta.idCompra + "]").find(".btncomentar").hide();
+                //        $("[data-idcompra=" + devuelta.idCompra + "]").find(".estado").text(devuelta.comentario);
+                //    }
+                //});
             },
             validar: function(actual){
-                var comentario = actual.find(".tComentarios").val();
+                
+                /*var comentario = actual.find(".tComentarios").val();
                 var rating = actual.find(".estrellas").val();
                 var error = $(".validacionerror");
 
@@ -228,11 +227,16 @@
                     error.text("Hay que seleccionar al menos 1 estrella")
                     return false;
                 }
-                error.hide();
+                error.hide();*/
 
                 return true;
 
                 //confirm_password.setCustomValidity("Las contraseñas no coinciden");
+            },
+            callbacks: {
+                '*': function(e){
+                    console.log($(".js-title-step").effect("highlight", {}, 1000));
+                }
             }
         });
 
@@ -250,7 +254,6 @@
 
 
             $.each(compra.productos, function(i,val){
-                console.log(i,val);
                 var nuevo = $("#comentarproducto").clone();
                 nuevo.attr({"data-step": i + 1, "data-title": val.nombre});
                 nuevo.find(".idProducto").val(val.idProducto);

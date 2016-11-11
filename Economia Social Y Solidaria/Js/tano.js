@@ -62,7 +62,7 @@
         }
     };
 
-    window.confirm = function (mensaje, callback, titulo, valueBoton, tercerBoton) {
+    window.confirm = function (mensaje, callback, titulo, valueBoton, callbackno, tercerBoton) {
         titulo = titulo || 'Confirmación';
         valueBoton = valueBoton || 'Aceptar';
         tercerBoton = tercerBoton || '';
@@ -92,7 +92,11 @@
                 callback();
         });
 
-        var btnCancelar = $("<button type='button' class='btn btn-danger' data-dismiss='modal'>Cancelar</button>");
+        var btnCancelar = $("<button type='button' class='btn btn-danger' data-dismiss='modal'>No</button>");
+        btnCancelar.click(function () {
+            if (callbackno !== undefined)
+                callbackno();
+        });
 
         footer.append(btnAceptar);
         footer.append(tercerBoton);

@@ -357,11 +357,11 @@ namespace Economia_Social_Y_Solidaria.Controllers
             Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
 
             Tandas ultima = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado != null);
-            var lista = ctx.Compras.Where(a => a.tandaId == ultima.idTanda && vecino.localId == null ? ( a.Locales.comuna == vecino.comuna ) : ( a.localId == vecino.localId )).ToList().Select(a => new
+            var lista = ctx.Compras.Where(a => (a.tandaId == ultima.idTanda) && (vecino.localId == null ? vecino.comuna == a.Locales.comuna : vecino.localId == a.localId)).ToList().Select(a => new
             {
                 idCompra = a.idCompra,
                 nombre = a.Vecinos.nombres,
-                productos = string.Join("<br/>", a.CompraProducto.ToList().Select(b => "(" + b.cantidad + ") " + b.Productos.producto)),
+                productos = string.Join("<br/>", a.CompraProducto.ToList().Select(b => "<span class='idca' style='display:none'>[" + b.productoId + "|" + b.cantidad + "]</span>(" + b.cantidad + ") " + b.Productos.producto + " - " + b.Productos.marca  + " - " + b.Productos.presentacion)),
                 precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio),
                 retiro = a.EstadosCompra.codigo
             });
@@ -379,11 +379,11 @@ namespace Economia_Social_Y_Solidaria.Controllers
             Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
 
             Tandas ultima = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado != null);
-            var lista = ctx.Compras.Where(a => a.tandaId == ultima.idTanda && a.Locales.comuna == vecino.comuna).OrderBy(a => new { a.Locales.idLocal, a.Vecinos.nombres }).ToList().Select(a => new
+            var lista = ctx.Compras.Where(a => a.tandaId == ultima.idTanda && (vecino.localId == null ? vecino.comuna == a.Locales.comuna : vecino.localId == a.localId)).OrderBy(a => new { a.Locales.idLocal, a.Vecinos.nombres }).ToList().Select(a => new
             {
                 idCompra = a.idCompra,
                 nombre = a.Vecinos.nombres,
-                productos = string.Join(" - ", a.CompraProducto.ToList().Select(b => "(" + b.cantidad + ") " + b.Productos.producto)),
+                productos = string.Join(" - ", a.CompraProducto.ToList().Select(b => "(" + b.cantidad + ") " + b.Productos.producto + " - " + b.Productos.marca + " - " + b.Productos.presentacion + " - " + b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio)),
                 precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio),
                 retiro = a.EstadosCompra.codigo,
                 local = a.Locales.direccion
@@ -405,7 +405,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
         }
 
-        public ActionResult EnregarPedido(int idCompra, bool entregado)
+        public ActionResult EnregarPedido(int idCompra, bool entregado, int[] ids = null, int[] cantidad = null)
         {
             TanoNEEntities ctx = new TanoNEEntities();
             Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
@@ -414,7 +414,22 @@ namespace Economia_Social_Y_Solidaria.Controllers
             EstadosCompra entre = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 3);
             EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 2);
             Compras compra = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra && a.estadoId == confirmado.idEstadoCompra);
-            compra.EstadosCompra = entregado ? entre : nopaso;
+
+            if (ids == null)
+                compra.EstadosCompra = entregado ? entre : nopaso;
+            else
+            {
+                var productos = compra.CompraProducto;
+                for ( int x = 0; x < ids.Count();  x++) {
+                    var prod = productos.FirstOrDefault(a => a.productoId == ids[x]);
+                    prod.cantidad = cantidad[x];
+
+                    if (prod.cantidad == 0)
+                        ctx.CompraProducto.Remove(prod);
+                }
+                compra.EstadosCompra = entregado ? entre : nopaso;
+            }
+
             ctx.SaveChanges();
 
             return Json(new { error = false }, JsonRequestBehavior.DenyGet);

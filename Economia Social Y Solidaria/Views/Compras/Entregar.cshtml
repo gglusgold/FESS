@@ -3,6 +3,12 @@
     Layout = "~/Views/Compartida/_layout.cshtml";
 }
 
+<style>
+    .modal .modal-body {
+        max-height: 420px;
+        overflow-y: auto;
+    }
+</style>
 <div class="container">
     <div class="row">
         <div class="col-md-6">
@@ -18,6 +24,43 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="entregaParcial" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="form_entregar">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Entregar Pedido</h4>
+                </div>
+                <div class="modal-body" id="parte_uno" style="display:block">
+                    <table class="table" id="tabla_listado">
+                        <caption>Listado de compras.</caption>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        <tfoot>
+
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <button type="button" data-loading-text="Espere..." class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="confirmada" data-loading-text="Espere..." class="btn btn-success">Terminar</button>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </form>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
 
 @section scripts{
     <script type="text/javascript">
@@ -56,10 +99,32 @@
                    events: {
                        'click .Retiro': function (e, value, row, index) {
 
-                           $(e.target).removeAttr("class").addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
-                           $.post("/Compras/EnregarPedido", { idCompra: row.idCompra, entregado: true }, function (devuelta) {
-                               $(e.target).removeAttr("class").addClass("fa fa-thumbs-o-up").closest("a").removeClass("notactive");
+                           confirm("Se retiraron todos los productos?", function (a) {
+
+                               $(e.target).removeAttr("class").empty().addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
+                               $.post("/Compras/EnregarPedido", { idCompra: row.idCompra, entregado: true }, function (devuelta) {
+                                   $(e.target).removeAttr("class").addClass("fa fa-thumbs-o-up").closest("a").removeClass("notactive");
+                               });
+
+                           }, "Frente de Economia Social y Solidaria", "Si", function () {
+                               console.log("No");
+
+                               $("#tabla_listado").attr("data-idcompra", row.idCompra)
+                               $("#entregaParcial").modal("show");
+                               $("#tabla_listado").find("tbody").empty();
+                               $.each(row.productos.split("<br/>"), function (i, val) {
+
+                                   var info = $(val).text().match(/\[(.*)\]/).pop().split("|");
+                                   var id = info[0];
+                                   var cantidad = info[1];
+
+                                   $("#tabla_listado").find("tbody").append("<tr><input name='pid' type='hidden' value='" + id + "'/><td>" + (i + 1) + "</td><td>" + val.substring(val.indexOf(")") + 1) + "</td><td><input name='pcantidad' type='number' max='" + cantidad + "' value='" + cantidad + "' min='0'/></td></tr>");
+                               });
+
+
                            });
+
+
                        },
                        'click .Colgo': function (e, value, row, index) {
 
@@ -70,8 +135,7 @@
                        },
                    },
                    formatter: function operateFormatter(value, row, index) {
-                       if (value != 3 && value != 5 )
-                       {
+                       if (value != 3 && value != 5) {
                            return "<a style='cursor:pointer' class='Retiro' title='Retiro'>Si</a> - <a style='cursor:pointer' class='Colgo' title='Colgo'>No</a>";
                        }
                        else if (value == 3)
@@ -88,6 +152,34 @@
             url: "/Compras/ListaTanda",
             method: "POST",
             columns: columnas
+        });
+
+        $("#form_entregar").submit(function (e) {
+            e.preventDefault();
+            var cantidad = [];
+            var ids = [];
+
+            var idCompra = $(this).find("table").data("idcompra");
+            $.each($(this).find("table tr"), function (i, val) {
+                if ($(val).find("input[name='pid']").val() != undefined) {
+                    ids.push($(val).find("input[name='pid']").val());
+                    cantidad.push($(val).find("input[name='pcantidad']").val());
+                }
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "/Compras/EnregarPedido",
+                data: { idCompra: idCompra, entregado: true, ids: ids, cantidad: cantidad },
+                dataType: "json",
+                traditional: true,
+                success: function (response) {
+                    $("#entregaParcial").modal("hide");
+                    tabla.bootstrapTable("refresh");
+                }
+            });
+
+            return false;
         });
     </script>
 }
