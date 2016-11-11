@@ -124,6 +124,28 @@
                    title: "Responsable Abrir/Cerrar",
                },
                {
+                   field: "finanzas",
+
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Finanzas",
+                   events: {
+                       'click .Finanzas': function (e, value, row, index) {
+                           
+                           $(e.target).removeAttr("class").addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
+                           $.post("/Tandas/CrearExcelFinanzas", row, function (response) {
+                               $(e.target).removeAttr("class").addClass("fa fa-usd").closest("a").removeClass("notactive");
+                               window.location = '/Tandas/Descargar?fileGuid=' + response.FileGuid + '&filename=' + response.FileName;
+                               
+                           });
+                       },
+                   },
+                   formatter: function operateFormatter(value, row, index) {
+                       return "<a style='cursor:pointer' class='Reporte' title='Finanzas'><i class='fa fa-usd'></i></a>";
+
+                   }
+               },
+               {
                    field: "reporte",
                    align: 'center',
                    valign: 'middle',
