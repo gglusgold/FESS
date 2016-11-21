@@ -186,7 +186,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     idProducto = b.Productos.idProducto,
                     nombre = b.Productos.producto,
                     cantidad = b.cantidad,
-                    comentado = a.Comentarios.Count == 1 ? a.Comentarios.FirstOrDefault().ComentariosProducto.FirstOrDefault(cp => cp.productoId == b.productoId).Productos != null : false,
+                    comentado = a.ComentariosProducto.FirstOrDefault(c => c.productoId == b.productoId) != null,  // a.Comentarios.Count == 1 ? a.Comentarios.FirstOrDefault().ComentariosProducto.FirstOrDefault(cp => cp.productoId == b.productoId).Productos != null : false,
                     precioUnidad = b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio
                 }).ToList()
             }).ToList();
@@ -321,34 +321,54 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
             Compras compra = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra);
 
+            var totalProductos = compra.CompraProducto.Where(a => a.compraId == idCompra).Count();
 
-            Comentarios comentario = new Comentarios();
-            if (ctx.Comentarios.FirstOrDefault(a => a.vecinoId == vecino.idVecino && a.compraId == compra.idCompra) == null)
+
+            //Comentarios comentario = ctx.Comentarios.FirstOrDefault(a => a.vecinoId == vecino.idVecino && a.compraId == compra.idCompra);
+            //if (comentario == null)
+            //{
+            //    comentario = new Comentarios();
+            //    comentario.Vecinos = vecino;
+            //    comentario.Compras = compra;
+            //    ctx.Comentarios.Add(comentario);
+            //}
+            //else
+            //{
+            //    comentario.fecha = DateTime.Now;
+            //}
+            var ids = new List<int>();
+            for (int x = 0; x < idProducto.Length; x++)
             {
-                compra.EstadosCompra = comentado;
+                int usar = idProducto[x];
+                Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == usar);
 
-                comentario.Vecinos = vecino;
-                comentario.fecha = DateTime.Now;
-                comentario.Compras = compra;
 
-                for (int x = 0; x < idProducto.Length; x++)
+                string com = tComentarios[x];
+                int rat = rating[x];
+                if ( com != "" && rat > 0)
                 {
-                    int usar = idProducto[x];
-                    Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == usar);
-
                     ComentariosProducto cp = new ComentariosProducto();
-                    cp.comentario = tComentarios[x];
-                    cp.estrellas = rating[x];
+                    cp.comentario = com;
+                    cp.estrellas = rat;
                     cp.Productos = prod;
-                    comentario.ComentariosProducto.Add(cp);
-                }
-
-                ctx.Comentarios.Add(comentario);
-                ctx.SaveChanges();
-                return Json(new { bien = true, idCompra = idCompra, comentario = comentado.nombre });
+                    cp.fecha = DateTime.Now;
+                    ids.Add(usar);
+                    compra.ComentariosProducto.Add(cp);
+                }                
             }
 
-            return Json(new { bien = false, mensaje = "No se puede comentar la misma compra 2 veces" });
+            bool todoComentado = false;
+            var totalComendados = compra.ComentariosProducto.Where(a => a.compraId == idCompra).Count();
+            if ( totalProductos == totalComendados )
+            {
+                compra.EstadosCompra = comentado;
+                todoComentado = true;
+            }
+
+            ctx.SaveChanges();
+            return Json(new { bien = true, idCompra = idCompra, comentario = comentado.nombre, ids = ids, todoComentado = todoComentado });
+
+            //return Json(new { bien = false, mensaje = "No se puede comentar la misma compra 2 veces" });
         }
 
         public ActionResult ListaTanda()
@@ -361,7 +381,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             {
                 idCompra = a.idCompra,
                 nombre = a.Vecinos.nombres,
-                productos = string.Join("<br/>", a.CompraProducto.ToList().Select(b => "<span class='idca' style='display:none'>[" + b.productoId + "|" + b.cantidad + "]</span>(" + b.cantidad + ") " + b.Productos.producto + " - " + b.Productos.marca  + " - " + b.Productos.presentacion)),
+                productos = string.Join("<br/>", a.CompraProducto.ToList().Select(b => "<span class='idca' style='display:none'>[" + b.productoId + "|" + b.cantidad + "]</span>(" + b.cantidad + ") " + b.Productos.producto + " - " + b.Productos.marca + " - " + b.Productos.presentacion)),
                 precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio),
                 retiro = a.EstadosCompra.codigo
             });
@@ -420,7 +440,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             else
             {
                 var productos = compra.CompraProducto;
-                for ( int x = 0; x < ids.Count();  x++) {
+                for (int x = 0; x < ids.Count(); x++)
+                {
                     var prod = productos.FirstOrDefault(a => a.productoId == ids[x]);
                     prod.cantidad = cantidad[x];
 

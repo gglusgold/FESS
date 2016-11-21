@@ -189,9 +189,6 @@
     <Compile Include="Models\Circuitos.cs">
       <DependentUpon>EssNe.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Comentarios.cs">
-      <DependentUpon>EssNe.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\ComentariosProducto.cs">
       <DependentUpon>EssNe.tt</DependentUpon>
     </Compile>
@@ -239,6 +236,9 @@
       <DependentUpon>EssNe.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\RolesVecinos.cs">
+      <DependentUpon>EssNe.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\sysdiagrams.cs">
       <DependentUpon>EssNe.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Tandas.cs">

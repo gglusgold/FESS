@@ -3,10 +3,8 @@
     ViewBag.Title = "Historial";
     Layout = "~/Views/Compartida/_layout.cshtml";
 }
-
 <div class="container-fluid comprascon" style="margin-top:100px">
 </div>
-
 <div class="modal fade" id="comentarmodal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <form id="calificarform" method="post" role="form">
@@ -16,19 +14,16 @@
                     <h4 class="js-title-step"></h4>
                 </div>
                 <div class="modal-body">
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default js-btn-step pull-left" data-orientation="cancel" data-dismiss="modal"></button>
                     <button type="button" class="btn btn-warning js-btn-step" data-orientation="previous"></button>
                     <button type="button" class="btn btn-success js-btn-step" data-orientation="next"></button>
-
                 </div>
             </div><!-- /.modal-content -->
         </form>
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
 <div class="row hide" id="comentarproducto">
     <div class="row col-md-12">
         <div class="col-md-8">
@@ -46,8 +41,7 @@
         <span class="help-block pull-right validacionerror" style="color:red; display:none"></span>
     </div>
     <div class="col-md-12"><span class="help-block">*No son obligatorios los comentarios</span></div>
-</div> 
-
+</div>
 <div id="compra" style="display:none">
     <div class="card">
         <div class="row">
@@ -67,7 +61,6 @@
                     <h4>Estado del pedido: <b class="estado"></b></h4>
                 </div>
             </div>
-
             <table class="table" id="tabla_listado">
                 <thead>
                     <tr>
@@ -78,7 +71,6 @@
                 </thead>
                 <tbody class="productos"></tbody>
                 <tfoot>
-
                 </tfoot>
             </table>
         </div>
@@ -102,7 +94,6 @@
         </div>
     </div>
 </div>
-
 
 @section scripts{
     <script type="text/javascript">
@@ -144,7 +135,7 @@
                 nueva.find(".btncomentar").show();
             if (comprado.comentado )
                 nueva.find(".btnrepetir").show();
-            
+
 
             nueva.removeAttr('id');
 
@@ -188,7 +179,7 @@
                 todo.productos.push(prod);
             });
 
-            
+
 
             Cookies.set('editar', todo, { path: '/' });
             window.location.href = "/Compras/Carrito";
@@ -197,23 +188,35 @@
 
         $('#comentarmodal').modalSteps({
             completeCallback: function(){
-                //$.post("/Compras/Calificar", $('#comentarmodal').find("form").serialize(), function(devuelta){
-                //    if (devuelta.bien){
-                //        $.toast({
-                //            heading: 'Frente de Economía Social y Solidaria!',
-                //            text: 'Gracias por dejarnos tus comentarios',
-                //            icon: 'info',
-                //            loader: false,
-                //            hideAfter: 5000
-                //        })
+                $.post("/Compras/Calificar", $('#comentarmodal').find("form").serialize(), function(devuelta){
 
-                //        $("[data-idcompra=" + devuelta.idCompra + "]").find(".btncomentar").hide();
-                //        $("[data-idcompra=" + devuelta.idCompra + "]").find(".estado").text(devuelta.comentario);
-                //    }
-                //});
+
+
+                    if (devuelta.bien){
+                        $.toast({
+                            heading: 'Frente de Economía Social y Solidaria!',
+                            text: 'Gracias por dejarnos tus comentarios',
+                            icon: 'info',
+                            loader: false,
+                            hideAfter: 5000
+                        })
+
+                        $.each(devuelta.ids, function(i,val){
+                            console.log(val);
+                            var ar = returnObjProd(compras[0].productos, val);
+                            ar.comentado = true
+                        });
+                        
+
+                        if ( devuelta.todoComentado ){
+                            $("[data-idcompra=" + devuelta.idCompra + "]").find(".btncomentar").hide();
+                            $("[data-idcompra=" + devuelta.idCompra + "]").find(".estado").text(devuelta.comentario);
+                        }
+                    }
+                });
             },
             validar: function(actual){
-                
+
                 /*var comentario = actual.find(".tComentarios").val();
                 var rating = actual.find(".estrellas").val();
                 var error = $(".validacionerror");
@@ -235,7 +238,7 @@
             },
             callbacks: {
                 '*': function(e){
-                    console.log($(".js-title-step").effect("highlight", {}, 1000));
+                    $(".js-title-step").effect("highlight", {}, 1000);
                 }
             }
         });
@@ -253,13 +256,17 @@
             $("#comentarmodal").find("#idCompra").val(idCompra);
 
 
+            var step = 1;
             $.each(compra.productos, function(i,val){
-                var nuevo = $("#comentarproducto").clone();
-                nuevo.attr({"data-step": i + 1, "data-title": val.nombre});
-                nuevo.find(".idProducto").val(val.idProducto);
-                nuevo.show();
+                if(!val.comentado){
+                    var nuevo = $("#comentarproducto").clone();
+                    nuevo.attr({"data-step": step, "data-title": val.nombre});
+                    nuevo.find(".idProducto").val(val.idProducto);
+                    nuevo.show();
 
-                $("#comentarmodal").find(".modal-body").append(nuevo);
+                    step++;
+                    $("#comentarmodal").find(".modal-body").append(nuevo);
+                }
 
             });
 
@@ -273,7 +280,7 @@
             boton.closest('.row').find('button').button('loading');
             var idCompra = boton.closest('.card').data('idcompra');
 
-           
+
         });
 
         $("#comentarmodal").on('hidden.bs.modal', function () {
@@ -306,6 +313,12 @@
         function returnObj(arr,r){
             return $.grep(arr, function(elem,index){
                 return elem ? elem.idCompra == r : false;
+            })[0];
+        }
+
+        function returnObjProd(arr,r){
+            return $.grep(arr, function(elem,index){
+                return elem ? elem.idProducto == r : false;
             })[0];
         }
 

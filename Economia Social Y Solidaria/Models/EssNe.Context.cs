@@ -36,8 +36,6 @@ public partial class TanoNEEntities : DbContext
 
     public virtual DbSet<Circuitos> Circuitos { get; set; }
 
-    public virtual DbSet<Comentarios> Comentarios { get; set; }
-
     public virtual DbSet<ComentariosProducto> ComentariosProducto { get; set; }
 
     public virtual DbSet<CompraProducto> CompraProducto { get; set; }
@@ -54,15 +52,17 @@ public partial class TanoNEEntities : DbContext
 
     public virtual DbSet<Productos> Productos { get; set; }
 
+    public virtual DbSet<Relevamientos> Relevamientos { get; set; }
+
     public virtual DbSet<Roles> Roles { get; set; }
 
     public virtual DbSet<RolesVecinos> RolesVecinos { get; set; }
 
+    public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
+
     public virtual DbSet<Tandas> Tandas { get; set; }
 
     public virtual DbSet<Vecinos> Vecinos { get; set; }
-
-    public virtual DbSet<Relevamientos> Relevamientos { get; set; }
 
 }
 

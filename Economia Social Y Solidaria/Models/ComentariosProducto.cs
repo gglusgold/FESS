@@ -20,7 +20,7 @@ public partial class ComentariosProducto
 
     public int idProductoComentario { get; set; }
 
-    public int comentarioId { get; set; }
+    public int compraId { get; set; }
 
     public int productoId { get; set; }
 
@@ -28,11 +28,13 @@ public partial class ComentariosProducto
 
     public int estrellas { get; set; }
 
+    public System.DateTime fecha { get; set; }
+
     public bool visible { get; set; }
 
 
 
-    public virtual Comentarios Comentarios { get; set; }
+    public virtual Compras Compras { get; set; }
 
     public virtual Productos Productos { get; set; }
 

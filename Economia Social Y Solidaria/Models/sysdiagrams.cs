@@ -15,32 +15,18 @@ namespace Economia_Social_Y_Solidaria.Models
 using System;
     using System.Collections.Generic;
     
-public partial class Comentarios
+public partial class sysdiagrams
 {
 
-    public Comentarios()
-    {
+    public string name { get; set; }
 
-        this.ComentariosProducto = new HashSet<ComentariosProducto>();
+    public int principal_id { get; set; }
 
-    }
+    public int diagram_id { get; set; }
 
+    public Nullable<int> version { get; set; }
 
-    public int idComentario { get; set; }
-
-    public System.DateTime fecha { get; set; }
-
-    public int vecinoId { get; set; }
-
-    public int compraId { get; set; }
-
-
-
-    public virtual Compras Compras { get; set; }
-
-    public virtual Vecinos Vecinos { get; set; }
-
-    public virtual ICollection<ComentariosProducto> ComentariosProducto { get; set; }
+    public byte[] definition { get; set; }
 
 }
 

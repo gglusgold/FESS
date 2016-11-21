@@ -21,8 +21,6 @@ public partial class Vecinos
     public Vecinos()
     {
 
-        this.Comentarios = new HashSet<Comentarios>();
-
         this.Compras = new HashSet<Compras>();
 
         this.RolesVecinos = new HashSet<RolesVecinos>();
@@ -51,8 +49,6 @@ public partial class Vecinos
     public Nullable<int> localId { get; set; }
 
 
-
-    public virtual ICollection<Comentarios> Comentarios { get; set; }
 
     public virtual ICollection<Compras> Compras { get; set; }
 

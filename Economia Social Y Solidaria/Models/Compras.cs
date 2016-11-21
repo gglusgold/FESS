@@ -21,7 +21,7 @@ public partial class Compras
     public Compras()
     {
 
-        this.Comentarios = new HashSet<Comentarios>();
+        this.ComentariosProducto = new HashSet<ComentariosProducto>();
 
         this.CompraProducto = new HashSet<CompraProducto>();
 
@@ -42,7 +42,7 @@ public partial class Compras
 
 
 
-    public virtual ICollection<Comentarios> Comentarios { get; set; }
+    public virtual ICollection<ComentariosProducto> ComentariosProducto { get; set; }
 
     public virtual ICollection<CompraProducto> CompraProducto { get; set; }
 
