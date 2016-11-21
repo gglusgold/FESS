@@ -99,6 +99,7 @@
     <script type="text/javascript">
         var compras = @Html.Raw(Json.Encode(Model.Compras));
         cargarDatos(compras);
+        console.log(compras);
 
         function cargarDatos(compras){
             var container = $(".comprascon");
@@ -209,30 +210,10 @@
                         if ( devuelta.todoComentado ){
                             $("[data-idcompra=" + devuelta.idCompra + "]").find(".btncomentar").hide();
                             $("[data-idcompra=" + devuelta.idCompra + "]").find(".estado").text(devuelta.comentario);
+                            $("[data-idcompra=" + devuelta.idCompra + "]").find(".btnrepetir").show();
                         }
                     }
                 });
-            },
-            validar: function(actual){
-
-                /*var comentario = actual.find(".tComentarios").val();
-                var rating = actual.find(".estrellas").val();
-                var error = $(".validacionerror");
-
-                if ( comentario.length < 5 ){
-                    error.show();
-                    error.text("El comentario debe tener un mínimo de 5 caracteres")
-                    return false;
-                } else if ( rating == 0 ){
-                    error.show();
-                    error.text("Hay que seleccionar al menos 1 estrella")
-                    return false;
-                }
-                error.hide();*/
-
-                return true;
-
-                //confirm_password.setCustomValidity("Las contraseñas no coinciden");
             },
             callbacks: {
                 '*': function(e){

@@ -359,15 +359,18 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 }
             }
 
+            ctx.SaveChanges();
+
             bool todoComentado = false;
-            var totalComendados = compra.ComentariosProducto.Where(a => a.compraId == idCompra).Count();
+            var totalComendados = ctx.ComentariosProducto.Where(a => a.compraId == idCompra).Count();
             if (totalProductos == totalComendados)
             {
                 compra.EstadosCompra = comentado;
                 todoComentado = true;
+                ctx.SaveChanges();
             }
 
-            ctx.SaveChanges();
+            
             return Json(new { bien = true, idCompra = idCompra, comentario = comentado.nombre, ids = ids, todoComentado = todoComentado });
 
             //return Json(new { bien = false, mensaje = "No se puede comentar la misma compra 2 veces" });
