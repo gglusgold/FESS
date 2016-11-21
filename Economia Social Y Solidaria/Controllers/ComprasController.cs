@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -345,7 +347,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                 string com = tComentarios[x];
                 int rat = rating[x];
-                if ( com != "" && rat > 0)
+                if (com != "" && rat > 0)
                 {
                     ComentariosProducto cp = new ComentariosProducto();
                     cp.comentario = com;
@@ -354,12 +356,12 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     cp.fecha = DateTime.Now;
                     ids.Add(usar);
                     compra.ComentariosProducto.Add(cp);
-                }                
+                }
             }
 
             bool todoComentado = false;
             var totalComendados = compra.ComentariosProducto.Where(a => a.compraId == idCompra).Count();
-            if ( totalProductos == totalComendados )
+            if (totalProductos == totalComendados)
             {
                 compra.EstadosCompra = comentado;
                 todoComentado = true;
@@ -460,6 +462,57 @@ namespace Economia_Social_Y_Solidaria.Controllers
         {
             int daysToAdd = ((int)day - (int)start.DayOfWeek + 7) % 7;
             return start.AddDays(daysToAdd);
+        }
+
+        public string MandarMailCalificacion()
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+            var compras = ctx.Compras.Where(a => a.EstadosCompra.codigo == 3).Distinct().ToList();
+
+            var vecinosQueCompraron = ctx.Compras.Where(a => a.EstadosCompra.codigo == 3).GroupBy(a => a.vecinoId).Select(a => a.FirstOrDefault(b => b.vecinoId == a.Key)).ToList();
+            foreach (var actualTanda in vecinosQueCompraron)
+            {
+                string nombre = actualTanda.Vecinos.nombres;
+                string correo = actualTanda.Vecinos.correo;
+
+                using (MailMessage mail = new MailMessage())
+                {
+
+                    mail.From = new MailAddress("economiasocial@encuentrocapital.com.ar", "Economía Social y Solidaria");
+                    mail.To.Add(correo);
+                    //mail.To.Add("julianlionti@hotmail.com");
+                    mail.Subject = "Economia Social y Solidaria -- Nuevo Encuentro";
+                    mail.Body = "<p>No te olvides de dejarnos tus comentarios sobre los productos comprados</p>";
+                    mail.BodyEncoding = System.Text.Encoding.UTF8;
+
+                    List<Compras> totalCompras = ctx.Compras.Where(a => a.vecinoId == actualTanda.Vecinos.idVecino && a.EstadosCompra.codigo == 3).ToList();
+                    foreach (var c in totalCompras)
+                    {
+                        mail.Body += "<p>-------------------</p>";
+                        mail.Body += "<p>Compra N° " + (totalCompras.IndexOf(c) + 1) + "</p>";
+
+                        foreach (CompraProducto prod in c.CompraProducto)
+                        {
+                            if (c.ComentariosProducto.FirstOrDefault(a => a.productoId == prod.productoId) == null)
+                                mail.Body += "<p>" + prod.Productos.producto + " - " + prod.Productos.presentacion + " - " + prod.Productos.marca + " - Cantidad: " + prod.cantidad + "</p>";
+                        }
+                        mail.Body += "<p>-------------------</p>";
+                        mail.Body += "<br/><br/>";
+                    }
+
+                    mail.Body += "<p>Muchas gracias! Te esperamos</p>";
+                    mail.IsBodyHtml = true;
+
+                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    {
+                        smtp.Credentials = new NetworkCredential("economiasocial@encuentrocapital.com.ar", "Frent3355");
+                        smtp.EnableSsl = true;
+                        smtp.Send(mail);
+                    }
+                }
+            }
+
+            return "Bien!";
         }
     }
 }

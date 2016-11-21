@@ -188,10 +188,9 @@
 
         $('#comentarmodal').modalSteps({
             completeCallback: function(){
+                $.blockUI({ message: null });
                 $.post("/Compras/Calificar", $('#comentarmodal').find("form").serialize(), function(devuelta){
-
-
-
+                    $.unblockUI();
                     if (devuelta.bien){
                         $.toast({
                             heading: 'Frente de Economía Social y Solidaria!',
@@ -202,7 +201,6 @@
                         })
 
                         $.each(devuelta.ids, function(i,val){
-                            console.log(val);
                             var ar = returnObjProd(compras[0].productos, val);
                             ar.comentado = true
                         });
