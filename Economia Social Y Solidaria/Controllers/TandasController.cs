@@ -321,31 +321,36 @@ namespace Economia_Social_Y_Solidaria.Controllers
             string handle = Guid.NewGuid().ToString();
 
             StringBuilder csv = new StringBuilder();
-            string Columnas = string.Format("{0};{1};{2};{3}", "N", "Producto", "Presentacion", "Cantidad", "Costo(Aprox)");
+            string Columnas = string.Format(";{0};{1};{2};{3};{4}", "Cantidad", "Producto", "Costo", "Precio", "Diferencia");
             csv.AppendLine(Columnas);
 
 
             TanoNEEntities ctx = new TanoNEEntities();
             Tandas actual = ctx.Tandas.FirstOrDefault(a => a.idTanda == idTanda);
 
-            decimal costoTotal = 0;
+            
             var locales = ctx.Compras.Where(a => a.tandaId == idTanda).Select(a => a.Locales).Distinct().ToList();
             foreach (var local in locales)
             {
                 csv.AppendLine(local.direccion);
+                decimal costoLocal = 0;
+                decimal precioLocal = 0;
                 var listado = ctx.CompraProducto.Where(a => a.Compras.localId == local.idLocal && a.Compras.tandaId == idTanda).GroupBy(a => a.productoId).Select(a => new { idProducto = a.Key, Cantidad = a.Sum(b => b.cantidad) }).ToArray();
                 for (int x = 0; x < listado.Count(); x++)
                 {
                     var compra = listado[x];
                     Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == compra.idProducto);
                     decimal costo = prod.Costos.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).costo * compra.Cantidad;
-                    costoTotal += costo;
-                    string filas = string.Format(";{0};{1};${2}", compra.Cantidad, string.Format("{0} - {1} - {2}", prod.producto, prod.marca, prod.presentacion), costo.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture));
+                    decimal precio = prod.Precios.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).precio * compra.Cantidad;
+                    costoLocal += costo;
+                    precioLocal += precio;
+                    string filas = string.Format(";{0};{1};${2};${3};${4}", compra.Cantidad, string.Format("{0} - {1} - {2}", prod.producto, prod.marca, prod.presentacion), costo.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), (precio - costo).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture));
                     csv.AppendLine(filas);
                 }
+                csv.AppendLine(string.Format(";;;${0};${1};${2}", costoLocal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), precioLocal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), (precioLocal - costoLocal).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)));
             }
-            string cierre = string.Format("Total;;;${0}", costoTotal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture));
-            csv.AppendLine(cierre);
+            //string cierre = string.Format("Total;;;${0}", costoTotal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture));
+            //csv.AppendLine(cierre);
 
             using (MemoryStream memoryStream = new MemoryStream(Encoding.Default.GetBytes(csv.ToString())))
             {

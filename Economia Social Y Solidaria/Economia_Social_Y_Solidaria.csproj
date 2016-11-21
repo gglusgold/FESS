@@ -131,6 +131,7 @@
     <Compile Include="Controllers\LocalesController.cs" />
     <Compile Include="Controllers\CategoriasController.cs" />
     <Compile Include="Controllers\EstadisticasController.cs" />
+    <Compile Include="Controllers\RelevamientosController.cs" />
     <Compile Include="Controllers\TandasController.cs" />
     <Compile Include="Controllers\ComprasController.cs" />
     <Compile Include="Controllers\InicioController.cs" />
@@ -231,6 +232,9 @@
       <DependentUpon>EssNe.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ProductosH.cs" />
+    <Compile Include="Models\Relevamientos.cs">
+      <DependentUpon>EssNe.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Roles.cs">
       <DependentUpon>EssNe.tt</DependentUpon>
     </Compile>

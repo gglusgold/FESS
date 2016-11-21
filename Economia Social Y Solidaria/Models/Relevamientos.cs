@@ -15,24 +15,24 @@ namespace Economia_Social_Y_Solidaria.Models
 using System;
     using System.Collections.Generic;
     
-public partial class Categorias
+public partial class Relevamientos
 {
 
-    public Categorias()
-    {
+    public int idRelevamiento { get; set; }
 
-        this.Productos = new HashSet<Productos>();
+    public string fruta { get; set; }
 
-    }
+    public string tipo { get; set; }
 
+    public int cantidad { get; set; }
 
-    public int idCategoria { get; set; }
+    public decimal precio { get; set; }
 
-    public string nombre { get; set; }
+    public string donde { get; set; }
 
+    public System.DateTime fechaRelevado { get; set; }
 
-
-    public virtual ICollection<Productos> Productos { get; set; }
+    public System.DateTime fechaSincronizado { get; set; }
 
 }
 
