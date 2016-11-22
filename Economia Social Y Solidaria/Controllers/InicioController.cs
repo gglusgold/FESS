@@ -45,7 +45,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     if (!vecino.verificado)
                     {
                         Response.Cookies["Error"].Value = "Hay que verificar la cuenta. Revisa tu mail";
-                        return RedirectToAction("Carrito", "Compras");
+                        return RedirectToAction("Portada", "Noticias");
                     }
 
                     pass = GetCrypt(pass);
@@ -59,7 +59,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         if (url.Split('/').Length == 3)
                             return RedirectToAction(url.Split('/')[2], url.Split('/')[1]);
                         else
-                            return RedirectToAction("Carrito", "Compras");
+                            return RedirectToAction("Portada", "Noticias");
                     }
                     else
                         Response.Cookies["Error"].Value = "Contraseña no válida";
@@ -119,7 +119,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     Response.Cookies["Info"].Value = "Te mandamos un mail para confirmar la cuenta!";
                 }
             }
-            return RedirectToAction("Carrito", "Compras");
+            return RedirectToAction("Portada", "Noticias");
         }
 
         public ActionResult ActivarCuenta(string k)
@@ -135,14 +135,14 @@ namespace Economia_Social_Y_Solidaria.Controllers
             else
                 Response.Cookies["Mensaje"].Value = ViewBag.Error = "No se encontró la cuenta para activar";
 
-            return RedirectToAction("Carrito", "Compras");
+            return RedirectToAction("Portada", "Noticias");
         }
 
         public ActionResult CerrarSesion()
         {
             Session.Abandon();
             FormsAuthentication.SignOut();
-            return RedirectToAction("Carrito", "Compras");
+            return RedirectToAction("Portada", "Noticias");
         }
 
 
