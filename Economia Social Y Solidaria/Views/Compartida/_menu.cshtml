@@ -29,6 +29,7 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
+                <li><a href="~/Noticias/Portada">Noticias</a></li>
                 <li><a href="~/Compras/Carrito">Comprar!</a></li>
                 @if (User.Identity.IsAuthenticated)
                 {
@@ -44,11 +45,15 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
                                 <ul class="dropdown-menu" style="position: absolute;">
                                     <li><a href="~/Productos/Productos">Productos</a></li>
+                                    <li role="separator" class="divider"></li>
                                     <li><a href="~/Tandas/Tandas">Tandas</a></li>
                                     <li><a id="ComprasTanda" href="#">Ver Compras por Tandas</a></li>
                                     <li><a href="~/Locales/Locales">Locales</a></li>
+                                    <li role="separator" class="divider"></li>
                                     <li><a href="~/Estadisticas/Estadisticas">Estadisticas</a></li>
                                     <li><a href="~/Vecinos/Vecino">Administrar</a></li>  
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="~/Noticias/Cargar">Noticias</a></li>  
                                 </ul>
                             </li>
                             

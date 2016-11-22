@@ -82,6 +82,20 @@
           <Property Name="circuitoId" Type="int" Nullable="false" />
           <Property Name="activo" Type="bit" Nullable="false" />
         </EntityType>
+        <EntityType Name="Noticias">
+          <Key>
+            <PropertyRef Name="idNoticia" />
+          </Key>
+          <Property Name="idNoticia" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="titulo" Type="varchar" MaxLength="255" />
+          <Property Name="copete" Type="text" Nullable="false" />
+          <Property Name="link" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="imagen" Type="varchar" MaxLength="100" />
+          <Property Name="categoria" Type="varchar" MaxLength="100" />
+          <Property Name="tags" Type="varchar" MaxLength="100" />
+          <Property Name="autor" Type="varchar" MaxLength="100" />
+          <Property Name="fecha" Type="datetime" />
+        </EntityType>
         <EntityType Name="Precios">
           <Key>
             <PropertyRef Name="idPrecio" />
@@ -382,6 +396,7 @@
           <EntitySet Name="Costos" EntityType="Self.Costos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EstadosCompra" EntityType="Self.EstadosCompra" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Locales" EntityType="Self.Locales" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Noticias" EntityType="Self.Noticias" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Precios" EntityType="Self.Precios" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Productos" EntityType="Self.Productos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Relevamientos" EntityType="Self.Relevamientos" Schema="dbo" store:Type="Tables" />
@@ -548,6 +563,7 @@
             <End Role="Vecinos" EntitySet="Vecinos" />
             <End Role="Tandas" EntitySet="Tandas" />
           </AssociationSet>
+          <EntitySet Name="Noticias" EntityType="TanoNEModel.Noticias" />
         </EntityContainer>
         <EntityType Name="Categorias">
           <Key>
@@ -951,6 +967,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Noticias">
+          <Key>
+            <PropertyRef Name="idNoticia" />
+          </Key>
+          <Property Name="idNoticia" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="titulo" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="copete" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="link" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="imagen" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="categoria" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="tags" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="autor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="fecha" Type="DateTime" Precision="3" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1132,6 +1162,21 @@
                 <ScalarProperty Name="nombres" ColumnName="nombres" />
                 <ScalarProperty Name="correo" ColumnName="correo" />
                 <ScalarProperty Name="idVecino" ColumnName="idVecino" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Noticias">
+            <EntityTypeMapping TypeName="TanoNEModel.Noticias">
+              <MappingFragment StoreEntitySet="Noticias">
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="autor" ColumnName="autor" />
+                <ScalarProperty Name="tags" ColumnName="tags" />
+                <ScalarProperty Name="categoria" ColumnName="categoria" />
+                <ScalarProperty Name="imagen" ColumnName="imagen" />
+                <ScalarProperty Name="link" ColumnName="link" />
+                <ScalarProperty Name="copete" ColumnName="copete" />
+                <ScalarProperty Name="titulo" ColumnName="titulo" />
+                <ScalarProperty Name="idNoticia" ColumnName="idNoticia" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
