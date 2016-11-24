@@ -47,6 +47,9 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net40\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="mercadopago">
+      <HintPath>..\..\..\..\..\Downloads\mercadopago.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
@@ -132,6 +135,7 @@
     <Compile Include="Controllers\CategoriasController.cs" />
     <Compile Include="Controllers\EstadisticasController.cs" />
     <Compile Include="Controllers\NoticiasController.cs" />
+    <Compile Include="Controllers\PruebaController.cs" />
     <Compile Include="Controllers\RelevamientosController.cs" />
     <Compile Include="Controllers\TandasController.cs" />
     <Compile Include="Controllers\ComprasController.cs" />
@@ -329,6 +333,7 @@
     <Content Include="Js\toastr.min.js" />
     <Content Include="Views\Noticias\Portada.cshtml" />
     <Content Include="Views\Noticias\Cargar.cshtml" />
+    <Content Include="Views\Prueba\Prueba.cshtml" />
     <None Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
