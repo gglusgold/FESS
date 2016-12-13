@@ -276,7 +276,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     {
                         var compra = listado[x];
                         Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == compra.idProducto);
-                        decimal costo = prod.Costos.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).costo * compra.Cantidad;
+                        Costos ultimo = prod.Costos.Count > 1 ? prod.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Costos.FirstOrDefault();
+                        decimal costo = ultimo.costo * compra.Cantidad;
                         costoTotal += costo;
                         string filas = string.Format(";{0};{1};${2}", compra.Cantidad, string.Format("{0} - {1} - {2}", prod.producto, prod.marca, prod.presentacion), costo.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture));
                         csv.AppendLine(filas);
@@ -293,7 +294,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 {
                     var compra = listado[x];
                     Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == compra.idProducto);
-                    decimal costo = prod.Costos.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).costo * compra.Cantidad;
+                    Costos ultimo = prod.Costos.Count > 1 ? prod.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Costos.FirstOrDefault();
+                    decimal costo = ultimo.costo * compra.Cantidad;
+                    //decimal costo = prod.Costos.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).costo * compra.Cantidad;
                     costoTotal += costo;
                     string filas = string.Format("{0};{1};{2};{3};${4}", x + 1, prod.producto, prod.presentacion, compra.Cantidad, costo.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture));
                     csv.AppendLine(filas);
@@ -340,8 +343,14 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 {
                     var compra = listado[x];
                     Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == compra.idProducto);
-                    decimal costo = prod.Costos.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).costo * compra.Cantidad;
-                    decimal precio = prod.Precios.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).precio * compra.Cantidad;
+
+                    Costos ultimoc = prod.Costos.Count > 1 ? prod.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Costos.FirstOrDefault();
+                    decimal costo = ultimoc.costo * compra.Cantidad;
+                    //decimal costo = prod.Costos.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).costo * compra.Cantidad;
+
+                    Precios ultimop = prod.Precios.Count > 1 ? prod.Precios.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Precios.FirstOrDefault();
+                    decimal precio = ultimop.precio * compra.Cantidad;
+                    //decimal precio = prod.Precios.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).precio * compra.Cantidad;
                     costoLocal += costo;
                     precioLocal += precio;
                     string filas = string.Format(";{0};{1};${2};${3};${4}", compra.Cantidad, string.Format("{0} - {1} - {2}", prod.producto, prod.marca, prod.presentacion), costo.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), (precio - costo).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture));

@@ -408,8 +408,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             {
                 idCompra = a.idCompra,
                 nombre = a.Vecinos.nombres,
-                productos = string.Join(" - ", a.CompraProducto.ToList().Select(b => "(" + b.cantidad + ") " + b.Productos.producto + " - " + b.Productos.marca + " - " + b.Productos.presentacion + " - " + b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio)),
-                precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio),
+                productos = string.Join(" - ", a.CompraProducto.ToList().Select(b => "(" + b.cantidad + ") " + b.Productos.producto + " - " + b.Productos.marca + " - " + b.Productos.presentacion + " - " + b.Productos.Precios.LastOrDefault(precio => a.fecha > precio.fecha).precio + "\015")),
+                precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Productos.Precios.LastOrDefault(precio => a.fecha >= precio.fecha).precio),
                 retiro = a.EstadosCompra.codigo,
                 local = a.Locales.direccion
             }).ToArray();
@@ -424,7 +424,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             using (MemoryStream memoryStream = new MemoryStream(Encoding.Default.GetBytes(csv.ToString())))
             {
                 memoryStream.Position = 0;
-                return File(memoryStream.ToArray() as byte[], "application/vnd.ms-excel", "Reporte");
+                return File(memoryStream.ToArray() as byte[], "application/vnd.ms-excel", "Reporte.csv");
             }
 
 
