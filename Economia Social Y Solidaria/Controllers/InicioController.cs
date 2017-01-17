@@ -56,9 +56,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         Response.Cookies.Remove("Mensaje");
 
                         FormsAuthentication.SetAuthCookie(vecino.correo, true);
-                        if (url.Split('/').Length == 3)
-                            return RedirectToAction(url.Split('/')[2], url.Split('/')[1]);
-                        else
+                        //if (url.Split('/').Length == 3)
+                        //    return RedirectToAction(url.Split('/')[2], url.Split('/')[1]);
+                        //else
                             return RedirectToAction("Portada", "Noticias");
                     }
                     else

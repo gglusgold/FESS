@@ -16,6 +16,7 @@ namespace Economia_Social_Y_Solidaria.Models
     {
         public Vecinos()
         {
+            this.Comentarios = new HashSet<Comentarios>();
             this.Compras = new HashSet<Compras>();
             this.RolesVecinos = new HashSet<RolesVecinos>();
             this.Tandas = new HashSet<Tandas>();
@@ -31,6 +32,7 @@ namespace Economia_Social_Y_Solidaria.Models
         public bool verificado { get; set; }
         public Nullable<int> localId { get; set; }
     
+        public virtual ICollection<Comentarios> Comentarios { get; set; }
         public virtual ICollection<Compras> Compras { get; set; }
         public virtual Locales Locales { get; set; }
         public virtual ICollection<RolesVecinos> RolesVecinos { get; set; }

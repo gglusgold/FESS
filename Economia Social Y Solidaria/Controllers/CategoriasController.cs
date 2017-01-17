@@ -24,5 +24,17 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(new { Options = lista });
         }
 
+        public JsonResult ListaJ()
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+            var lista = ctx.Categorias.Select(a => new
+            {
+                DisplayText = a.nombre,
+                Value = a.idCategoria
+            });
+
+            return Json(new { Result = "OK", Options = lista }, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

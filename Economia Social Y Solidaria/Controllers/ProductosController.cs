@@ -1,7 +1,5 @@
 ﻿using Economia_Social_Y_Solidaria.Models;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -10,6 +8,18 @@ using System.Web.Mvc;
 
 namespace Economia_Social_Y_Solidaria.Controllers
 {
+
+    public class Asignacion
+    {
+        public int idProducto { get; set; }
+        public string nombre { get; set; }
+        public string descripcion { get; set; }
+
+        public int idLocal { get; set; }
+        public string direccion { get; set; }
+
+    }
+
     public class ProductosController : Controller
     {
         private string rutaImagen = AppDomain.CurrentDomain.BaseDirectory + "Imagenes\\";
@@ -21,10 +31,12 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return View();
         }
 
-        public JsonResult Lista(/*string order, int limit, int offset*/)
+        public JsonResult Lista(int jtStartIndex = 0, int jtPageSize = 0, string jtSorting = "Id ASC", string nombre = null, string marca = null, string descripcion = null, string cantidad = null, decimal precio = -1, decimal costo = -1, int stock = -2, int idCategoria = -1, bool todos = true, int idLocal = -1)
         {
+            //string path = HttpContext.Request.Url.AbsolutePath;
+            //bool todos = true;
             TanoNEEntities ctx = new TanoNEEntities();
-            var lista = ctx.Productos/*.OrderBy(a => a.idProducto).Skip(offset).Take(limit)*/.ToList().Select(a => new
+            var listaFinal = ctx.Productos.Where(a => todos == true ? (a.activo == true || a.activo == false) : a.activo == !todos)/*.OrderBy(a => a.idProducto).Skip(offset).Take(limit)*/.ToList().Select(a => new
             {
                 idProducto = a.idProducto,
                 nombre = a.producto,
@@ -32,18 +44,131 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 marca = a.marca,
                 descripcion = a.descripcion != null ? a.descripcion.Replace("\n", "<br/>") : "",
                 cantidad = a.presentacion,
-                idCategoria = a.categoriaId,
+                imagen = System.IO.File.Exists(HttpContext.Server.MapPath("/Imagenes/Producto-" + a.idProducto + ".jpg")) ? "/Imagenes/Producto-" + a.idProducto + ".jpg" : "/Imagenes/Fijas/pp.jpeg",
+                categoriaId = a.categoriaId,
                 categoria = a.Categorias.nombre,
                 precio = a.Precios.LastOrDefault().precio,
                 costo = a.Costos.LastOrDefault().costo,
-                borrar = a.activo
+                borrar = a.activo,
+                selected = idLocal != -1 ? a.ProductosLocales.Count > 0 : false
             });
 
+            switch (jtSorting)
+            {
+                default:
+                    listaFinal = listaFinal.OrderByDescending(a => a.idProducto);
+                    break;
+
+                case "nombre ASC":
+                    listaFinal = listaFinal.OrderBy(a => a.nombre);
+                    break;
+
+                case "nombre DESC":
+                    listaFinal = listaFinal.OrderByDescending(a => a.nombre);
+                    break;
+
+                case "marca ASC":
+                    listaFinal = listaFinal.OrderBy(a => a.marca);
+                    break;
+
+                case "marca DESC":
+                    listaFinal = listaFinal.OrderByDescending(a => a.marca);
+                    break;
+
+                case "descripcion ASC":
+                    listaFinal = listaFinal.OrderBy(a => a.descripcion);
+                    break;
+
+                case "descripcion DESC":
+                    listaFinal = listaFinal.OrderByDescending(a => a.descripcion);
+                    break;
+
+                case "cantidad ASC":
+                    listaFinal = listaFinal.OrderBy(a => a.cantidad);
+                    break;
+
+                case "cantidad DESC":
+                    listaFinal = listaFinal.OrderByDescending(a => a.cantidad);
+                    break;
+
+                case "categoria ASC":
+                    listaFinal = listaFinal.OrderBy(a => a.categoria);
+                    break;
+
+                case "categoria DESC":
+                    listaFinal = listaFinal.OrderByDescending(a => a.categoria);
+                    break;
+
+                case "precio ASC":
+                    listaFinal = listaFinal.OrderBy(a => a.precio);
+                    break;
+
+                case "precio DESC":
+                    listaFinal = listaFinal.OrderByDescending(a => a.precio);
+                    break;
+
+                case "costo ASC":
+                    listaFinal = listaFinal.OrderBy(a => a.costo);
+                    break;
+
+                case "costo DESC":
+                    listaFinal = listaFinal.OrderByDescending(a => a.costo);
+                    break;
+
+                case "stock ASC":
+                    listaFinal = listaFinal.OrderBy(a => a.stock);
+                    break;
+
+                case "stock DESC":
+                    listaFinal = listaFinal.OrderByDescending(a => a.stock);
+                    break;
+
+                case "borrar ASC":
+                    listaFinal = listaFinal.OrderBy(a => a.borrar);
+                    break;
+
+                case "borrar DESC":
+                    listaFinal = listaFinal.OrderByDescending(a => a.borrar);
+                    break;
+
+            }
+
+            if (!string.IsNullOrWhiteSpace(nombre))
+                listaFinal = listaFinal.Where(a => a.nombre.Contains(nombre)).ToList();
+
+            if (!string.IsNullOrWhiteSpace(marca))
+                listaFinal = listaFinal.Where(a => a.marca.Contains(marca)).ToList();
+
+            if (!string.IsNullOrWhiteSpace(descripcion))
+                listaFinal = listaFinal.Where(a => a.marca.Contains(descripcion)).ToList();
+
+            if (!string.IsNullOrWhiteSpace(cantidad))
+                listaFinal = listaFinal.Where(a => a.nombre.Contains(cantidad)).ToList();
+
+            if (idCategoria > 0)
+                listaFinal = listaFinal.Where(a => a.categoriaId == idCategoria).ToList();
+
+            if (precio > 0)
+                listaFinal = listaFinal.Where(a => a.precio == precio).ToList();
+
+            if (costo > 0)
+                listaFinal = listaFinal.Where(a => a.costo == costo).ToList();
+
+            if (stock > -2)
+                listaFinal = listaFinal.Where(a => a.stock == stock).ToList();
+
+            int size = listaFinal.Count();
+
+            if (jtPageSize > 0 || jtStartIndex > 0)
+                listaFinal = listaFinal.Skip(jtStartIndex).Take(jtPageSize).ToList();
+
+            return Json(new { Result = "OK", Records = listaFinal, TotalRecordCount = size });
+
             //return Json(new { total = lista.Count(), rows = lista }, JsonRequestBehavior.DenyGet);
-            return Json(lista, JsonRequestBehavior.DenyGet);
+            //return Json(lista, JsonRequestBehavior.DenyGet);
         }
 
-        public JsonResult Crear(string nombre, string marca, string descripcion, HttpPostedFileBase imagen_img, string cantidad, int idCategoria, decimal precio, decimal costo, int stock)
+        public JsonResult Crear(string nombre, string marca, string descripcion, HttpPostedFileBase imagen, string cantidad, int idCategoria, decimal precio, decimal costo, int stock)
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
@@ -73,10 +198,10 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 ctx.Productos.Add(item);
                 ctx.SaveChanges();
 
-                if (imagen_img != null)
+                if (imagen != null)
                 {
-                    string savedFileName = rutaImagen + "Producto-" + item.idProducto + imagen_img.FileName.Substring(imagen_img.FileName.LastIndexOf("."));
-                    imagen_img.SaveAs(savedFileName);
+                    string savedFileName = rutaImagen + "Producto-" + item.idProducto + imagen.FileName.Substring(imagen.FileName.LastIndexOf("."));
+                    imagen.SaveAs(savedFileName);
                 }
             }
             else
@@ -84,10 +209,26 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 return Json(new { error = true, mensaje = "Ya existe el producto" }, JsonRequestBehavior.DenyGet);
             }
 
-            return Json(new { error = false, mensaje = "Producto grabado satisfactoriamente" }, JsonRequestBehavior.DenyGet);
+            var devuelta = new
+            {
+                idProducto = item.idProducto,
+                nombre = item.producto,
+                stock = item.stock,
+                marca = item.marca,
+                descripcion = item.descripcion != null ? item.descripcion.Replace("\n", "<br/>") : "",
+                cantidad = item.presentacion,
+                imagen = System.IO.File.Exists(HttpContext.Server.MapPath("/Imagenes/Producto-" + item.idProducto + ".jpg")) ? "/Imagenes/Producto-" + item.idProducto + ".jpg" : "/Imagenes/Fijas/pp.jpeg",
+                idCategoria = item.categoriaId,
+                categoria = item.Categorias.nombre,
+                precio = item.Precios.LastOrDefault().precio,
+                costo = item.Costos.LastOrDefault().costo,
+                borrar = item.activo
+            };
+
+            return Json(new { Result = "OK", Record = devuelta }, JsonRequestBehavior.DenyGet);
         }
 
-        public JsonResult Editar(int idProducto, string nombre, string marca, string descripcion, HttpPostedFileBase imagen_img, string cantidad, int idCategoria, decimal precio, decimal costo, int stock)
+        public JsonResult Editar(int idProducto, string nombre, string marca, string descripcion, HttpPostedFileBase imagen, string cantidad, int idCategoria, decimal precio, decimal costo, int stock)
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
@@ -118,10 +259,10 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                 ctx.SaveChanges();
 
-                if (imagen_img != null)
+                if (imagen != null)
                 {
-                    string savedFileName = rutaImagen + "Producto-" + item.idProducto + imagen_img.FileName.Substring(imagen_img.FileName.LastIndexOf("."));
-                    imagen_img.SaveAs(savedFileName);
+                    string savedFileName = rutaImagen + "Producto-" + item.idProducto + imagen.FileName.Substring(imagen.FileName.LastIndexOf("."));
+                    imagen.SaveAs(savedFileName);
                 }
             }
             else
@@ -129,20 +270,38 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 return Json(new { error = true, mensaje = "No existe el producto" }, JsonRequestBehavior.DenyGet);
             }
 
-            return Json(new { error = false, mensaje = "Producto editado satisfactoriamente" }, JsonRequestBehavior.DenyGet);
+            var devuelta = new
+            {
+                idProducto = item.idProducto,
+                nombre = item.producto,
+                stock = item.stock,
+                marca = item.marca,
+                descripcion = item.descripcion != null ? item.descripcion.Replace("\n", "<br/>") : "",
+                cantidad = item.presentacion,
+                imagen = System.IO.File.Exists(HttpContext.Server.MapPath("/Imagenes/Producto-" + item.idProducto + ".jpg")) ? "/Imagenes/Producto-" + item.idProducto + ".jpg" : "/Imagenes/Fijas/pp.jpeg",
+                idCategoria = item.categoriaId,
+                categoria = item.Categorias.nombre,
+                precio = item.Precios.LastOrDefault().precio,
+                costo = item.Costos.LastOrDefault().costo,
+                borrar = item.activo
+            };
+
+            return Json(new { Result = "OK", Record = devuelta }, JsonRequestBehavior.DenyGet);
+
+            //return Json(new { error = false, mensaje = "Producto editado satisfactoriamente" }, JsonRequestBehavior.DenyGet);
         }
 
-        public JsonResult Borrar(int idProducto, bool activar)
+        public JsonResult Borrar(int idProducto)
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
             Productos item = ctx.Productos.FirstOrDefault(a => a.idProducto == idProducto);
             if (item != null)
             {
-                item.activo = activar;
+                item.activo = !item.activo;
                 ctx.SaveChanges();
 
-                string savedFileName = rutaImagen + "Producto-" + item.idProducto + ".jpg";
+                //string savedFileName = rutaImagen + "Producto-" + item.idProducto + ".jpg";
                 //if (System.IO.File.Exists(savedFileName))
                 //{
                 //    System.IO.File.Delete(savedFileName);
@@ -153,7 +312,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 return Json(new { error = true, mensaje = "No existe el producto" }, JsonRequestBehavior.DenyGet);
             }
 
-            return Json(activar, JsonRequestBehavior.DenyGet);
+            return Json(new { Result = "OK" }, JsonRequestBehavior.DenyGet);
         }
 
         public JsonResult Muchos(HttpPostedFileBase archivo)
@@ -200,6 +359,12 @@ namespace Economia_Social_Y_Solidaria.Controllers
             ctx.SaveChanges();
 
             return Json(new { error = false, mensaje = "Producto grabado satisfactoriamente" }, JsonRequestBehavior.DenyGet);
+        }
+
+        public ActionResult Asignar()
+        {
+            //List
+            return View();
         }
 
     }

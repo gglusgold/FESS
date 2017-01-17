@@ -74,11 +74,11 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
     public class ComprasController : Controller
     {
-        public ActionResult Carrito(int idCategoria = 1)
+        public ActionResult Carrito(int idCategoria = 1, int idLocal = -1)
         {
 
             ChanguitoCompleta completo = new ChanguitoCompleta();
-            crearChango(completo, idCategoria);
+            crearChango(completo, idCategoria, idLocal);
 
             DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
             completo.proxFecha = ProximaEntrea.ToShortDateString();
@@ -88,10 +88,10 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return View(completo);
         }
 
-        public ActionResult cambioCategoria(int idCategoria)
+        public ActionResult cambioCategoria(int idCategoria, int idLocal = -1)
         {
             ChanguitoCompleta completo = new ChanguitoCompleta();
-            crearChango(completo, idCategoria);
+            crearChango(completo, idCategoria, idLocal);
 
             DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
             completo.proxFecha = ProximaEntrea.ToShortDateString();
@@ -99,7 +99,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(new { lista = completo.changuito });
         }
 
-        public ChanguitoCompleta crearChango(ChanguitoCompleta completo, int idCategoria = -1)
+        public ChanguitoCompleta crearChango(ChanguitoCompleta completo, int idCategoria = -1, int idLocal = -1)
         {
             TanoNEEntities ctx = new TanoNEEntities();
             Tandas ultima = ctx.Tandas.ToList().LastOrDefault();
@@ -127,7 +127,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
             ViewBag.categoria = cat.idCategoria;
 
-            completo.changuito = ctx.Productos.Where(a => a.categoriaId == cat.idCategoria).ToList().Where(a => a.activo).Select(a => new Changuito()
+            completo.changuito = ctx.Productos.Where(a => a.categoriaId == cat.idCategoria && a.ProductosLocales.Any(b => b.localId == idLocal)).ToList().Where(a => a.activo).Select(a => new Changuito()
             {
                 idProducto = a.idProducto,
                 stock = a.stock,
@@ -170,6 +170,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
             EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 3);
             EstadosCompra comentado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 4);
 
+            //Precios ultimop = prod.Precios.Count > 1 ? prod.Precios.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Precios.FirstOrDefault();
+
+
             MisCompras compras = new MisCompras();
             compras.Compras = ctx.Compras.Where(a => a.vecinoId == vecino.idVecino).OrderByDescending(a => a.fecha).ToList().Select(a => new Comprados
             {
@@ -189,7 +192,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     nombre = b.Productos.producto,
                     cantidad = b.cantidad,
                     comentado = a.ComentariosProducto.FirstOrDefault(c => c.productoId == b.productoId) != null,  // a.Comentarios.Count == 1 ? a.Comentarios.FirstOrDefault().ComentariosProducto.FirstOrDefault(cp => cp.productoId == b.productoId).Productos != null : false,
-                    precioUnidad = b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio
+                    precioUnidad = b.Productos.Precios.Count > 1 ? b.Productos.Precios.LastOrDefault(precio => a.fecha.Date >= precio.fecha.Date).precio : b.Productos.Precios.FirstOrDefault().precio,
+
                 }).ToList()
             }).ToList();
 
@@ -229,7 +233,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     idProducto = b.Productos.idProducto,
                     nombre = b.Productos.producto,
                     cantidad = b.cantidad,
-                    precioUnidad = b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio
+                    //precioUnidad = b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio
+                    precioUnidad = b.Productos.Precios.Count > 1 ? b.Productos.Precios.LastOrDefault(precio => a.fecha.Date <= precio.fecha.Date).precio : b.Productos.Precios.FirstOrDefault().precio,
                 }).ToList()
             }).ToList();
 
@@ -370,7 +375,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 ctx.SaveChanges();
             }
 
-            
+
             return Json(new { bien = true, idCompra = idCompra, comentario = comentado.nombre, ids = ids, todoComentado = todoComentado });
 
             //return Json(new { bien = false, mensaje = "No se puede comentar la misma compra 2 veces" });

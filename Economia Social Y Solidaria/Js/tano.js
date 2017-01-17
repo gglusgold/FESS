@@ -220,11 +220,12 @@
         dialog.append(content);
         modal.append(dialog);
 
+        modal.appendTo("body");
 
         modal.modal({
             keyboard: false,
             backdrop: 'static',
-            show: true
+            show: true,
         });
     };
     function isHTML(str) {
@@ -649,7 +650,13 @@ $(function () {
         });
     };
 
+    String.prototype.replaceAll = function (search, replacement) {
+        var target = this;
+        return target.replace(new RegExp(search, 'g'), replacement);
+    };
 
-
+    String.prototype.capitalizeFirstLetter = function () {
+        return this.charAt(0).toUpperCase() + this.slice(1);
+    }
 });
 

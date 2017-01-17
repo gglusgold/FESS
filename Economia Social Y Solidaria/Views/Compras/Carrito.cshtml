@@ -7,6 +7,10 @@
     .dropdown-backdrop {
         position: static;
     }
+
+    .ui-dialog {
+        z-index: 9999;
+    }
 </style>
 <div class="container">
 
@@ -47,6 +51,35 @@
 
 </div>
 
+
+<div class="modal fade" id="locales" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="form_confirmar" action="~/Compras/ConfirmarPedido" method="post" enctype="application/x-www-form-urlencoded">
+            <div class="modal-content">
+                <div class="modal-header">
+                    @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>*@
+                    <h4 class="modal-title">Comenzar pedido</h4>
+                </div>
+                <div class="modal-body">
+                    <h3>Para saber qué productos mostrarte, tenemos que saber dónde vas a retirar tu pedido<br />Los locales de:</h3>
+                    <h3>El pedido debe retirarse el dia @(Model.proxFecha)</h3>
+                    <div class="radio locales">
+                        @foreach (var local in Model.locales)
+                        {
+                            <label style="padding-top: 5px;padding-bottom: 5px;"><input type="radio" name="local" id="local" value="@(local.idLocal)" required>@(local.direccion) (Comuna @(local.comuna) - @(local.barrio)) - de @(local.horario).</label>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type='button' class='btn btn-primary' id="localaceptar">Aceptar</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </form>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
 <div class="modal fade" id="confirmarCompra" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <form id="form_confirmar" action="~/Compras/ConfirmarPedido" method="post" enctype="application/x-www-form-urlencoded">
@@ -71,31 +104,20 @@
                         </tfoot>
                     </table>
                 </div>
-                <div class="modal-body" id="parte_dos" style="display:none">
-                    <h3>Elegir el local por donde retirar</h3>
-                    <h3>El pedido debe retirarse el dia @(Model.proxFecha)</h3>
-                    <div class="radio locales">
-                        @foreach (var local in Model.locales)
-                        {
-                            <label style="padding-top: 5px;padding-bottom: 5px;"><input type="radio" name="local" id="local" value="@(local.idLocal)" required>@(local.direccion) (Comuna @(local.comuna) - @(local.barrio)) - de @(local.horario).</label>
-                        }
-                    </div>
-                </div>
-
                 <div class="modal-footer">
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-sm-4">
+                            @*<div class="col-sm-4">
                                 <button type="button" data-loading-text="Espere..." id="btn_anterior_compra" class="form-control btn btn-primary" style="display: none">Anterior</button>
-                            </div>
+                            </div>*@
                             <div class="col-sm-4">
                                 <button type="button" data-loading-text="Espere..." class="form-control btn btn-default" data-dismiss="modal">Cancelar</button>
                             </div>
-                            <div class="col-sm-4">
+                            @*<div class="col-sm-4">
                                 <button type="button" id="btn_siguiente_compra" class="form-control btn btn-primary">Siguiente</button>
-                            </div>
+                            </div>*@
                             <div class="col-sm-4">
-                                <button type="submit" id="confirmada" data-loading-text="Espere..." class="form-control btn btn-success" style="display:none">Terminar</button>
+                                <button type="submit" id="confirmada" data-loading-text="Espere..." class="form-control btn btn-success">Terminar</button>
                             </div>
                         </div>
                     </div>
@@ -159,11 +181,11 @@
 
         var productos = @Html.Raw(Json.Encode(Model.changuito));
         cargarDatos(productos);
-        console.log(@ViewBag.categoria);
+
         $("#scat").val(@ViewBag.categoria);
         $("#scat").change(function(e){
             $.blockUI({ message: null });
-            $.post("/Compras/cambioCategoria", {idCategoria:$(this).val()}, function(e){
+            $.post("/Compras/cambioCategoria", {idCategoria:$(this).val(), idLocal: Cookies.get('idLocal')}, function(e){
                 $.unblockUI();
                 productos = e.lista;
                 cargarDatos(e.lista);
@@ -191,6 +213,14 @@
             })
 
             $(".pedido").hide();
+        }
+        else{
+            $("#locales").modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+
+            $("#locales").modal('show');
         }
 
         var totalCompras = @Model.totalCompraTandaUsuario;
@@ -306,7 +336,7 @@
             $("#btn_siguiente_compra").show();
             $("#confirmada").hide();
 
-            $("#parte_dos").hide();
+            //$("#parte_dos").hide();
             $("#parte_uno").show();
             e.preventDefault();
         });
@@ -316,7 +346,7 @@
             $("#btn_siguiente_compra").hide();
             $("#confirmada").show();
 
-            $("#parte_dos").show();
+           // $("#parte_dos").show();
             $("#parte_uno").hide();
             e.preventDefault();
 
@@ -331,6 +361,33 @@
             $("#btn_anterior_compra").hide();
             $("#confirmada").hide();
             $("#btn_siguiente_compra").show();
+
+        });
+
+        $("#locales").on('show.bs.modal', function () {
+            $(this).find(".locales input:checked").prop('checked', false);
+
+        });
+
+        $("#localaceptar").on('click', function () {
+            if ($("#locales input:checked").length > 0 )
+            {
+                var idLocal = $("#locales .locales input:checked").val();
+                Cookies.set('idLocal', idLocal);
+
+                $.post("/Compras/cambioCategoria", {idCategoria:$("#scat").val(), idLocal: idLocal}, function(e){
+                    $.unblockUI();
+                    productos = e.lista;
+                    cargarDatos(e.lista);
+                    $("#locales").modal("hide");
+                }).fail(function(xhr, status, error) {
+                    $.unblockUI();
+                    alert("Ocurrio un error");
+                });;
+            }
+            else{
+                alert("Hay q seleccionar un local");
+            }
 
         });
 
@@ -352,7 +409,7 @@
                 cantidad.push(val.cantidad);
             });
 
-            var data = { local:parseInt(local), idCompra: idCompra, cantidad: cantidad, idProducto: id };
+            var data = { local:Cookies.get('idLocal'), idCompra: idCompra, cantidad: cantidad, idProducto: id };
             console.log(data);
 
             $.ajax({
@@ -362,7 +419,7 @@
                 dataType: "json",
                 traditional: true,
                 success: function(response){
-                    
+
                     console.log(response.error == null );
                     if ( response.error == null ){
                         alert("Gracias!");
@@ -386,6 +443,7 @@
         $(document).on("click", ".detalle",function(i){
             $.redirectPost("/Compras/Detalle", { id:$(i.target).closest(".arriba").data("idproducto")})
         });
+
 
         function cargarDatos(productos){
             var container = $(".cont");

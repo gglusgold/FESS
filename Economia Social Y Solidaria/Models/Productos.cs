@@ -20,6 +20,7 @@ namespace Economia_Social_Y_Solidaria.Models
             this.CompraProducto = new HashSet<CompraProducto>();
             this.Costos = new HashSet<Costos>();
             this.Precios = new HashSet<Precios>();
+            this.ProductosLocales = new HashSet<ProductosLocales>();
         }
     
         public int idProducto { get; set; }
@@ -36,5 +37,6 @@ namespace Economia_Social_Y_Solidaria.Models
         public virtual ICollection<CompraProducto> CompraProducto { get; set; }
         public virtual ICollection<Costos> Costos { get; set; }
         public virtual ICollection<Precios> Precios { get; set; }
+        public virtual ICollection<ProductosLocales> ProductosLocales { get; set; }
     }
 }

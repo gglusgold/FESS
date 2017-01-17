@@ -84,6 +84,7 @@
     $(document).on("submit", "#register-form", function (e) {
         $("#register-form").find("input[type='submit']").button('loading');
         $("#register-form").addHidden('url', window.location.pathname);
+
         return true;
     });
 

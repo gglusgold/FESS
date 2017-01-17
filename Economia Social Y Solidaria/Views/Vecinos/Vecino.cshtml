@@ -133,6 +133,29 @@
                        return "<a style='cursor:pointer' class='Retiro' title='Encargado'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
 
                    }
+               },
+               {
+                   field: "noticias",
+                   title: 'Noticias',
+                   sortable: "true",
+                   align: 'center',
+                   valign: 'middle',
+                   create: true,
+                   events: {
+                       'click .Retiro': function (e, value, row, index) {
+
+                           var que = $(e.target).hasClass("glyphicon-ok");
+                           $(e.target).removeAttr("class").addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
+                           $.post("/Vecinos/Editar", { idVecino: row.idVecino, noticias: !que }, function (devuelta) {
+                               $(e.target).removeAttr("class").addClass(devuelta.noticias ? "glyphicon glyphicon-ok" : "glyphicon glyphicon-remove").closest("a").removeClass("notactive");
+                           });
+
+                       }
+                   },
+                   formatter: function operateFormatter(value, row, index) {
+                       return "<a style='cursor:pointer' class='Retiro' title='Encargado'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
+
+                   }
                }
         ];
 

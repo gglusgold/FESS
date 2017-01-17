@@ -18,7 +18,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 Value = a.idCircuito
             });
 
-            return Json(new { Options = lista });
+            return Json(new { Result = "OK", Options = lista }, JsonRequestBehavior.AllowGet);
         }
     }
 }

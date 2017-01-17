@@ -21,17 +21,17 @@ namespace Economia_Social_Y_Solidaria.Controllers
             var listado = ctx.Locales.Select(a => new
             {
                 idLocal = a.idLocal,
-                nombre	= a.nombre,
+                nombre = a.nombre,
                 direccion = a.direccion,
-                barrio	= a.barrio,
-                horario	= a.horario,
-                comuna		= a.comuna,
+                barrio = a.barrio,
+                horario = a.horario,
+                comuna = a.comuna,
                 circuitoId = a.Circuitos.idCircuito,
                 circuito = a.Circuitos.nombre,
                 activo = a.activo
             });
 
-            return Json(listado, JsonRequestBehavior.DenyGet); 
+            return Json(new { Result = "OK", Records = listado }, JsonRequestBehavior.DenyGet);
         }
 
         public JsonResult Crear(Locales crear)
@@ -55,10 +55,25 @@ namespace Economia_Social_Y_Solidaria.Controllers
             }
             else
             {
-                return Json(new { error = true, mensaje = "Ya existe el local" }, JsonRequestBehavior.DenyGet);
+                return Json(new { Result = "ERROR", Message = "Ya existe el local" });
             }
 
-            return Json(new { error = false, mensaje = "Local grabado satisfactoriamente" }, JsonRequestBehavior.DenyGet);
+            var it = new
+            {
+                idLocal = local.idLocal,
+                nombre = local.nombre,
+                direccion = local.direccion,
+                barrio = local.barrio,
+                horario = local.horario,
+                comuna = local.comuna,
+                circuitoId = local.Circuitos.idCircuito,
+                circuito = local.Circuitos.nombre,
+                activo = local.activo
+            };
+
+            return Json(new { Result = "OK", Record = it });
+
+            //return Json(new { error = false, mensaje = "Local grabado satisfactoriamente" }, JsonRequestBehavior.DenyGet);
         }
 
         public JsonResult Editar(Locales editar)
@@ -74,27 +89,43 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 item.barrio = editar.barrio;
                 item.horario = editar.horario;
                 item.comuna = editar.comuna;
+                item.Circuitos = cir;
 
                 ctx.SaveChanges();
             }
             else
             {
-                return Json(new { error = true, mensaje = "No existe el producto" }, JsonRequestBehavior.DenyGet);
+                return Json(new { Result = "ERROR", Message = "No existe el producto" });
+                //return Json(new { error = true, mensaje = "No existe el producto" }, JsonRequestBehavior.DenyGet);
             }
 
-            return Json(new { error = false, mensaje = "Producto editado satisfactoriamente" }, JsonRequestBehavior.DenyGet);
+            var it = new
+            {
+                idLocal = item.idLocal,
+                nombre = item.nombre,
+                direccion = item.direccion,
+                barrio = item.barrio,
+                horario = item.horario,
+                comuna = item.comuna,
+                circuitoId = item.Circuitos.idCircuito,
+                circuito = item.Circuitos.nombre,
+                activo = item.activo
+            };
+
+            return Json(new { Result = "OK", Record = it });
+            //return Json(new { error = false, mensaje = "Producto editado satisfactoriamente" }, JsonRequestBehavior.DenyGet);
         }
 
-        public JsonResult Desactivar(int idLocal, bool activar)
+        public JsonResult Desactivar(int idLocal)
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
             Locales item = ctx.Locales.FirstOrDefault(a => a.idLocal == idLocal);
-            item.activo = activar;
+            item.activo = !item.activo;
 
             ctx.SaveChanges();
 
-            return Json(activar, JsonRequestBehavior.DenyGet);
+            return Json(new { Result = "OK" }, JsonRequestBehavior.DenyGet);
         }
 
     }

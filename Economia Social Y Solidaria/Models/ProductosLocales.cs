@@ -12,12 +12,13 @@ namespace Economia_Social_Y_Solidaria.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class sysdiagrams
+    public partial class ProductosLocales
     {
-        public string name { get; set; }
-        public int principal_id { get; set; }
-        public int diagram_id { get; set; }
-        public Nullable<int> version { get; set; }
-        public byte[] definition { get; set; }
+        public int idProductoLocal { get; set; }
+        public int productoId { get; set; }
+        public int localId { get; set; }
+    
+        public virtual Locales Locales { get; set; }
+        public virtual Productos Productos { get; set; }
     }
 }

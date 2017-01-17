@@ -20,6 +20,15 @@
           <Property Name="nombre" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="codigo" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="Comentarios">
+          <Key>
+            <PropertyRef Name="idComentario" />
+          </Key>
+          <Property Name="idComentario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="fecha" Type="datetime" Nullable="false" />
+          <Property Name="vecinoId" Type="int" Nullable="false" />
+          <Property Name="compraId" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="ComentariosProducto">
           <Key>
             <PropertyRef Name="idProductoComentario" />
@@ -118,6 +127,14 @@
           <Property Name="activo" Type="bit" Nullable="false" />
           <Property Name="categoriaId" Type="int" />
         </EntityType>
+        <EntityType Name="ProductosLocales">
+          <Key>
+            <PropertyRef Name="idProductoLocal" />
+          </Key>
+          <Property Name="idProductoLocal" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="productoId" Type="int" Nullable="false" />
+          <Property Name="localId" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="Relevamientos">
           <Key>
             <PropertyRef Name="idRelevamiento" />
@@ -147,16 +164,6 @@
           <Property Name="vecinoId" Type="int" Nullable="false" />
           <Property Name="rolId" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="sysdiagrams">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="principal_id" Type="int" Nullable="false" />
-          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="version" Type="int" />
-          <Property Name="definition" Type="varbinary(max)" />
-        </EntityType>
         <EntityType Name="Tandas">
           <Key>
             <PropertyRef Name="idTanda" />
@@ -181,6 +188,30 @@
           <Property Name="verificado" Type="bit" Nullable="false" />
           <Property Name="localId" Type="int" />
         </EntityType>
+        <Association Name="FK_Comentarios_Compras1">
+          <End Role="Compras" Type="Self.Compras" Multiplicity="1" />
+          <End Role="Comentarios" Type="Self.Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Compras">
+              <PropertyRef Name="idCompra" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="compraId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comentarios_Vecinos1">
+          <End Role="Vecinos" Type="Self.Vecinos" Multiplicity="1" />
+          <End Role="Comentarios" Type="Self.Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="vecinoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ComentariosProducto_Compras">
           <End Role="Compras" Type="Self.Compras" Multiplicity="1" />
           <End Role="ComentariosProducto" Type="Self.ComentariosProducto" Multiplicity="*" />
@@ -327,6 +358,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ProductosLocales_Locales">
+          <End Role="Locales" Type="Self.Locales" Multiplicity="1" />
+          <End Role="ProductosLocales" Type="Self.ProductosLocales" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Locales">
+              <PropertyRef Name="idLocal" />
+            </Principal>
+            <Dependent Role="ProductosLocales">
+              <PropertyRef Name="localId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductosLocales_Productos">
+          <End Role="Productos" Type="Self.Productos" Multiplicity="1" />
+          <End Role="ProductosLocales" Type="Self.ProductosLocales" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="idProducto" />
+            </Principal>
+            <Dependent Role="ProductosLocales">
+              <PropertyRef Name="productoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_RolesVecinos_Roles">
           <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
           <End Role="RolesVecinos" Type="Self.RolesVecinos" Multiplicity="*" />
@@ -390,6 +445,7 @@
         <EntityContainer Name="TanoNEModelStoreContainer">
           <EntitySet Name="Categorias" EntityType="Self.Categorias" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Circuitos" EntityType="Self.Circuitos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Comentarios" EntityType="Self.Comentarios" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ComentariosProducto" EntityType="Self.ComentariosProducto" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CompraProducto" EntityType="Self.CompraProducto" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Compras" EntityType="Self.Compras" Schema="dbo" store:Type="Tables" />
@@ -399,12 +455,20 @@
           <EntitySet Name="Noticias" EntityType="Self.Noticias" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Precios" EntityType="Self.Precios" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Productos" EntityType="Self.Productos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProductosLocales" EntityType="Self.ProductosLocales" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Relevamientos" EntityType="Self.Relevamientos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="RolesVecinos" EntityType="Self.RolesVecinos" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Tandas" EntityType="Self.Tandas" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Vecinos" EntityType="Self.Vecinos" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Comentarios_Compras1" Association="Self.FK_Comentarios_Compras1">
+            <End Role="Compras" EntitySet="Compras" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comentarios_Vecinos1" Association="Self.FK_Comentarios_Vecinos1">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
+          </AssociationSet>
           <AssociationSet Name="FK_ComentariosProducto_Compras" Association="Self.FK_ComentariosProducto_Compras">
             <End Role="Compras" EntitySet="Compras" />
             <End Role="ComentariosProducto" EntitySet="ComentariosProducto" />
@@ -453,6 +517,14 @@
             <End Role="Categorias" EntitySet="Categorias" />
             <End Role="Productos" EntitySet="Productos" />
           </AssociationSet>
+          <AssociationSet Name="FK_ProductosLocales_Locales" Association="Self.FK_ProductosLocales_Locales">
+            <End Role="Locales" EntitySet="Locales" />
+            <End Role="ProductosLocales" EntitySet="ProductosLocales" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductosLocales_Productos" Association="Self.FK_ProductosLocales_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="ProductosLocales" EntitySet="ProductosLocales" />
+          </AssociationSet>
           <AssociationSet Name="FK_RolesVecinos_Roles" Association="Self.FK_RolesVecinos_Roles">
             <End Role="Roles" EntitySet="Roles" />
             <End Role="RolesVecinos" EntitySet="RolesVecinos" />
@@ -481,18 +553,20 @@
         <EntityContainer Name="TanoNEEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Categorias" EntityType="TanoNEModel.Categorias" />
           <EntitySet Name="Circuitos" EntityType="TanoNEModel.Circuitos" />
+          <EntitySet Name="Comentarios" EntityType="TanoNEModel.Comentarios" />
           <EntitySet Name="ComentariosProducto" EntityType="TanoNEModel.ComentariosProducto" />
           <EntitySet Name="CompraProducto" EntityType="TanoNEModel.CompraProducto" />
           <EntitySet Name="Compras" EntityType="TanoNEModel.Compras" />
           <EntitySet Name="Costos" EntityType="TanoNEModel.Costos" />
           <EntitySet Name="EstadosCompra" EntityType="TanoNEModel.EstadosCompra" />
           <EntitySet Name="Locales" EntityType="TanoNEModel.Locales" />
+          <EntitySet Name="Noticias" EntityType="TanoNEModel.Noticias" />
           <EntitySet Name="Precios" EntityType="TanoNEModel.Precios" />
           <EntitySet Name="Productos" EntityType="TanoNEModel.Productos" />
+          <EntitySet Name="ProductosLocales" EntityType="TanoNEModel.ProductosLocales" />
           <EntitySet Name="Relevamientos" EntityType="TanoNEModel.Relevamientos" />
           <EntitySet Name="Roles" EntityType="TanoNEModel.Roles" />
           <EntitySet Name="RolesVecinos" EntityType="TanoNEModel.RolesVecinos" />
-          <EntitySet Name="sysdiagrams" EntityType="TanoNEModel.sysdiagrams" />
           <EntitySet Name="Tandas" EntityType="TanoNEModel.Tandas" />
           <EntitySet Name="Vecinos" EntityType="TanoNEModel.Vecinos" />
           <AssociationSet Name="FK_Productos_Categorias" Association="TanoNEModel.FK_Productos_Categorias">
@@ -506,6 +580,14 @@
           <AssociationSet Name="FK_Tandas_Circuitos" Association="TanoNEModel.FK_Tandas_Circuitos">
             <End Role="Circuitos" EntitySet="Circuitos" />
             <End Role="Tandas" EntitySet="Tandas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comentarios_Compras1" Association="TanoNEModel.FK_Comentarios_Compras1">
+            <End Role="Compras" EntitySet="Compras" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comentarios_Vecinos1" Association="TanoNEModel.FK_Comentarios_Vecinos1">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="Comentarios" EntitySet="Comentarios" />
           </AssociationSet>
           <AssociationSet Name="FK_ComentariosProducto_Compras" Association="TanoNEModel.FK_ComentariosProducto_Compras">
             <End Role="Compras" EntitySet="Compras" />
@@ -543,6 +625,10 @@
             <End Role="Productos" EntitySet="Productos" />
             <End Role="Costos" EntitySet="Costos" />
           </AssociationSet>
+          <AssociationSet Name="FK_ProductosLocales_Locales" Association="TanoNEModel.FK_ProductosLocales_Locales">
+            <End Role="Locales" EntitySet="Locales" />
+            <End Role="ProductosLocales" EntitySet="ProductosLocales" />
+          </AssociationSet>
           <AssociationSet Name="FK_Vecinos_Locales" Association="TanoNEModel.FK_Vecinos_Locales">
             <End Role="Locales" EntitySet="Locales" />
             <End Role="Vecinos" EntitySet="Vecinos" />
@@ -550,6 +636,10 @@
           <AssociationSet Name="FK_Precios_Productos" Association="TanoNEModel.FK_Precios_Productos">
             <End Role="Productos" EntitySet="Productos" />
             <End Role="Precios" EntitySet="Precios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductosLocales_Productos" Association="TanoNEModel.FK_ProductosLocales_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="ProductosLocales" EntitySet="ProductosLocales" />
           </AssociationSet>
           <AssociationSet Name="FK_RolesVecinos_Roles" Association="TanoNEModel.FK_RolesVecinos_Roles">
             <End Role="Roles" EntitySet="Roles" />
@@ -563,7 +653,6 @@
             <End Role="Vecinos" EntitySet="Vecinos" />
             <End Role="Tandas" EntitySet="Tandas" />
           </AssociationSet>
-          <EntitySet Name="Noticias" EntityType="TanoNEModel.Noticias" />
         </EntityContainer>
         <EntityType Name="Categorias">
           <Key>
@@ -582,6 +671,17 @@
           <Property Name="codigo" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Locales" Relationship="TanoNEModel.FK_Locales_Circuitos" FromRole="Circuitos" ToRole="Locales" />
           <NavigationProperty Name="Tandas" Relationship="TanoNEModel.FK_Tandas_Circuitos" FromRole="Circuitos" ToRole="Tandas" />
+        </EntityType>
+        <EntityType Name="Comentarios">
+          <Key>
+            <PropertyRef Name="idComentario" />
+          </Key>
+          <Property Name="idComentario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="fecha" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="vecinoId" Type="Int32" Nullable="false" />
+          <Property Name="compraId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Comentarios_Compras1" FromRole="Comentarios" ToRole="Compras" />
+          <NavigationProperty Name="Vecinos" Relationship="TanoNEModel.FK_Comentarios_Vecinos1" FromRole="Comentarios" ToRole="Vecinos" />
         </EntityType>
         <EntityType Name="ComentariosProducto">
           <Key>
@@ -618,6 +718,7 @@
           <Property Name="tandaId" Type="Int32" Nullable="false" />
           <Property Name="localId" Type="Int32" Nullable="false" />
           <Property Name="estadoId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Comentarios" Relationship="TanoNEModel.FK_Comentarios_Compras1" FromRole="Compras" ToRole="Comentarios" />
           <NavigationProperty Name="ComentariosProducto" Relationship="TanoNEModel.FK_ComentariosProducto_Compras" FromRole="Compras" ToRole="ComentariosProducto" />
           <NavigationProperty Name="CompraProducto" Relationship="TanoNEModel.FK_CompraProducto_Compras" FromRole="Compras" ToRole="CompraProducto" />
           <NavigationProperty Name="EstadosCompra" Relationship="TanoNEModel.FK_Compras_EstadosCompra" FromRole="Compras" ToRole="EstadosCompra" />
@@ -658,7 +759,22 @@
           <Property Name="activo" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Circuitos" Relationship="TanoNEModel.FK_Locales_Circuitos" FromRole="Locales" ToRole="Circuitos" />
           <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Compras_Locales" FromRole="Locales" ToRole="Compras" />
+          <NavigationProperty Name="ProductosLocales" Relationship="TanoNEModel.FK_ProductosLocales_Locales" FromRole="Locales" ToRole="ProductosLocales" />
           <NavigationProperty Name="Vecinos" Relationship="TanoNEModel.FK_Vecinos_Locales" FromRole="Locales" ToRole="Vecinos" />
+        </EntityType>
+        <EntityType Name="Noticias">
+          <Key>
+            <PropertyRef Name="idNoticia" />
+          </Key>
+          <Property Name="idNoticia" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="titulo" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="copete" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="link" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="imagen" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="categoria" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="tags" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="autor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="fecha" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="Precios">
           <Key>
@@ -687,6 +803,17 @@
           <NavigationProperty Name="CompraProducto" Relationship="TanoNEModel.FK_CompraProducto_Productos" FromRole="Productos" ToRole="CompraProducto" />
           <NavigationProperty Name="Costos" Relationship="TanoNEModel.FK_Costos_Productos" FromRole="Productos" ToRole="Costos" />
           <NavigationProperty Name="Precios" Relationship="TanoNEModel.FK_Precios_Productos" FromRole="Productos" ToRole="Precios" />
+          <NavigationProperty Name="ProductosLocales" Relationship="TanoNEModel.FK_ProductosLocales_Productos" FromRole="Productos" ToRole="ProductosLocales" />
+        </EntityType>
+        <EntityType Name="ProductosLocales">
+          <Key>
+            <PropertyRef Name="idProductoLocal" />
+          </Key>
+          <Property Name="idProductoLocal" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="productoId" Type="Int32" Nullable="false" />
+          <Property Name="localId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Locales" Relationship="TanoNEModel.FK_ProductosLocales_Locales" FromRole="ProductosLocales" ToRole="Locales" />
+          <NavigationProperty Name="Productos" Relationship="TanoNEModel.FK_ProductosLocales_Productos" FromRole="ProductosLocales" ToRole="Productos" />
         </EntityType>
         <EntityType Name="Relevamientos">
           <Key>
@@ -720,16 +847,6 @@
           <NavigationProperty Name="Roles" Relationship="TanoNEModel.FK_RolesVecinos_Roles" FromRole="RolesVecinos" ToRole="Roles" />
           <NavigationProperty Name="Vecinos" Relationship="TanoNEModel.FK_RolesVecinos_Vecinos" FromRole="RolesVecinos" ToRole="Vecinos" />
         </EntityType>
-        <EntityType Name="sysdiagrams">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
-          <Property Name="principal_id" Type="Int32" Nullable="false" />
-          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="version" Type="Int32" />
-          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
-        </EntityType>
         <EntityType Name="Tandas">
           <Key>
             <PropertyRef Name="idTanda" />
@@ -756,6 +873,7 @@
           <Property Name="hash" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="verificado" Type="Boolean" Nullable="false" />
           <Property Name="localId" Type="Int32" />
+          <NavigationProperty Name="Comentarios" Relationship="TanoNEModel.FK_Comentarios_Vecinos1" FromRole="Vecinos" ToRole="Comentarios" />
           <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Compras_Vecinos" FromRole="Vecinos" ToRole="Compras" />
           <NavigationProperty Name="Locales" Relationship="TanoNEModel.FK_Vecinos_Locales" FromRole="Vecinos" ToRole="Locales" />
           <NavigationProperty Name="RolesVecinos" Relationship="TanoNEModel.FK_RolesVecinos_Vecinos" FromRole="Vecinos" ToRole="RolesVecinos" />
@@ -794,6 +912,30 @@
             </Principal>
             <Dependent Role="Tandas">
               <PropertyRef Name="circuitoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comentarios_Compras1">
+          <End Type="TanoNEModel.Compras" Role="Compras" Multiplicity="1" />
+          <End Type="TanoNEModel.Comentarios" Role="Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Compras">
+              <PropertyRef Name="idCompra" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="compraId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comentarios_Vecinos1">
+          <End Type="TanoNEModel.Vecinos" Role="Vecinos" Multiplicity="1" />
+          <End Type="TanoNEModel.Comentarios" Role="Comentarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="Comentarios">
+              <PropertyRef Name="vecinoId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -907,6 +1049,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ProductosLocales_Locales">
+          <End Type="TanoNEModel.Locales" Role="Locales" Multiplicity="1" />
+          <End Type="TanoNEModel.ProductosLocales" Role="ProductosLocales" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Locales">
+              <PropertyRef Name="idLocal" />
+            </Principal>
+            <Dependent Role="ProductosLocales">
+              <PropertyRef Name="localId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Vecinos_Locales">
           <End Type="TanoNEModel.Locales" Role="Locales" Multiplicity="0..1" />
           <End Type="TanoNEModel.Vecinos" Role="Vecinos" Multiplicity="*" />
@@ -927,6 +1081,18 @@
               <PropertyRef Name="idProducto" />
             </Principal>
             <Dependent Role="Precios">
+              <PropertyRef Name="productoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductosLocales_Productos">
+          <End Type="TanoNEModel.Productos" Role="Productos" Multiplicity="1" />
+          <End Type="TanoNEModel.ProductosLocales" Role="ProductosLocales" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="idProducto" />
+            </Principal>
+            <Dependent Role="ProductosLocales">
               <PropertyRef Name="productoId" />
             </Dependent>
           </ReferentialConstraint>
@@ -967,20 +1133,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="Noticias">
-          <Key>
-            <PropertyRef Name="idNoticia" />
-          </Key>
-          <Property Name="idNoticia" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="titulo" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="copete" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="link" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="imagen" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="categoria" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="tags" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="autor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="fecha" Type="DateTime" Precision="3" />
-        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1001,6 +1153,16 @@
                 <ScalarProperty Name="codigo" ColumnName="codigo" />
                 <ScalarProperty Name="nombre" ColumnName="nombre" />
                 <ScalarProperty Name="idCircuito" ColumnName="idCircuito" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Comentarios">
+            <EntityTypeMapping TypeName="TanoNEModel.Comentarios">
+              <MappingFragment StoreEntitySet="Comentarios">
+                <ScalarProperty Name="compraId" ColumnName="compraId" />
+                <ScalarProperty Name="vecinoId" ColumnName="vecinoId" />
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="idComentario" ColumnName="idComentario" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1072,6 +1234,21 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Noticias">
+            <EntityTypeMapping TypeName="TanoNEModel.Noticias">
+              <MappingFragment StoreEntitySet="Noticias">
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="autor" ColumnName="autor" />
+                <ScalarProperty Name="tags" ColumnName="tags" />
+                <ScalarProperty Name="categoria" ColumnName="categoria" />
+                <ScalarProperty Name="imagen" ColumnName="imagen" />
+                <ScalarProperty Name="link" ColumnName="link" />
+                <ScalarProperty Name="copete" ColumnName="copete" />
+                <ScalarProperty Name="titulo" ColumnName="titulo" />
+                <ScalarProperty Name="idNoticia" ColumnName="idNoticia" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Precios">
             <EntityTypeMapping TypeName="TanoNEModel.Precios">
               <MappingFragment StoreEntitySet="Precios">
@@ -1093,6 +1270,15 @@
                 <ScalarProperty Name="descripcion" ColumnName="descripcion" />
                 <ScalarProperty Name="producto" ColumnName="producto" />
                 <ScalarProperty Name="idProducto" ColumnName="idProducto" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProductosLocales">
+            <EntityTypeMapping TypeName="TanoNEModel.ProductosLocales">
+              <MappingFragment StoreEntitySet="ProductosLocales">
+                <ScalarProperty Name="localId" ColumnName="localId" />
+                <ScalarProperty Name="productoId" ColumnName="productoId" />
+                <ScalarProperty Name="idProductoLocal" ColumnName="idProductoLocal" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1128,17 +1314,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="sysdiagrams">
-            <EntityTypeMapping TypeName="TanoNEModel.sysdiagrams">
-              <MappingFragment StoreEntitySet="sysdiagrams">
-                <ScalarProperty Name="definition" ColumnName="definition" />
-                <ScalarProperty Name="version" ColumnName="version" />
-                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
-                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
-                <ScalarProperty Name="name" ColumnName="name" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Tandas">
             <EntityTypeMapping TypeName="TanoNEModel.Tandas">
               <MappingFragment StoreEntitySet="Tandas">
@@ -1162,21 +1337,6 @@
                 <ScalarProperty Name="nombres" ColumnName="nombres" />
                 <ScalarProperty Name="correo" ColumnName="correo" />
                 <ScalarProperty Name="idVecino" ColumnName="idVecino" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Noticias">
-            <EntityTypeMapping TypeName="TanoNEModel.Noticias">
-              <MappingFragment StoreEntitySet="Noticias">
-                <ScalarProperty Name="fecha" ColumnName="fecha" />
-                <ScalarProperty Name="autor" ColumnName="autor" />
-                <ScalarProperty Name="tags" ColumnName="tags" />
-                <ScalarProperty Name="categoria" ColumnName="categoria" />
-                <ScalarProperty Name="imagen" ColumnName="imagen" />
-                <ScalarProperty Name="link" ColumnName="link" />
-                <ScalarProperty Name="copete" ColumnName="copete" />
-                <ScalarProperty Name="titulo" ColumnName="titulo" />
-                <ScalarProperty Name="idNoticia" ColumnName="idNoticia" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -11,51 +11,51 @@ namespace Economia_Social_Y_Solidaria.Controllers
     public class ApiProductosController : ApiController
     {
         // GET api/apiproductos
-        public IEnumerable<ApiProductos> Get()
+        [ActionName("Productos")]
+        public IHttpActionResult Get(int idLocal)
         {
             TanoNEEntities ctx = new TanoNEEntities();
-            var listado = ctx.Productos.Where(a => a.activo).Select(a => new ApiProductos
+
+            var categorias = ctx.ProductosLocales.Where(a => idLocal == -1 ? a.Locales.activo : a.localId == idLocal).ToList().Select(b => new
             {
-                idProducto = a.idProducto,
-                nombre = a.producto,
-                presentacion = a.presentacion,
-                marca = a.marca,
-                categoriaId = a.categoriaId,
-                categorias = a.Categorias.nombre
+                idProducto = b.Productos.idProducto,
+                nombre = b.Productos.producto,
+                marca = b.Productos.marca,
+                presentacion = b.Productos.presentacion,
+                precio = b.Productos.Precios.ToArray().Last().precio,
+                stock = b.Productos.stock,
+                idCategoria = b.Productos.categoriaId,
+                categoria = b.Productos.Categorias.nombre
             });
-            return listado;
+
+            var groupedCustomerList = categorias
+            .GroupBy(u => u.categoria)
+            .Select(grp => new
+            {
+                nombre = grp.Key,
+                productos = grp.ToList()
+            })
+            .ToList();
+
+            return Json(groupedCustomerList);
         }
 
-        // GET api/apiproductos/5
-        public string Get(int id)
-        {
-            return "value";
-        }
 
-        // POST api/apiproductos
-        public void Post([FromBody]string value)
+        [ActionName("Locales")]
+        public IHttpActionResult Get()
         {
-        }
+            TanoNEEntities ctx = new TanoNEEntities();
 
-        // PUT api/apiproductos/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
+            var locales = ctx.ProductosLocales.Where(a => a.Locales.activo).ToList().Select(b => new
+            {
+                idLocal = b.Locales.idLocal,
+                nombre = b.Locales.nombre,
+                direccion = b.Locales.direccion,
+                comuna = b.Locales.comuna,
+                barrio = b.Locales.barrio,
+            }).Distinct();
 
-        // DELETE api/apiproductos/5
-        public void Delete(int id)
-        {
-        }
-
-        public class ApiProductos
-        {
-            internal int? categoriaId;
-            internal string categorias;
-
-            public int idProducto { get; set; }
-            public string marca { get; set; }
-            public string nombre { get; set; }
-            public string presentacion { get; set; }
+            return Json(locales);
         }
     }
 }
