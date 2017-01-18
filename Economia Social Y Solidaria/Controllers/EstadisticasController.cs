@@ -80,7 +80,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
         TanoNEEntities ctx = new TanoNEEntities();
         var fechasCircuitos = ctx.Tandas.Where(a => a.circuitoId == 1 && a.fechaCerrado != null).ToList().Select(a => new
         {
-            fechas = a.fechaCerrado.Value.ToShortDateString(),
+            fechas = a.fechaCerrado.Value.ToString("dd/MM/yyyy"),
             productos = a.Compras.Select(b => b.CompraProducto.Select(c => c.Productos.producto)),
             ventas = a.Compras.Select(b => b.CompraProducto.Select(c => c.cantidad))
         }).ToList();

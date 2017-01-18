@@ -23,6 +23,10 @@
     </div>
 </div>
 
+<div id="dialog-confirm" title="Borrar Usuario?" style="display:none">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Seguro que queres borrar el usuario?</p>
+</div>
+
 @section scripts{
     <script type="text/javascript">
 
@@ -66,6 +70,20 @@
                    valign: 'middle',
                    title: "Comuna",
                    sortable: "true",
+                   formatter: function operateFormatter(value, row, index) {
+                       console.log(value);
+                       if (value == 16)
+                           return "Gran Bs. As"
+                       else
+                           return "Comuna " + value;
+                   }
+               },
+               {
+                   field: "fechaCreado",
+                   align: 'center',
+                   valign: 'middle',
+                   title: "Fecha registro",
+                   sortable: "true"
                },
                {
                    field: "administrador",
@@ -154,6 +172,39 @@
                    },
                    formatter: function operateFormatter(value, row, index) {
                        return "<a style='cursor:pointer' class='Retiro' title='Encargado'><i class='glyphicon " + (value ? "glyphicon-ok" : "glyphicon-remove") + "'></i></a>";
+
+                   }
+               },
+               {
+                   field: "borrar",
+                   title: 'Borrar',
+                   align: 'center',
+                   valign: 'middle',
+                   events: {
+                       'click .Borrar': function (e, value, row, index) {
+
+                           $("#dialog-confirm").dialog({
+                               resizable: false,
+                               height: "auto",
+                               width: 400,
+                               modal: true,
+                               buttons: {
+                                   "Aceptar": function () {
+                                       $(this).dialog("close");
+                                       $.post("/Vecinos/Borrar", { idVecino: row.idVecino }, function () {
+                                           tabla.bootstrapTable("refresh");
+                                       })
+                                   },
+                                   "Cancelar": function () {
+                                       $(this).dialog("close");
+                                   }
+                               }
+                           });
+
+                       }
+                   },
+                   formatter: function operateFormatter(value, row, index) {
+                       return "<a style='cursor:pointer' class='Borrar' title='Borrar'><img src='/Imagenes/Fijas/trash.png'></a>";
 
                    }
                }

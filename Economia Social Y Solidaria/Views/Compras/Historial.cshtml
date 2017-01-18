@@ -143,7 +143,7 @@
             var precioTotal = 0;
             $.each(comprado.productos, function(i,val){
                 precioTotal += (val.precioUnidad * val.cantidad);
-                nueva.find(".productos").append("<tr data-idproducto='" + comprado.productos.idProducto + "'><td>" + val.nombre+ "</td><td>" +val.cantidad+ "</td><td>$" +val.precioUnidad+ "</td></tr>");
+                nueva.find(".productos").append("<tr data-idproducto='" + comprado.productos.idProducto + "'><td>" + val.nombre + ( val.marca == "" ? "" :  " - " + val.marca ) + " - " + val.presentacion + "</td><td>" +val.cantidad+ "</td><td>$" +val.precioUnidad+ "</td></tr>");
             });
             nueva.find(".productos").append("<tr><td></td><td  style='text-align:right;' colspan=2 ><b>Total: $" + precioTotal+ "</b></td></tr>");
             nueva.show();

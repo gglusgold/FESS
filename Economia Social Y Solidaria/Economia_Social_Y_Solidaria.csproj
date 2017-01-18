@@ -221,6 +221,9 @@
     <Compile Include="Models\Costos.cs">
       <DependentUpon>EssNe.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\C_Comentarios.cs">
+      <DependentUpon>EssNe.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\EssNe.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -264,6 +267,9 @@
     <Compile Include="Models\RolesVecinos.cs">
       <DependentUpon>EssNe.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\sysdiagrams.cs">
+      <DependentUpon>EssNe.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Tandas.cs">
       <DependentUpon>EssNe.tt</DependentUpon>
     </Compile>
@@ -290,6 +296,7 @@
     <Content Include="Imagenes\Fijas\box.png" />
     <Content Include="Imagenes\Fijas\box64.png" />
     <Content Include="Imagenes\Fijas\contact-form.png" />
+    <Content Include="Imagenes\Fijas\disabled.png" />
     <Content Include="Imagenes\Fijas\edit.png" />
     <Content Include="Imagenes\Fijas\ESS_1.jpg" />
     <Content Include="Imagenes\Fijas\ESS_2.jpg" />

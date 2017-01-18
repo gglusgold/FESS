@@ -94,6 +94,9 @@
 
             nueva.find(".link").attr("href", noticia.link);
 
+            if ( noticia.link == null )
+                nueva.find(".link").hide();
+
             /*if (comprado.editar )
                 nueva.find(".btneditar").show();
             if (comprado.comentar )

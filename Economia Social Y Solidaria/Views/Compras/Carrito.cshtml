@@ -61,14 +61,14 @@
                     <h4 class="modal-title">Comenzar pedido</h4>
                 </div>
                 <div class="modal-body">
-                    <h3>Para saber qué productos mostrarte, tenemos que saber dónde vas a retirar tu pedido<br />Los locales de:</h3>
-                    <h3>El pedido debe retirarse el dia @(Model.proxFecha)</h3>
+                    <h3>Para saber qué productos mostrarte, tenemos que saber dónde vas a retirar tu pedido<br/>Los locales de:</h3>
                     <div class="radio locales">
                         @foreach (var local in Model.locales)
                         {
                             <label style="padding-top: 5px;padding-bottom: 5px;"><input type="radio" name="local" id="local" value="@(local.idLocal)" required>@(local.direccion) (Comuna @(local.comuna) - @(local.barrio)) - de @(local.horario).</label>
                         }
                     </div>
+                    <h3>Tu pedido lo tenés que retirar el sábado @(Model.proxFecha) en el horario según el local que elijas</h3>
                 </div>
                 <div class="modal-footer">
                     <button type='button' class='btn btn-primary' id="localaceptar">Aceptar</button>
@@ -334,7 +334,7 @@
         $('#btn_anterior_compra').click(function (e) {
             $("#btn_anterior_compra").hide();
             $("#btn_siguiente_compra").show();
-            $("#confirmada").hide();
+            //$("#confirmada").hide();
 
             //$("#parte_dos").hide();
             $("#parte_uno").show();
@@ -344,7 +344,7 @@
         $('#btn_siguiente_compra').click(function (e) {
             $("#btn_anterior_compra").show();
             $("#btn_siguiente_compra").hide();
-            $("#confirmada").show();
+            //$("#confirmada").show();
 
            // $("#parte_dos").show();
             $("#parte_uno").hide();
@@ -359,7 +359,7 @@
             $("#parte_uno").show();
             $("#parte_dos").hide();
             $("#btn_anterior_compra").hide();
-            $("#confirmada").hide();
+            //$("#confirmada").hide();
             $("#btn_siguiente_compra").show();
 
         });
@@ -503,6 +503,7 @@
 
         var toastAgregar;
         function agregarItem(id, precio, nombre, cantidad, mostrar) {
+            nombre = nombre + " - $" + precio;
             var listado = $("#listado");
             var check = listado.find("li[data-idprod='" + id + "']")
             var cantMostrar = 0;

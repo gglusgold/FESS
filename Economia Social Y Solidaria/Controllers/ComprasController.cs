@@ -48,6 +48,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
         public int idProducto;
         public int cantidad;
         public string nombre;
+        public string marca;
+        public string presentacion;
         public bool comentado;
         public decimal precioUnidad;
     }
@@ -81,7 +83,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             crearChango(completo, idCategoria, idLocal);
 
             DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
-            completo.proxFecha = ProximaEntrea.ToShortDateString();
+            completo.proxFecha = ProximaEntrea.ToString("dd/MM/yyyy");
 
 
 
@@ -94,7 +96,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             crearChango(completo, idCategoria, idLocal);
 
             DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
-            completo.proxFecha = ProximaEntrea.ToShortDateString();
+            completo.proxFecha = ProximaEntrea.ToString("dd/MM/yyyy");
 
             return Json(new { lista = completo.changuito });
         }
@@ -190,6 +192,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 {
                     idProducto = b.Productos.idProducto,
                     nombre = b.Productos.producto,
+                    marca = b.Productos.marca,
+                    presentacion = b.Productos.presentacion,
                     cantidad = b.cantidad,
                     comentado = a.ComentariosProducto.FirstOrDefault(c => c.productoId == b.productoId) != null,  // a.Comentarios.Count == 1 ? a.Comentarios.FirstOrDefault().ComentariosProducto.FirstOrDefault(cp => cp.productoId == b.productoId).Productos != null : false,
                     precioUnidad = b.Productos.Precios.Count > 1 ? b.Productos.Precios.LastOrDefault(precio => a.fecha.Date >= precio.fecha.Date).precio : b.Productos.Precios.FirstOrDefault().precio,

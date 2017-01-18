@@ -54,14 +54,14 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 }
                 else
                 {
-                    conf.leyenda = "Circuito Abierto el " + ultima.fechaAbierto.ToShortDateString() + " por : " + ultima.Vecinos.nombres;
+                    conf.leyenda = "Circuito Abierto el " + ultima.fechaAbierto.ToString("dd/MM/yyyy") + " por : " + ultima.Vecinos.nombres;
                     conf.idCircuito = ultima.Circuitos.idCircuito;
                     conf.abrir = false;
                 }
 
                 conf.idTanda = ultima.idTanda;
                 conf.circuito = ultima.Circuitos.nombre;
-                conf.fechaAbierto = ultima.fechaAbierto.ToShortDateString();
+                conf.fechaAbierto = ultima.fechaAbierto.ToString("dd/MM/yyyy");
 
             }
 
@@ -157,8 +157,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             var lista = ctx.Tandas.OrderByDescending(a => a.idTanda).ToList().Select(a => new
             {
                 idTanda = a.idTanda,
-                fechaAbierto = a.fechaAbierto.ToShortDateString(),
-                fechaCerrado = a.fechaCerrado.HasValue ? a.fechaCerrado.Value.ToShortDateString() : "-",
+                fechaAbierto = a.fechaAbierto.ToString("dd/MM/yyyy"),
+                fechaCerrado = a.fechaCerrado.HasValue ? a.fechaCerrado.Value.ToString("dd/MM/yyyy") : "-",
                 circuito = a.Circuitos.nombre,
                 responsable = a.Vecinos.nombres,
             });
@@ -175,7 +175,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             var vecinosQueCompraron = tandaActual.Compras.Where(a => a.EstadosCompra.idEstadoCompra == confirmado.idEstadoCompra).GroupBy(a => a.vecinoId).Select(a => a.FirstOrDefault(b => b.vecinoId == a.Key));
             foreach (var actualTanda in vecinosQueCompraron)
             {
-                string fecha = ProximaEntrea.ToShortDateString() + " - " + actualTanda.Locales.horario;
+                string fecha = ProximaEntrea.ToString("dd/MM/yyyy") + " - " + actualTanda.Locales.horario;
                 string nombre = actualTanda.Vecinos.nombres;
                 string correo = actualTanda.Vecinos.correo;
 
@@ -225,7 +225,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return View();
         }
 
-        public JsonResult ListaCompras(bool ad)
+        public JsonResult ListaCompras(bool ad, string jtSorting)
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
@@ -242,8 +242,46 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 vecine = a.Vecinos.nombres,
                 productos = string.Join("<br/>", a.CompraProducto.Select(ab => string.Format("{0}: {1} {2} - {3}", ab.cantidad, ab.Productos.producto, ab.Productos.marca, ab.Productos.presentacion))),
                 local = a.Locales.direccion,
-                fecha = a.fecha.ToShortDateString()
+                fecha = a.fecha.ToString("dd/MM/yyyy")
             });
+
+            switch (jtSorting)
+            {
+                case "idCompra ASC":
+                    lista = lista.OrderBy(a => a.idCompra);
+                    break;
+                case "idCompra DESC":
+                    lista = lista.OrderByDescending(a => a.idCompra);
+                    break;
+
+                case "vecine ASC":
+                    lista = lista.OrderBy(a => a.vecine);
+                    break;
+                case "vecine DESC":
+                    lista = lista.OrderByDescending(a => a.vecine);
+                    break;
+
+                case "productos ASC":
+                    lista = lista.OrderBy(a => a.productos);
+                    break;
+                case "productos DESC":
+                    lista = lista.OrderByDescending(a => a.productos);
+                    break;
+
+                case "local ASC":
+                    lista = lista.OrderBy(a => a.local);
+                    break;
+                case "local DESC":
+                    lista = lista.OrderByDescending(a => a.local);
+                    break;
+
+                case "fecha ASC":
+                    lista = lista.OrderBy(a => a.fecha);
+                    break;
+                case "fecha DESC":
+                    lista = lista.OrderByDescending(a => a.fecha);
+                    break;
+            }
 
             return Json(new { Result = "OK", Records = lista }, JsonRequestBehavior.DenyGet);
         }

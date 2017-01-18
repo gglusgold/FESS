@@ -17,6 +17,8 @@
 
         var tabla = $('#Tabla').jtable({
             title: 'Compras por tanda',
+            sorting: true, //Enable sorting
+            defaultSorting: 'idCompra ASC',
             actions: {
                 listAction: '/Tandas/ListaCompras?ad=' + admin,
             },

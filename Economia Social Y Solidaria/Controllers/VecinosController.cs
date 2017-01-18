@@ -27,6 +27,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 correo = a.correo,
                 telefono = a.telefono,
                 comuna = a.comuna,
+                fechaCreado = a.fechaCreado.HasValue ? a.fechaCreado.Value.ToString("dd/MM/yyyy") : "-",
                 roles = a.RolesVecinos.Select(b => b.Roles.codigoRol),
                 administrador = a.RolesVecinos.Any(b => b.Roles.codigoRol == 2),
                 contador = a.RolesVecinos.Any(b => b.Roles.codigoRol == 3),
@@ -75,5 +76,12 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(new { error = false, admin = administrador, contador = contador, encargado = encargado, noticias = noticias }, JsonRequestBehavior.DenyGet);
         }
 
+        public void Borrar(int idVecino)
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+            Vecinos vec = ctx.Vecinos.FirstOrDefault(a => a.idVecino == idVecino);
+            ctx.Vecinos.Remove(vec);
+            ctx.SaveChanges();
+        }
     }
 }

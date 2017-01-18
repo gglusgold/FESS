@@ -128,5 +128,20 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(new { Result = "OK" }, JsonRequestBehavior.DenyGet);
         }
 
+        public JsonResult Borrar(int idLocal)
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+
+            Locales item = ctx.Locales.FirstOrDefault(a => a.idLocal == idLocal);
+            ctx.Locales.Remove(item);
+
+            ctx.SaveChanges();
+
+            return Json(new { Result = "OK" }, JsonRequestBehavior.DenyGet);
+        }
+
+
+        
+
     }
 }

@@ -214,6 +214,10 @@
 
 </div>
 
+<div id="dialog-confirm" title="Des/activar local?" style="display:none">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Seguro que queres des/activar el local?</p>
+</div>
+
 @section scripts{
     <script type="text/javascript">
 
@@ -224,7 +228,7 @@
             actions: {
                 listAction: '/Locales/Lista',
                 createAction: '/Locales/Crear',
-                deleteAction: '/Locales/Desactivar',
+                deleteAction: '/Locales/Borrar',
                 updateAction: '/Locales/Editar'
             },
             fields: {
@@ -335,6 +339,18 @@
                     edit: false,
                     options: [{ Value: true, DisplayText: 'Si!' }, { Value: false, DisplayText: 'No' }]
 
+                },
+                desactivar: {
+                    title: '',
+                    width: '1%',
+                    sorting: false,
+                    edit: false,
+                    create: false,
+                    display: function (data) {
+                        var $img = $('<img data-idlocal=' + data.record.idLocal + ' class="desactivar" style="cursor:pointer" src="/Imagenes/Fijas/disabled.png" title="Activar" />');
+                        return $img;
+                    }
+
                 }
             },
             recordDeleted: function (e, data) {
@@ -342,6 +358,29 @@
             }
         });
         tabla.jtable('load');
+
+        $(document).on("click", ".desactivar", function (e) {
+            console.log();
+
+            $("#dialog-confirm").dialog({
+                resizable: false,
+                height: "auto",
+                width: 400,
+                modal: true,
+                buttons: {
+                    "Aceptar": function () {
+                        $(this).dialog("close");
+                        $.post("/Locales/Desactivar", { idLocal: $(e.toElement).data("idlocal") }, function () {
+                            tabla.jtable('reload');
+                        })
+                    },
+                    "Cancelar": function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+        });
 
         function mostrarProductos(id) {
             $.blockUI({ message: null });

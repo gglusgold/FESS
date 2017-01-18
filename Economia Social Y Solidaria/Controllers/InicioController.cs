@@ -80,6 +80,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     vecino.telefono = telefono;
                     vecino.contrasena = GetCrypt(password);
                     vecino.comuna = comuna;
+                    vecino.fechaCreado = DateTime.Now;
 
                     List<string> hashes = ctx.Vecinos.Select(a => a.hash).ToList();
                     string hash = RandomString(25);
