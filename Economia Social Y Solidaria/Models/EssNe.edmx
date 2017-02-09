@@ -310,7 +310,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Compras_Locales">
-          <End Role="Locales" Type="Self.Locales" Multiplicity="1" />
+          <End Role="Locales" Type="Self.Locales" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="Compras" Type="Self.Compras" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Locales">
@@ -396,7 +398,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ProductosLocales_Locales">
-          <End Role="Locales" Type="Self.Locales" Multiplicity="1" />
+          <End Role="Locales" Type="Self.Locales" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="ProductosLocales" Type="Self.ProductosLocales" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Locales">
@@ -1090,7 +1094,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Compras_Locales">
-          <End Type="TanoNEModel.Locales" Role="Locales" Multiplicity="1" />
+          <End Type="TanoNEModel.Locales" Role="Locales" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="TanoNEModel.Compras" Role="Compras" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Locales">
@@ -1140,7 +1146,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ProductosLocales_Locales">
-          <End Type="TanoNEModel.Locales" Role="Locales" Multiplicity="1" />
+          <End Type="TanoNEModel.Locales" Role="Locales" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="TanoNEModel.ProductosLocales" Role="ProductosLocales" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Locales">

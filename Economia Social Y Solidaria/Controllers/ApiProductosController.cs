@@ -10,6 +10,12 @@ namespace Economia_Social_Y_Solidaria.Controllers
 {
     public class ApiProductosController : ApiController
     {
+        public static DateTime GetNextWeekday(DateTime start, DayOfWeek day)
+        {
+            int daysToAdd = ((int)day - (int)start.DayOfWeek + 7) % 7;
+            return start.AddDays(daysToAdd);
+        }
+
         // GET api/apiproductos
         [ActionName("Productos")]
         public IHttpActionResult Get(int idLocal)
@@ -37,6 +43,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             })
             .ToList();
 
+            //DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            //return Json(new { Proxima = ProximaEntrea.ToString("dd/MM/yyyy"), Lista = groupedCustomerList });
             return Json(groupedCustomerList);
         }
 
@@ -50,12 +58,17 @@ namespace Economia_Social_Y_Solidaria.Controllers
             {
                 idLocal = b.Locales.idLocal,
                 nombre = b.Locales.nombre,
+                horario = b.Locales.horario,
                 direccion = b.Locales.direccion,
                 comuna = b.Locales.comuna,
                 barrio = b.Locales.barrio,
             }).Distinct();
 
-            return Json(locales);
+            DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+
+            return Json(new { Proxima = ProximaEntrea.ToString("dd/MM/yyyy"), Lista = locales });
+
+            //return Json(locales);
         }
     }
 }

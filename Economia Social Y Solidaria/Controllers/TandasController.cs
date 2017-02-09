@@ -194,15 +194,24 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     {
                         mail.Body += "<p>-------------------</p>";
                         mail.Body += "<p>Compra N° " + (totalCompras.IndexOf(compras) + 1) + "</p>";
-                        mail.Body += "<p><b>Lo tenés que pasar a retirar el dia " + fecha + " Por nuestrno local en " + actualTanda.Locales.direccion + "</b></p>";
+                        mail.Body += "<p><b>Lo tenés que pasar a retirar el dia " + fecha + " Por nuestro local en " + actualTanda.Locales.direccion + "</b></p>";
 
+                        decimal total = 0;
                         foreach (CompraProducto prod in compras.CompraProducto)
                         {
-                            mail.Body += "<p>" + prod.Productos.producto + " - " + prod.Productos.presentacion + " - " + prod.Productos.marca + " - Cantidad: " + prod.cantidad + "</p>";
+                            mail.Body += "<p>" + prod.cantidad + " - " + prod.Productos.producto + " - " + prod.Productos.presentacion + " - " + prod.Productos.marca + " - " + prod.Productos.Precios.LastOrDefault().precio + "</p>";
+                            total += prod.Productos.Precios.LastOrDefault().precio;
                         }
                         mail.Body += "<p>-------------------</p>";
+                        mail.Body += "<p>Total : " + total + "</p>";
                         mail.Body += "<br/><br/>";
+
                     }
+
+                    mail.Body += "<p>o	Sujeto a disponibilidad de stock</p>";
+                    mail.Body += "<p>o	No te olvides de venir con cambio. Y con bolsa, changuito o lo que te parezca donde poder llevarte tu compra</p>";
+                    mail.Body += "<p>o	Pasada el horario de entrega no se aceptan reclamos. Cualcuier problema avisanos con tiempo</p>";
+                    mail.Body += "<p>o	Tené en cuenta que cada producto que se pide por este medio lo abonamos al productor (con el dinero de los militantes) y no tenemos devolución posible. No nos claves, gracias.</p>";
 
                     mail.Body += "<p>Muchas gracias! Te esperamos</p>";
                     mail.IsBodyHtml = true;
@@ -307,7 +316,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             {
                 decimal costoTotal = 0;
                 var locales = ctx.Compras.Where(a => a.tandaId == idTanda).Select(a => a.Locales).Distinct().ToList();
-                foreach  ( var local in locales ) {
+                foreach (var local in locales)
+                {
                     csv.AppendLine(local.direccion);
                     var listado = ctx.CompraProducto.Where(a => a.Compras.localId == local.idLocal && a.Compras.tandaId == idTanda).GroupBy(a => a.productoId).Select(a => new { idProducto = a.Key, Cantidad = a.Sum(b => b.cantidad) }).ToArray();
                     for (int x = 0; x < listado.Count(); x++)
@@ -332,7 +342,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 {
                     var compra = listado[x];
                     Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == compra.idProducto);
-                    Costos ultimo = prod.Costos.Count > 1 ? prod.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Costos.FirstOrDefault();
+                    Costos ultimo = prod.Costos.Count > 1 ? (prod.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) == null ? prod.Costos.LastOrDefault() : prod.Costos.FirstOrDefault()) : prod.Costos.FirstOrDefault();
                     decimal costo = ultimo.costo * compra.Cantidad;
                     //decimal costo = prod.Costos.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).costo * compra.Cantidad;
                     costoTotal += costo;
@@ -369,7 +379,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             TanoNEEntities ctx = new TanoNEEntities();
             Tandas actual = ctx.Tandas.FirstOrDefault(a => a.idTanda == idTanda);
 
-            
+
             var locales = ctx.Compras.Where(a => a.tandaId == idTanda).Select(a => a.Locales).Distinct().ToList();
             foreach (var local in locales)
             {

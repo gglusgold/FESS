@@ -352,6 +352,7 @@
     <Content Include="Views\Noticias\Cargar.cshtml" />
     <Content Include="Views\Prueba\Prueba.cshtml" />
     <Content Include="Views\Productos\Asignar.cshtml" />
+    <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
     <None Include="Web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
