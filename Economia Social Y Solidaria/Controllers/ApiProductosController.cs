@@ -145,5 +145,82 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
         }
 
+        public IHttpActionResult Pedir([FromBody] int local, [FromBody] int[] idProducto, [FromBody] int[] cantidad)
+        {
+            string error = null;
+
+            
+
+            TanoNEEntities ctx = new TanoNEEntities();
+
+            Locales localCompro = ctx.Locales.FirstOrDefault(a => a.idLocal == local);
+            Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
+            if (vecino == null)
+                error = "Hay que iniciar sesion para realizar un pedido";
+
+            Tandas ultimaTanda = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado == null);
+            if (ultimaTanda == null)
+                error = "No hay circuitos abiertos en este momento";
+
+            //Encargado
+            EstadosCompra estado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
+
+            Compras compra = new Compras();
+            //if (idCompra.HasValue)
+            //{
+            //    compra = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra.Value);
+            //    compra.CompraProducto.ToList().ForEach(cs => ctx.CompraProducto.Remove(cs));
+            //}
+            //else
+            //{
+                compra.fecha = DateTime.Now;
+            //}
+
+            compra.Locales = localCompro;
+            compra.Vecinos = vecino;
+            compra.Tandas = ultimaTanda;
+            compra.EstadosCompra = estado;
+
+            //if (!idCompra.HasValue)
+                ctx.Compras.Add(compra);
+
+
+            for (int x = 0; x < idProducto.Length; x++)
+            {
+                int prodActual = idProducto[x];
+                int cantActual = cantidad[x];
+
+                Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == prodActual);
+                if (prod.stock != -1)
+                {
+                    int stockrestante = prod.stock - cantActual;
+                    if (stockrestante < 0)
+                    {
+                        error = string.Format("{0} del siguiente producto:<br/>{1} - {2} - {3}", prod.stock == 0 ? "No contamos con stock" : "Solo contamos con " + prod.stock + " articulos", prod.producto, prod.presentacion, prod.marca);
+                        break;
+                    }
+                    else
+                        prod.stock = stockrestante;
+                }
+
+
+                CompraProducto productos = new CompraProducto();
+                productos.Productos = prod;
+                productos.Compras = compra;
+                productos.cantidad = cantidad[x];
+
+                ctx.CompraProducto.Add(productos);
+            }
+
+
+
+            if (string.IsNullOrEmpty(error))
+            {
+                ctx.SaveChanges();
+            }
+
+            return Json(new { error = error });
+        }
+
     }
 }
