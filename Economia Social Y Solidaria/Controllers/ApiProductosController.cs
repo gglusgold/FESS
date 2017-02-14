@@ -73,7 +73,6 @@ namespace Economia_Social_Y_Solidaria.Controllers
         }
 
         [ActionName("Usuario")]
-        [HttpPost]
         public IHttpActionResult Usuario() // string correo, string pass)
         {
             TanoNEEntities ctx = new TanoNEEntities();
@@ -145,6 +144,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
         }
 
+        [ActionName("Pedir")]
         public IHttpActionResult Pedir([FromBody] int local, [FromBody] int[] idProducto, [FromBody] int[] cantidad)
         {
             string error = null;

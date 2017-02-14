@@ -355,6 +355,7 @@
     <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
     <None Include="Web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
