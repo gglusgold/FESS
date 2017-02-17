@@ -6,6 +6,11 @@ using System.Net.Http;
 using System.Web.Http;
 using Economia_Social_Y_Solidaria.Models;
 using System.Web;
+using System.Web.Helpers;
+using System.Web.Script.Serialization;
+using Newtonsoft.Json.Linq;
+using System.Net.Mail;
+using System.Configuration;
 
 namespace Economia_Social_Y_Solidaria.Controllers
 {
@@ -39,6 +44,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             .GroupBy(u => u.categoria)
             .Select(grp => new
             {
+                idCategoria = grp.FirstOrDefault().idCategoria,
                 nombre = grp.Key,
                 productos = grp.ToList()
             })
@@ -81,6 +87,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
             string correo = form["correo"];
             string pass = form["pass"];
+            string token = form["token"];
 
             Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == correo);
             if (vecino != null)
@@ -94,6 +101,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 pass = InicioController.GetCrypt(pass);
                 if (vecino.contrasena == pass)
                 {
+                    vecino.token = token;
+                    ctx.SaveChanges();
+
                     EstadosCompra EstadoEntregado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
                     EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 3);
                     EstadosCompra comentado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 4);
@@ -144,83 +154,306 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
         }
 
-        [ActionName("Pedir")]
-        public IHttpActionResult Pedir([FromBody] int local, [FromBody] int[] idProducto, [FromBody] int[] cantidad)
-        {
-            string error = null;
 
-            
+        [ActionName("ActualizarToken")]
+        public IHttpActionResult ActualizarToken()
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+
+            var form = HttpContext.Current.Request.Form;
+
+            int idVecino = int.Parse(form["idVecino"]);
+            string token = form["token"];
+
+            Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.idVecino == idVecino);
+            if (vecino != null)
+                vecino.token = token;
+
+            ctx.SaveChanges();
+
+            return Json(new {  });
+        }
+
+        [ActionName("Registrarse")]
+        public IHttpActionResult Registrarse()
+        {
+            string urla = ConfigurationManager.AppSettings["UrlSitio"];
 
             TanoNEEntities ctx = new TanoNEEntities();
 
-            Locales localCompro = ctx.Locales.FirstOrDefault(a => a.idLocal == local);
-            Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
+            var form = HttpContext.Current.Request.Form;
+
+            
+            string email = form["mail"];
+            string nombres = form["nombres"];
+            string telefono = form["telefono"];
+            string password = form["password"];
+            int comuna = int.Parse(form["comuna"]);
+            string token = form["token"];
+
+            Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == email);
             if (vecino == null)
-                error = "Hay que iniciar sesion para realizar un pedido";
-
-            Tandas ultimaTanda = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado == null);
-            if (ultimaTanda == null)
-                error = "No hay circuitos abiertos en este momento";
-
-            //Encargado
-            EstadosCompra estado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
-
-            Compras compra = new Compras();
-            //if (idCompra.HasValue)
-            //{
-            //    compra = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra.Value);
-            //    compra.CompraProducto.ToList().ForEach(cs => ctx.CompraProducto.Remove(cs));
-            //}
-            //else
-            //{
-                compra.fecha = DateTime.Now;
-            //}
-
-            compra.Locales = localCompro;
-            compra.Vecinos = vecino;
-            compra.Tandas = ultimaTanda;
-            compra.EstadosCompra = estado;
-
-            //if (!idCompra.HasValue)
-                ctx.Compras.Add(compra);
-
-
-            for (int x = 0; x < idProducto.Length; x++)
             {
-                int prodActual = idProducto[x];
-                int cantActual = cantidad[x];
+                vecino = new Vecinos();
+                vecino.correo = email;
+                vecino.nombres = nombres;
+                vecino.telefono = telefono;
+                vecino.contrasena = InicioController.GetCrypt(password);
+                vecino.comuna = comuna;
+                vecino.fechaCreado = DateTime.Now;
+                vecino.token = token;
 
-                Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == prodActual);
-                if (prod.stock != -1)
+                List<string> hashes = ctx.Vecinos.Select(a => a.hash).ToList();
+                string hash = InicioController.RandomString(25);
+                while (hashes.Contains(hash))
                 {
-                    int stockrestante = prod.stock - cantActual;
-                    if (stockrestante < 0)
-                    {
-                        error = string.Format("{0} del siguiente producto:<br/>{1} - {2} - {3}", prod.stock == 0 ? "No contamos con stock" : "Solo contamos con " + prod.stock + " articulos", prod.producto, prod.presentacion, prod.marca);
-                        break;
-                    }
-                    else
-                        prod.stock = stockrestante;
+                    hash = InicioController.RandomString(25);
                 }
 
-
-                CompraProducto productos = new CompraProducto();
-                productos.Productos = prod;
-                productos.Compras = compra;
-                productos.cantidad = cantidad[x];
-
-                ctx.CompraProducto.Add(productos);
-            }
+                vecino.hash = hash;
+                ctx.Vecinos.Add(vecino);
 
 
+                using (MailMessage mail = new MailMessage())
+                {
+                    //string datos = "Datos para entrar:<br/>Usuario: " + email;
+                    string datos = "Datos para entrar:<br/>Usuario: " + email + " Contraseña :" + password;
+                    mail.From = new MailAddress("economiasocial@encuentrocapital.com.ar", "Economía Social y Solidaria");
+                    mail.To.Add(email);
+                    mail.Subject = "Economia Social y Solidaria -- Nuevo Encuentro";
+                    mail.Body = "<p>Gracias por usar nuestro sistema. Hacé click en el link de abajo para activar la cuenta</p>";
+                    mail.Body += "<p><a href='" + urla + "Inicio/ActivarCuenta?k=" + hash + "'>Activar Cuenta</a></p>";
+                    mail.Body += "<p>-------------------</p><p><p>" + datos + "</p><p>-------------------</p>";
+                    mail.IsBodyHtml = true;
 
-            if (string.IsNullOrEmpty(error))
-            {
+                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    //using (SmtpClient smtp = new SmtpClient("smtp.encuentrocapital.com.ar", 587))
+                    {
+                        // smtp.Credentials = new NetworkCredential("racinglocura07@gmail.com", "kapanga34224389,");
+                        smtp.Credentials = new NetworkCredential("economiasocial@encuentrocapital.com.ar", "Frent3355");
+                        smtp.EnableSsl = true;
+                        smtp.Send(mail);
+                    }
+                }
+
                 ctx.SaveChanges();
+
+                return Json(new { respuesta = "Te enviamos un mail para activar la cuenta" });
+            }
+            else
+            {
+                return Json(new { error = "Ya existe el usuario" });
+            }
+        } 
+
+        [ActionName("Pedir")]
+        public IHttpActionResult Pedir()
+        {
+            try
+            {
+                string error = "";
+
+                var form = HttpContext.Current.Request.Form;
+
+                int idVecino = int.Parse(form["idVecino"]);
+                int local = int.Parse(form["local"]);
+                string prods = form["productos"];
+                int idCompra = int.Parse(form["idCompra"]);
+
+                dynamic dyn = JArray.Parse(prods);
+
+                TanoNEEntities ctx = new TanoNEEntities();
+
+                Locales localCompro = ctx.Locales.FirstOrDefault(a => a.idLocal == local);
+                Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.idVecino == idVecino);
+                if (vecino == null)
+                    error = "Hay que iniciar sesion para realizar un pedido";
+
+                Tandas ultimaTanda = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado == null);
+                if (ultimaTanda == null)
+                    error = "No hay circuitos abiertos en este momento";
+
+                //Encargado
+                EstadosCompra estado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
+
+                Compras compra = new Compras();
+                if (idCompra != -1)
+                {
+                    compra = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra);
+                    compra.CompraProducto.ToList().ForEach(cs => ctx.CompraProducto.Remove(cs));
+                }
+                else
+                {
+                compra.fecha = DateTime.Now;
+                }
+
+                compra.Locales = localCompro;
+                compra.Vecinos = vecino;
+                compra.Tandas = ultimaTanda;
+                compra.EstadosCompra = estado;
+
+                if (idCompra == -1)
+                    ctx.Compras.Add(compra);
+
+                foreach (dynamic producto in dyn)
+                {
+                    int prodActual = producto.idProducto;
+                    int cantActual = producto.pedidos;
+
+                    Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == prodActual);
+                    if (prod.stock != -1)
+                    {
+                        int stockrestante = prod.stock - cantActual;
+                        if (stockrestante < 0)
+                        {
+                            error = string.Format("{0} del siguiente producto:<br/>{1} - {2} - {3}", prod.stock == 0 ? "No contamos con stock" : "Solo contamos con " + prod.stock + " articulos", prod.producto, prod.presentacion, prod.marca);
+                            break;
+                        }
+                        else
+                            prod.stock = stockrestante;
+                    }
+
+
+                    CompraProducto productos = new CompraProducto();
+                    productos.Productos = prod;
+                    productos.Compras = compra;
+                    productos.cantidad = cantActual;
+
+                    ctx.CompraProducto.Add(productos);
+                }
+
+                if (string.IsNullOrEmpty(error))
+                {
+                    ctx.SaveChanges();
+                }
+
+                return Json(new { error = error });
+
+            }
+            catch (Exception)
+            {
+                return Json(new { error = "Error al grabar, si te sigue pasando, ¡avisanos!" });
             }
 
-            return Json(new { error = error });
+
         }
 
+
+        [ActionName("MisCompras")]
+        public IHttpActionResult MisCompras()
+        {
+            try
+            {
+                var form = HttpContext.Current.Request.Form;
+
+                int idVecino = int.Parse(form["idVecino"]);
+
+                TanoNEEntities ctx = new TanoNEEntities();
+
+                Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.idVecino == idVecino);
+
+                Tandas ultimaTanda = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado == null);
+
+                EstadosCompra EstadoEntregado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
+                EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 3);
+                EstadosCompra comentado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 4);
+
+                //Precios ultimop = prod.Precios.Count > 1 ? prod.Precios.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Precios.FirstOrDefault();
+
+
+                var json = ctx.Compras.Where(a => a.vecinoId == idVecino).OrderByDescending(a => a.fecha).ToList().Select(a => new
+                {
+                    idCompra = a.idCompra,
+                    estado = a.EstadosCompra.nombre,
+                    fecha = a.fecha.ToString("hh:mm dd/MM/yyyy"),
+                    idLocal = a.Locales.idLocal,
+                    local = a.Locales.direccion,
+                    barrio = a.Locales.barrio,
+                    editar = ultimaTanda == null ? false : a.estadoId == EstadoEntregado.idEstadoCompra,
+                    comentar = a.estadoId == confirmado.idEstadoCompra,
+                    comentado = a.estadoId == comentado.idEstadoCompra,
+                    comuna = a.Locales.comuna,
+                    productos = a.CompraProducto.ToList().Select(b => new
+                    {
+                        idProducto = b.Productos.idProducto,
+                        nombre = b.Productos.producto,
+                        marca = b.Productos.marca,
+                        presentacion = b.Productos.presentacion,
+                        cantidad = b.cantidad,
+                        comentado = a.ComentariosProducto.FirstOrDefault(c => c.productoId == b.productoId) != null,  // a.Comentarios.Count == 1 ? a.Comentarios.FirstOrDefault().ComentariosProducto.FirstOrDefault(cp => cp.productoId == b.productoId).Productos != null : false,
+                        precioUnidad = b.Productos.Precios.Count > 1 ? b.Productos.Precios.LastOrDefault(precio => a.fecha.Date >= precio.fecha.Date).precio : b.Productos.Precios.FirstOrDefault().precio,
+
+                    })
+                }).ToList();
+
+                
+
+                return Json(new { Historico = json });
+
+            }
+            catch (Exception)
+            {
+                return Json(new { error = "Error al grabar, si te sigue pasando, ¡avisanos!" });
+            }
+
+
+        }
+
+        [ActionName("CancelarPedido")]
+        public IHttpActionResult CancelarPedido()
+        {
+            try
+            {
+                string error = "";
+                var form = HttpContext.Current.Request.Form;
+
+                int idVecino = int.Parse(form["idVecino"]);
+                int idCompra = int.Parse(form["idCompra"]);
+
+                TanoNEEntities ctx = new TanoNEEntities();
+                Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.idVecino == idVecino);
+
+                EstadosCompra EstadoEntregado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
+                Compras cancelar = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra && vecino.idVecino == a.vecinoId);
+                if ( cancelar.estadoId != EstadoEntregado.idEstadoCompra )
+                {
+                    error = "No se puede cancelar la compra, ya ha sido encargada!";
+                }
+                if (cancelar != null && string.IsNullOrWhiteSpace(error))
+                {
+                    ctx.Compras.Remove(cancelar);
+                    ctx.SaveChanges();
+                }
+
+                return Json(new { error = error });
+
+            }
+            catch (Exception)
+            {
+                return Json(new { error = "Error al grabar, si te sigue pasando, ¡avisanos!" });
+            }
+        }
+
+        [ActionName("Noticias")]
+        public IHttpActionResult Noticias()
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+
+            return Json(new
+            {
+                Noticias = ctx.Noticias.OrderBy(a => a.fecha).ToList().Select(a => new
+                {
+                    titulo = a.titulo,
+                    copete = a.copete,
+                    link = a.link,
+                    imagen = a.imagen,
+                    categoria = a.categoria,
+                    tags = a.tags,
+                    autor = a.autor,
+                    fecha = a.fecha.HasValue ? a.fecha.Value.ToShortDateString() : "",
+                }).Take(10)
+            });
+        }
     }
+
 }

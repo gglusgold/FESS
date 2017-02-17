@@ -221,9 +221,6 @@
     <Compile Include="Models\Costos.cs">
       <DependentUpon>EssNe.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\C_Comentarios.cs">
-      <DependentUpon>EssNe.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\EssNe.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

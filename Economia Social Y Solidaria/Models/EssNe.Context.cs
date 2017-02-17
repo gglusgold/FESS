@@ -25,7 +25,6 @@ namespace Economia_Social_Y_Solidaria.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<C_Comentarios> C_Comentarios { get; set; }
         public virtual DbSet<Categorias> Categorias { get; set; }
         public virtual DbSet<Circuitos> Circuitos { get; set; }
         public virtual DbSet<Comentarios> Comentarios { get; set; }

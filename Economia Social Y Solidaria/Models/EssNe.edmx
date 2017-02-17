@@ -5,18 +5,6 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="TanoNEModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="_Comentarios">
-          <Key>
-            <PropertyRef Name="idComentario" />
-          </Key>
-          <Property Name="idComentario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="comentario" Type="varchar" MaxLength="255" Nullable="false" />
-          <Property Name="estrellas" Type="int" Nullable="false" />
-          <Property Name="fecha" Type="date" Nullable="false" />
-          <Property Name="vecinoId" Type="int" Nullable="false" />
-          <Property Name="productoId" Type="int" />
-          <Property Name="compraId" Type="int" />
-        </EntityType>
         <EntityType Name="Categorias">
           <Key>
             <PropertyRef Name="idCategoria" />
@@ -210,6 +198,7 @@
           <Property Name="verificado" Type="bit" Nullable="false" />
           <Property Name="localId" Type="int" />
           <Property Name="fechaCreado" Type="datetime" />
+          <Property Name="token" Type="varchar" MaxLength="255" />
         </EntityType>
         <Association Name="FK_Comentarios_Compras1">
           <End Role="Compras" Type="Self.Compras" Multiplicity="1" />
@@ -220,18 +209,6 @@
             </Principal>
             <Dependent Role="Comentarios">
               <PropertyRef Name="compraId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Comentarios_Vecinos">
-          <End Role="Vecinos" Type="Self.Vecinos" Multiplicity="1" />
-          <End Role="_Comentarios" Type="Self._Comentarios" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Vecinos">
-              <PropertyRef Name="idVecino" />
-            </Principal>
-            <Dependent Role="_Comentarios">
-              <PropertyRef Name="vecinoId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -486,7 +463,6 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="TanoNEModelStoreContainer">
-          <EntitySet Name="_Comentarios" EntityType="Self._Comentarios" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Categorias" EntityType="Self.Categorias" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Circuitos" EntityType="Self.Circuitos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Comentarios" EntityType="Self.Comentarios" Schema="dbo" store:Type="Tables" />
@@ -509,10 +485,6 @@
           <AssociationSet Name="FK_Comentarios_Compras1" Association="Self.FK_Comentarios_Compras1">
             <End Role="Compras" EntitySet="Compras" />
             <End Role="Comentarios" EntitySet="Comentarios" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Comentarios_Vecinos" Association="Self.FK_Comentarios_Vecinos">
-            <End Role="Vecinos" EntitySet="Vecinos" />
-            <End Role="_Comentarios" EntitySet="_Comentarios" />
           </AssociationSet>
           <AssociationSet Name="FK_Comentarios_Vecinos1" Association="Self.FK_Comentarios_Vecinos1">
             <End Role="Vecinos" EntitySet="Vecinos" />
@@ -600,7 +572,6 @@
     <edmx:ConceptualModels>
       <Schema Namespace="TanoNEModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="TanoNEEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="C_Comentarios" EntityType="TanoNEModel.C_Comentarios" />
           <EntitySet Name="Categorias" EntityType="TanoNEModel.Categorias" />
           <EntitySet Name="Circuitos" EntityType="TanoNEModel.Circuitos" />
           <EntitySet Name="Comentarios" EntityType="TanoNEModel.Comentarios" />
@@ -620,10 +591,6 @@
           <EntitySet Name="sysdiagrams" EntityType="TanoNEModel.sysdiagrams" />
           <EntitySet Name="Tandas" EntityType="TanoNEModel.Tandas" />
           <EntitySet Name="Vecinos" EntityType="TanoNEModel.Vecinos" />
-          <AssociationSet Name="FK_Comentarios_Vecinos" Association="TanoNEModel.FK_Comentarios_Vecinos">
-            <End Role="Vecinos" EntitySet="Vecinos" />
-            <End Role="C_Comentarios" EntitySet="C_Comentarios" />
-          </AssociationSet>
           <AssociationSet Name="FK_Productos_Categorias" Association="TanoNEModel.FK_Productos_Categorias">
             <End Role="Categorias" EntitySet="Categorias" />
             <End Role="Productos" EntitySet="Productos" />
@@ -709,19 +676,6 @@
             <End Role="Tandas" EntitySet="Tandas" />
           </AssociationSet>
         </EntityContainer>
-        <EntityType Name="C_Comentarios">
-          <Key>
-            <PropertyRef Name="idComentario" />
-          </Key>
-          <Property Name="idComentario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="comentario" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="estrellas" Type="Int32" Nullable="false" />
-          <Property Name="fecha" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="vecinoId" Type="Int32" Nullable="false" />
-          <Property Name="productoId" Type="Int32" />
-          <Property Name="compraId" Type="Int32" />
-          <NavigationProperty Name="Vecinos" Relationship="TanoNEModel.FK_Comentarios_Vecinos" FromRole="C_Comentarios" ToRole="Vecinos" />
-        </EntityType>
         <EntityType Name="Categorias">
           <Key>
             <PropertyRef Name="idCategoria" />
@@ -952,25 +906,13 @@
           <Property Name="verificado" Type="Boolean" Nullable="false" />
           <Property Name="localId" Type="Int32" />
           <Property Name="fechaCreado" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="C_Comentarios" Relationship="TanoNEModel.FK_Comentarios_Vecinos" FromRole="Vecinos" ToRole="C_Comentarios" />
+          <Property Name="token" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Comentarios" Relationship="TanoNEModel.FK_Comentarios_Vecinos1" FromRole="Vecinos" ToRole="Comentarios" />
           <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Compras_Vecinos" FromRole="Vecinos" ToRole="Compras" />
           <NavigationProperty Name="Locales" Relationship="TanoNEModel.FK_Vecinos_Locales" FromRole="Vecinos" ToRole="Locales" />
           <NavigationProperty Name="RolesVecinos" Relationship="TanoNEModel.FK_RolesVecinos_Vecinos" FromRole="Vecinos" ToRole="RolesVecinos" />
           <NavigationProperty Name="Tandas" Relationship="TanoNEModel.FK_Tandas_Vecinos" FromRole="Vecinos" ToRole="Tandas" />
         </EntityType>
-        <Association Name="FK_Comentarios_Vecinos">
-          <End Type="TanoNEModel.Vecinos" Role="Vecinos" Multiplicity="1" />
-          <End Type="TanoNEModel.C_Comentarios" Role="C_Comentarios" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Vecinos">
-              <PropertyRef Name="idVecino" />
-            </Principal>
-            <Dependent Role="C_Comentarios">
-              <PropertyRef Name="vecinoId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Productos_Categorias">
           <End Type="TanoNEModel.Categorias" Role="Categorias" Multiplicity="0..1" />
           <End Type="TanoNEModel.Productos" Role="Productos" Multiplicity="*" />
@@ -1239,19 +1181,6 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="TanoNEModelStoreContainer" CdmEntityContainer="TanoNEEntities">
-          <EntitySetMapping Name="C_Comentarios">
-            <EntityTypeMapping TypeName="TanoNEModel.C_Comentarios">
-              <MappingFragment StoreEntitySet="_Comentarios">
-                <ScalarProperty Name="compraId" ColumnName="compraId" />
-                <ScalarProperty Name="productoId" ColumnName="productoId" />
-                <ScalarProperty Name="vecinoId" ColumnName="vecinoId" />
-                <ScalarProperty Name="fecha" ColumnName="fecha" />
-                <ScalarProperty Name="estrellas" ColumnName="estrellas" />
-                <ScalarProperty Name="comentario" ColumnName="comentario" />
-                <ScalarProperty Name="idComentario" ColumnName="idComentario" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Categorias">
             <EntityTypeMapping TypeName="TanoNEModel.Categorias">
               <MappingFragment StoreEntitySet="Categorias">
@@ -1452,6 +1381,7 @@
           <EntitySetMapping Name="Vecinos">
             <EntityTypeMapping TypeName="TanoNEModel.Vecinos">
               <MappingFragment StoreEntitySet="Vecinos">
+                <ScalarProperty Name="token" ColumnName="token" />
                 <ScalarProperty Name="fechaCreado" ColumnName="fechaCreado" />
                 <ScalarProperty Name="localId" ColumnName="localId" />
                 <ScalarProperty Name="verificado" ColumnName="verificado" />
