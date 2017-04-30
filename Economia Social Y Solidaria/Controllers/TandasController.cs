@@ -200,7 +200,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         foreach (CompraProducto prod in compras.CompraProducto)
                         {
                             mail.Body += "<p>" + prod.cantidad + " - " + prod.Productos.producto + " - " + prod.Productos.presentacion + " - " + prod.Productos.marca + " - " + prod.Productos.Precios.LastOrDefault().precio + "</p>";
-                            total += prod.Productos.Precios.LastOrDefault().precio;
+                            //total += prod.Productos.Precios.LastOrDefault().precio;
+                            total += prod.cantidad * prod.Productos.Precios.LastOrDefault().precio;
                         }
                         mail.Body += "<p>-------------------</p>";
                         mail.Body += "<p>Total : " + total + "</p>";
@@ -210,7 +211,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                     mail.Body += "<p>o	Sujeto a disponibilidad de stock</p>";
                     mail.Body += "<p>o	No te olvides de venir con cambio. Y con bolsa, changuito o lo que te parezca donde poder llevarte tu compra</p>";
-                    mail.Body += "<p>o	Pasada el horario de entrega no se aceptan reclamos. Cualcuier problema avisanos con tiempo</p>";
+                    mail.Body += "<p>o	Pasada el horario de entrega no se aceptan reclamos. Cualquier problema avisanos con tiempo</p>";
                     mail.Body += "<p>o	Tené en cuenta que cada producto que se pide por este medio lo abonamos al productor (con el dinero de los militantes) y no tenemos devolución posible. No nos claves, gracias.</p>";
 
                     mail.Body += "<p>Muchas gracias! Te esperamos</p>";
