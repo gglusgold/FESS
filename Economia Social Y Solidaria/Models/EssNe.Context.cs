@@ -9,10 +9,9 @@
 
 namespace Economia_Social_Y_Solidaria.Models
 {
-    using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
-    
+
     public partial class TanoNEEntities : DbContext
     {
         public TanoNEEntities()

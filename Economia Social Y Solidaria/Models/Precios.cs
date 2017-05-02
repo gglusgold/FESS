@@ -10,8 +10,7 @@
 namespace Economia_Social_Y_Solidaria.Models
 {
     using System;
-    using System.Collections.Generic;
-    
+
     public partial class Precios
     {
         public int idPrecio { get; set; }

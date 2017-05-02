@@ -9,9 +9,7 @@
 
 namespace Economia_Social_Y_Solidaria.Models
 {
-    using System;
-    using System.Collections.Generic;
-    
+
     public partial class ComentariosProducto
     {
         public int idProductoComentario { get; set; }

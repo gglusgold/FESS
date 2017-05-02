@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using Economia_Social_Y_Solidaria.Models;
 using System.Web;
-using System.Web.Helpers;
-using System.Web.Script.Serialization;
 using Newtonsoft.Json.Linq;
 using System.Net.Mail;
 using System.Configuration;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace Economia_Social_Y_Solidaria.Controllers
 {
@@ -59,9 +58,17 @@ namespace Economia_Social_Y_Solidaria.Controllers
         [ActionName("Locales")]
         public IHttpActionResult Get()
         {
+            string error = null;
             TanoNEEntities ctx = new TanoNEEntities();
 
-            var locales = ctx.ProductosLocales.Where(a => a.Locales.activo).ToList().Select(b => new
+            Tandas ultimaTanda = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado == null);
+            if (ultimaTanda == null)
+            {
+                error = "No hay circuitos abiertos en este momento";
+                return Json(new { Error = error });
+            }
+
+            var locales = ctx.ProductosLocales.Where(a => a.Locales.activo && a.Locales.circuitoId == ultimaTanda.circuitoId).ToList().Select(b => new
             {
                 idLocal = b.Locales.idLocal,
                 nombre = b.Locales.nombre,
@@ -171,7 +178,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
             ctx.SaveChanges();
 
-            return Json(new {  });
+            return Json(new { });
         }
 
         [ActionName("Registrarse")]
@@ -183,7 +190,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
             var form = HttpContext.Current.Request.Form;
 
-            
+
             string email = form["mail"];
             string nombres = form["nombres"];
             string telefono = form["telefono"];
@@ -244,7 +251,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             {
                 return Json(new { error = "Ya existe el usuario" });
             }
-        } 
+        }
 
         [ActionName("Pedir")]
         public IHttpActionResult Pedir()
@@ -284,7 +291,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 }
                 else
                 {
-                compra.fecha = DateTime.Now;
+                    compra.fecha = DateTime.Now;
                 }
 
                 compra.Locales = localCompro;
@@ -386,7 +393,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     })
                 }).ToList();
 
-                
+
 
                 return Json(new { Historico = json });
 
@@ -415,7 +422,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                 EstadosCompra EstadoEntregado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
                 Compras cancelar = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra && vecino.idVecino == a.vecinoId);
-                if ( cancelar.estadoId != EstadoEntregado.idEstadoCompra )
+                if (cancelar.estadoId != EstadoEntregado.idEstadoCompra)
                 {
                     error = "No se puede cancelar la compra, ya ha sido encargada!";
                 }
@@ -453,6 +460,63 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     fecha = a.fecha.HasValue ? a.fecha.Value.ToShortDateString() : "",
                 }).Take(10)
             });
+        }
+
+        [ActionName("MandarNotificacion")]
+        public IHttpActionResult MandarNotificacion()
+        {
+            var form = HttpContext.Current.Request.Form;
+
+            string titulo = form["titulo"];
+            string mensaje = form["mensaje"];
+
+            mandarNotificacion(titulo, mensaje);
+            return Json("Si");
+        }
+
+
+        public static void mandarNotificacion(string titulo, string mensaje, string donde = null, string[] regIds = null)
+        {
+            if (regIds == null)
+            {
+                TanoNEEntities ctx = new TanoNEEntities();
+                regIds = ctx.Vecinos.Where(x => x.token != null).Select(x => x.token).ToArray();
+            }
+
+            if (regIds.Count() == 0)
+                return;
+
+            string authkey = "AIzaSyB34E8CF1abOR9LvGBIuT9nfniWkY_DEyE";
+
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://fcm.googleapis.com/fcm/send");
+            httpWebRequest.ContentType = "application/json";
+            httpWebRequest.Method = "POST";
+            httpWebRequest.Headers.Add("Authorization", "key=" + authkey);
+
+
+            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            {
+                var json = new
+                {
+                    data = new
+                    {
+                        titulo = titulo,
+                        mensaje = mensaje,
+                        donde = donde
+                    },
+                    registration_ids = regIds
+                };
+
+                streamWriter.Write(JsonConvert.SerializeObject(json));
+                streamWriter.Flush();
+                streamWriter.Close();
+            }
+
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                var result = streamReader.ReadToEnd();
+            }
         }
     }
 

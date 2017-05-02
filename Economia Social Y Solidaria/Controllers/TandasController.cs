@@ -1,13 +1,11 @@
 ﻿using Economia_Social_Y_Solidaria.Models;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Economia_Social_Y_Solidaria.Controllers
@@ -102,6 +100,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         conf.idCircuito = tanda.Circuitos.idCircuito;
                         conf.leyenda = "Circuito Abierto: ";
 
+                        ApiProductosController.mandarNotificacion("Ya poder pedir!", "Desde hoy tenés la posibilidad de hacer tu pedido", "CARRITO");
+
                         ctx.Tandas.Add(tanda);
                         ctx.SaveChanges();
                     }
@@ -151,6 +151,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return RedirectToAction("Tandas", "Tandas");
         }
 
+        
+
         public JsonResult Lista()
         {
             TanoNEEntities ctx = new TanoNEEntities();
@@ -173,6 +175,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             TanoNEEntities ctx = new TanoNEEntities();
             EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 2);
             var vecinosQueCompraron = tandaActual.Compras.Where(a => a.EstadosCompra.idEstadoCompra == confirmado.idEstadoCompra).GroupBy(a => a.vecinoId).Select(a => a.FirstOrDefault(b => b.vecinoId == a.Key));
+
+            ApiProductosController.mandarNotificacion("Pedido Confirmado", "Gracias por colaborar con la economía social y solidaria. No te olvides de venir con cambio!", "MISCOMPRAS", vecinosQueCompraron.Where(a => a.Vecinos.token != null).Select(a => a.Vecinos.token).ToArray());
             foreach (var actualTanda in vecinosQueCompraron)
             {
                 string fecha = ProximaEntrea.ToString("dd/MM/yyyy") + " - " + actualTanda.Locales.horario;
@@ -200,7 +204,6 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         foreach (CompraProducto prod in compras.CompraProducto)
                         {
                             mail.Body += "<p>" + prod.cantidad + " - " + prod.Productos.producto + " - " + prod.Productos.presentacion + " - " + prod.Productos.marca + " - " + prod.Productos.Precios.LastOrDefault().precio + "</p>";
-                            //total += prod.Productos.Precios.LastOrDefault().precio;
                             total += prod.cantidad * prod.Productos.Precios.LastOrDefault().precio;
                         }
                         mail.Body += "<p>-------------------</p>";
@@ -211,7 +214,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                     mail.Body += "<p>o	Sujeto a disponibilidad de stock</p>";
                     mail.Body += "<p>o	No te olvides de venir con cambio. Y con bolsa, changuito o lo que te parezca donde poder llevarte tu compra</p>";
-                    mail.Body += "<p>o	Pasada el horario de entrega no se aceptan reclamos. Cualquier problema avisanos con tiempo</p>";
+                    mail.Body += "<p>o	Pasada el horario de entrega no se aceptan reclamos. Cualcuier problema avisanos con tiempo</p>";
                     mail.Body += "<p>o	Tené en cuenta que cada producto que se pide por este medio lo abonamos al productor (con el dinero de los militantes) y no tenemos devolución posible. No nos claves, gracias.</p>";
 
                     mail.Body += "<p>Muchas gracias! Te esperamos</p>";

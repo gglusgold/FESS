@@ -10,8 +10,7 @@
 namespace Economia_Social_Y_Solidaria.Models
 {
     using System;
-    using System.Collections.Generic;
-    
+
     public partial class sysdiagrams
     {
         public string name { get; set; }
