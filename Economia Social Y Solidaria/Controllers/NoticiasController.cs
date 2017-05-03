@@ -31,7 +31,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
-            List<Noticias> lista = ctx.Noticias.OrderBy(a => a.fecha).ToList();
+            List<Noticias> lista = ctx.Noticias.OrderByDescending(a => a.fecha).ToList();
             return Json(new { Result = "OK", Records = lista });
         }
 

@@ -457,6 +457,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 bordeNegrita.Border.RightBorder.Color = System.Drawing.Color.Black;
                 bordeNegrita.Border.BottomBorder.Color = System.Drawing.Color.Black;
 
+                bordeNegrita.Font.Bold = true;
+
                 bordeNegrita.Border.LeftBorder.BorderStyle = BorderStyleValues.Thin;
                 bordeNegrita.Border.TopBorder.BorderStyle = BorderStyleValues.Thin;
                 bordeNegrita.Border.RightBorder.BorderStyle = BorderStyleValues.Thin;
@@ -476,13 +478,11 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                 SLStyle bordeAb = sl.CreateStyle();
                 bordeAb.Border.BottomBorder.Color = System.Drawing.Color.Black;
-                bordeAb.Border.BottomBorder.BorderStyle = BorderStyleValues.Thin;
-
-
-                bordeNegrita.Font.Bold = true;
+                bordeAb.Border.BottomBorder.BorderStyle = BorderStyleValues.Thin;               
 
                 SLStyle saltoLinea = sl.CreateStyle();
                 saltoLinea.SetVerticalAlignment(VerticalAlignmentValues.Center);
+                saltoLinea.SetHorizontalAlignment(HorizontalAlignmentValues.Center);
                 saltoLinea.SetWrapText(true);
 
                 SLStyle rojo = sl.CreateStyle();
@@ -495,8 +495,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 centrado.Font.FontSize = 10;
                 centrado.SetHorizontalAlignment(HorizontalAlignmentValues.Right);
 
-                sl.SetColumnWidth(1, 16);
-                sl.SetColumnWidth(2, 55);
+                sl.SetColumnWidth(1, 30);
+                sl.SetColumnWidth(2, 65);
                 sl.SetColumnWidth(3, 10);
                 sl.SetColumnWidth(4, 10);
                 sl.SetColumnWidth(5, 35);
@@ -512,9 +512,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 int row = 3;
 
                 bordeNegrita.Font.Bold = false;
-                bordeNegrita.Border.Outline = true;
 
-                var lista = ctx.Compras.Where(a => a.tandaId == ultima.idTanda && (vecino.localId == null ? vecino.comuna == a.Locales.comuna : vecino.localId == a.localId)).OrderBy(a => a.Vecinos.nombres);
+                var lista = ctx.Compras.Where(a => a.tandaId == ultima.idTanda && (vecino.localId == null ? vecino.comuna == a.Locales.comuna : vecino.localId == a.localId)).OrderBy(a => new { a.Locales.idLocal, a.Vecinos.nombres });
                 foreach (var compra in lista)
                 {
                     int totalVecinx = (row + compra.CompraProducto.Count - 1);
@@ -526,11 +525,12 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         sl.SetCellStyle(row, x, totalVecinx, x, bordeDe);
                     }
 
-                    sl.SetCellValue(row, 1, new System.Globalization.CultureInfo("en-US", false).TextInfo.ToTitleCase(compra.Vecinos.nombres.ToLower()) + "\n" + compra.Vecinos.telefono);
+                    sl.SetCellValue(row, 1, new System.Globalization.CultureInfo("en-US", false).TextInfo.ToTitleCase(compra.Vecinos.nombres.ToLower()) + "\n" + compra.Vecinos.telefono + "\n" + compra.Vecinos.correo);
                     sl.SetCellStyle(row, 1, saltoLinea);
                     sl.MergeWorksheetCells(row, 1, totalVecinx, 1);
 
-                    foreach (var compraProducto in compra.CompraProducto)
+                    var ordenado = compra.CompraProducto.OrderBy(a => a.Productos.producto);
+                    foreach (var compraProducto in ordenado)
                     {
                         centrado.Font.Bold = false;
                         sl.SetCellValue(row, 2, compraProducto.cantidad + ": " + compraProducto.Productos.producto + " - " + compraProducto.Productos.marca + " - " + compraProducto.Productos.presentacion);

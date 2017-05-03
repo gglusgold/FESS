@@ -1,4 +1,6 @@
-﻿using Economia_Social_Y_Solidaria.Models;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Economia_Social_Y_Solidaria.Models;
+using SpreadsheetLight;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -151,7 +153,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return RedirectToAction("Tandas", "Tandas");
         }
 
-        
+
 
         public JsonResult Lista()
         {
@@ -302,7 +304,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
         public ActionResult CrearExcel(int idTanda, bool porLocal = false)
         {
 
-            string handle = Guid.NewGuid().ToString();
+            /*string handle = Guid.NewGuid().ToString();
 
             StringBuilder csv = new StringBuilder();
             string Columnas = null;
@@ -366,14 +368,212 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 TempData[handle] = memoryStream.ToArray();
             }
 
-            return Json(new { FileGuid = handle, FileName = "Reporte.csv" });
+            return Json(new { FileGuid = handle, FileName = "Reporte.csv" });*/
+
+            string handle = Guid.NewGuid().ToString();
+
+            TanoNEEntities ctx = new TanoNEEntities();
+            Tandas actual = ctx.Tandas.FirstOrDefault(a => a.idTanda == idTanda);
+
+            using (MemoryStream mem = new MemoryStream())
+            using (SLDocument sl = new SLDocument())
+            {
+                sl.RenameWorksheet(SLDocument.DefaultFirstSheetName, porLocal ? "Local" : "Total");
+
+                SLStyle bordeNegrita = sl.CreateStyle();
+                bordeNegrita.Border.LeftBorder.Color = System.Drawing.Color.Black;
+                bordeNegrita.Border.TopBorder.Color = System.Drawing.Color.Black;
+                bordeNegrita.Border.RightBorder.Color = System.Drawing.Color.Black;
+                bordeNegrita.Border.BottomBorder.Color = System.Drawing.Color.Black;
+
+                bordeNegrita.Font.Bold = true;
+
+                bordeNegrita.Border.LeftBorder.BorderStyle = BorderStyleValues.Thin;
+                bordeNegrita.Border.TopBorder.BorderStyle = BorderStyleValues.Thin;
+                bordeNegrita.Border.RightBorder.BorderStyle = BorderStyleValues.Thin;
+                bordeNegrita.Border.BottomBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeIz = sl.CreateStyle();
+                bordeIz.Border.LeftBorder.Color = System.Drawing.Color.Black;
+                bordeIz.Border.LeftBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeDe = sl.CreateStyle();
+                bordeDe.Border.RightBorder.Color = System.Drawing.Color.Black;
+                bordeDe.Border.RightBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeAr = sl.CreateStyle();
+                bordeAr.Border.TopBorder.Color = System.Drawing.Color.Black;
+                bordeAr.Border.TopBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeAb = sl.CreateStyle();
+                bordeAb.Border.BottomBorder.Color = System.Drawing.Color.Black;
+                bordeAb.Border.BottomBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle saltoLinea = sl.CreateStyle();
+                saltoLinea.SetVerticalAlignment(VerticalAlignmentValues.Center);
+                saltoLinea.SetWrapText(true);
+
+                SLStyle rojo = sl.CreateStyle();
+                rojo.Fill.SetPatternType(PatternValues.Solid);//.BottomBorder.Color = System.Drawing.Color.Red;
+                rojo.Font.FontColor = System.Drawing.Color.White;
+                rojo.Fill.SetPatternForegroundColor(System.Drawing.Color.Red);
+
+                SLStyle centrado = sl.CreateStyle();
+                centrado.FormatCode = "$ * #,##0.00";
+                centrado.Font.FontSize = 10;
+                centrado.SetHorizontalAlignment(HorizontalAlignmentValues.Right);
+
+                SLStyle negrita = sl.CreateStyle();
+                negrita.Font.Bold = true;
+
+                int row = 3;
+
+                if (porLocal)
+                {
+                    sl.SetColumnWidth(1, 16);
+                    sl.SetColumnWidth(2, 10);
+                    sl.SetColumnWidth(3, 65);
+                    sl.SetColumnWidth(4, 15);
+                    sl.SetColumnWidth(5, 15);
+
+                    sl.SetCellValue(1, 1, "Local");
+                    sl.SetCellValue(1, 2, "Cantidad");
+                    sl.SetCellValue(1, 3, "Producto");
+                    sl.SetCellValue(1, 4, "Costo");
+                    sl.SetCellValue(1, 5, "Costo Total");
+
+                    sl.SetCellStyle(1, 1, 1, 5, bordeNegrita);
+
+                    decimal total = 0;
+                    var locales = ctx.Compras.Where(a => a.tandaId == idTanda).Select(a => a.Locales).Distinct().OrderBy(a => new { a.comuna, a.nombre }).ToList();
+                    foreach (var local in locales)
+                    {
+                        var listado = ctx.CompraProducto.Where(a => a.Compras.localId == local.idLocal && a.Compras.tandaId == idTanda).OrderBy(a => a.Productos.producto).GroupBy(a => a.productoId).Select(a => new { idProducto = a.Key, Cantidad = a.Sum(b => b.cantidad) });
+                        int totalVecinx = (row + listado.Count() - 1);
+
+                        sl.SetCellStyle(row, 1, totalVecinx, 1, bordeIz);
+                        sl.SetCellStyle(row, 1, row, 5, bordeAr);
+                        sl.SetCellStyle(totalVecinx, 1, totalVecinx, 5, bordeAb);
+                        for (int x = 1; x < 6; x++)
+                        {
+                            sl.SetCellStyle(row, x, totalVecinx, x, bordeDe);
+                        }
+
+                        sl.SetCellValue(row, 1, local.direccion + (local.nombre != null ? "\n" + local.nombre : ""));
+                        sl.SetCellStyle(row, 1, saltoLinea);
+                        sl.MergeWorksheetCells(row, 1, totalVecinx, 1);
+
+                        decimal subTotalLocal = 0;
+                        foreach (var productos in listado)
+                        {
+                            Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == productos.idProducto);
+
+                            Costos ultimo = prod.Costos.Count > 1 ? (prod.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) == null ? prod.Costos.LastOrDefault() : prod.Costos.FirstOrDefault()) : prod.Costos.FirstOrDefault();
+                            decimal costoTotal = ultimo.costo * productos.Cantidad;
+                            subTotalLocal += costoTotal;
+
+                            sl.SetCellValue(row, 2, productos.Cantidad);
+                            sl.SetCellValue(row, 3, prod.producto + " - " + prod.marca + " - " + prod.presentacion);
+
+                            sl.SetCellValue(row, 4, ultimo.costo);
+                            sl.SetCellValue(row, 5, costoTotal);
+
+                            sl.SetCellStyle(row, 4, centrado);
+                            sl.SetCellStyle(row, 5, centrado);
+
+                            row++;
+                        }
+
+                        total += subTotalLocal;
+
+                        sl.SetCellValue(row, 4, "Subtotal local: ");
+                        sl.SetCellStyle(row, 4, negrita);
+                        sl.SetCellValue(row, 5, subTotalLocal);
+                        sl.SetCellStyle(row, 5, centrado);
+                        sl.SetCellStyle(row, 5, negrita);
+
+                        row++;
+                        row++;
+
+                    }
+
+                    row++;
+                    sl.SetCellValue(row, 4, "Total: ");
+                    sl.SetCellStyle(row, 4, negrita);
+                    sl.SetCellValue(row, 5, total);
+                    sl.SetCellStyle(row, 5, centrado);
+                    sl.SetCellStyle(row, 5, negrita);
+
+                }
+                else
+                {
+                    sl.SetColumnWidth(1, 5);
+                    sl.SetColumnWidth(2, 10);
+                    sl.SetColumnWidth(3, 65);
+                    sl.SetColumnWidth(4, 20);
+                    sl.SetColumnWidth(5, 20);
+                    sl.SetColumnWidth(6, 15);
+                    sl.SetColumnWidth(7, 15);
+
+                    sl.SetCellValue(1, 1, "N°");
+                    sl.SetCellValue(1, 2, "Cantidad");
+                    sl.SetCellValue(1, 3, "Producto");
+                    sl.SetCellValue(1, 4, "Marca");
+                    sl.SetCellValue(1, 5, "Presentacion");
+                    sl.SetCellValue(1, 6, "Costo");
+                    sl.SetCellValue(1, 7, "Costo Total");
+
+                    sl.SetCellStyle(1, 1, 1, 7, bordeNegrita);
+
+                    var listado = ctx.CompraProducto.Where(a => a.Compras.tandaId == idTanda).GroupBy(a => a.productoId).Select(a => new { idProducto = a.Key, Cantidad = a.Sum(b => b.cantidad), Compra = a.FirstOrDefault() }).OrderBy(a => new { a.Compra.Productos.Categorias.nombre, a.Compra.Productos.producto }).ToList();
+
+                    decimal subTotal = 0;
+                    for (int x = 0; x < listado.Count(); x++)
+                    {
+                        var compra = listado.ElementAt(x);
+
+                        Costos ultimo = compra.Compra.Productos.Costos.Count > 1 ? (compra.Compra.Productos.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) == null ? compra.Compra.Productos.Costos.LastOrDefault() : compra.Compra.Productos.Costos.FirstOrDefault()) : compra.Compra.Productos.Costos.FirstOrDefault();
+                        decimal costoTotal = ultimo.costo * compra.Cantidad;
+                        subTotal += costoTotal;
+
+                        sl.SetCellValue(row, 1, x + 1);
+                        sl.SetCellValue(row, 2, compra.Cantidad);
+                        sl.SetCellValue(row, 3, compra.Compra.Productos.producto + " - " + compra.Compra.Productos.marca + " - " + compra.Compra.Productos.presentacion);
+                        sl.SetCellValue(row, 4, compra.Compra.Productos.marca);
+                        sl.SetCellValue(row, 5, compra.Compra.Productos.presentacion);
+                        sl.SetCellValue(row, 6, ultimo.costo);
+                        sl.SetCellValue(row, 7, costoTotal);
+
+                        sl.SetCellStyle(row, 6, centrado);
+                        sl.SetCellStyle(row, 7, centrado);
+
+                        row++;
+
+
+                    }
+
+                    centrado.Font.Bold = true;
+                    sl.SetCellValue(row, 5, "Total: ");
+                    sl.SetCellValue(row, 7, subTotal);
+                    sl.SetCellStyle(row, 7, centrado);
+                }
+
+                sl.SaveAs(mem);
+                mem.Position = 0;
+
+
+                TempData[handle] = mem.ToArray();
+
+                return Json(new { FileGuid = handle, FileName = porLocal ? "Local.xlsx" : "Total.xlsx" });
+            }
+
 
         }
 
         public ActionResult CrearExcelFinanzas(int idTanda)
         {
 
-            string handle = Guid.NewGuid().ToString();
+            /*string handle = Guid.NewGuid().ToString();
 
             StringBuilder csv = new StringBuilder();
             string Columnas = string.Format(";{0};{1};{2};{3};{4}", "Cantidad", "Producto", "Costo", "Precio", "Diferencia");
@@ -419,7 +619,166 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 TempData[handle] = memoryStream.ToArray();
             }
 
-            return Json(new { FileGuid = handle, FileName = "Reporte.csv" });
+            return Json(new { FileGuid = handle, FileName = "Reporte.csv" });*/
+
+
+            string handle = Guid.NewGuid().ToString();
+
+            TanoNEEntities ctx = new TanoNEEntities();
+            Tandas actual = ctx.Tandas.FirstOrDefault(a => a.idTanda == idTanda);
+
+            using (MemoryStream mem = new MemoryStream())
+            using (SLDocument sl = new SLDocument())
+            {
+                sl.RenameWorksheet(SLDocument.DefaultFirstSheetName, "Finanzas");
+
+                SLStyle bordeNegrita = sl.CreateStyle();
+                bordeNegrita.Border.LeftBorder.Color = System.Drawing.Color.Black;
+                bordeNegrita.Border.TopBorder.Color = System.Drawing.Color.Black;
+                bordeNegrita.Border.RightBorder.Color = System.Drawing.Color.Black;
+                bordeNegrita.Border.BottomBorder.Color = System.Drawing.Color.Black;
+
+                bordeNegrita.Font.Bold = true;
+
+                bordeNegrita.Border.LeftBorder.BorderStyle = BorderStyleValues.Thin;
+                bordeNegrita.Border.TopBorder.BorderStyle = BorderStyleValues.Thin;
+                bordeNegrita.Border.RightBorder.BorderStyle = BorderStyleValues.Thin;
+                bordeNegrita.Border.BottomBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeIz = sl.CreateStyle();
+                bordeIz.Border.LeftBorder.Color = System.Drawing.Color.Black;
+                bordeIz.Border.LeftBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeDe = sl.CreateStyle();
+                bordeDe.Border.RightBorder.Color = System.Drawing.Color.Black;
+                bordeDe.Border.RightBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeAr = sl.CreateStyle();
+                bordeAr.Border.TopBorder.Color = System.Drawing.Color.Black;
+                bordeAr.Border.TopBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeAb = sl.CreateStyle();
+                bordeAb.Border.BottomBorder.Color = System.Drawing.Color.Black;
+                bordeAb.Border.BottomBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle saltoLinea = sl.CreateStyle();
+                saltoLinea.SetVerticalAlignment(VerticalAlignmentValues.Center);
+                saltoLinea.SetWrapText(true);
+
+                SLStyle rojo = sl.CreateStyle();
+                rojo.Fill.SetPatternType(PatternValues.Solid);//.BottomBorder.Color = System.Drawing.Color.Red;
+                rojo.Font.FontColor = System.Drawing.Color.White;
+                rojo.Fill.SetPatternForegroundColor(System.Drawing.Color.Red);
+
+                SLStyle centrado = sl.CreateStyle();
+                centrado.FormatCode = "$ * #,##0.00";
+                centrado.Font.FontSize = 10;
+                centrado.SetHorizontalAlignment(HorizontalAlignmentValues.Right);
+
+                SLStyle negrita = sl.CreateStyle();
+                negrita.Font.Bold = true;
+
+                int row = 3;
+
+                sl.SetColumnWidth(1, 16);
+                sl.SetColumnWidth(2, 10);
+                sl.SetColumnWidth(3, 65);
+                sl.SetColumnWidth(4, 15);
+                sl.SetColumnWidth(5, 15);
+                sl.SetColumnWidth(6, 15);
+
+                sl.SetCellValue(1, 1, "Local");
+                sl.SetCellValue(1, 2, "Cantidad");
+                sl.SetCellValue(1, 3, "Producto");
+                sl.SetCellValue(1, 4, "Costo");
+                sl.SetCellValue(1, 5, "Precio");
+                sl.SetCellValue(1, 6, "Diferencia");
+
+                sl.SetCellStyle(1, 1, 1, 5, bordeNegrita);
+
+                var locales = ctx.Compras.Where(a => a.tandaId == idTanda).Select(a => a.Locales).Distinct().OrderBy(a => new { a.comuna, a.nombre }).ToList();
+                foreach (var local in locales)
+                {
+                    var listado = ctx.CompraProducto.Where(a => a.Compras.localId == local.idLocal && a.Compras.tandaId == idTanda).GroupBy(a => a.productoId).Select(a => new { idProducto = a.Key, Cantidad = a.Sum(b => b.cantidad) }).ToArray();
+
+                    int totalVecinx = (row + listado.Count() - 1);
+
+                    sl.SetCellStyle(row, 1, totalVecinx, 1, bordeIz);
+                    sl.SetCellStyle(row, 1, row, 6, bordeAr);
+                    sl.SetCellStyle(totalVecinx, 1, totalVecinx, 6, bordeAb);
+                    for (int x = 1; x < 7; x++)
+                    {
+                        sl.SetCellStyle(row, x, totalVecinx, x, bordeDe);
+                    }
+
+                    sl.SetCellValue(row, 1, local.direccion + (local.nombre != null ? "\n" + local.nombre : ""));
+                    sl.SetCellStyle(row, 1, saltoLinea);
+                    sl.MergeWorksheetCells(row, 1, totalVecinx, 1);
+
+                    decimal costoLocal = 0;
+                    decimal precioLocal = 0;
+                    for (int x = 0; x < listado.Count(); x++)
+                    {
+                        var compra = listado[x];
+                        Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == compra.idProducto);
+
+                        Costos ultimoc = prod.Costos.Count > 1 ? prod.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Costos.FirstOrDefault();
+                        decimal costo = ultimoc.costo * compra.Cantidad;
+                        //decimal costo = prod.Costos.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).costo * compra.Cantidad;
+
+                        Precios ultimop = prod.Precios.Count > 1 ? prod.Precios.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Precios.FirstOrDefault();
+                        decimal precio = ultimop.precio * compra.Cantidad;
+                        //decimal precio = prod.Precios.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).precio * compra.Cantidad;
+                        costoLocal += costo;
+                        precioLocal += precio;
+
+                        //string filas = string.Format(";{0};{1};${2};${3};${4}", compra.Cantidad, string.Format("{0} - {1} - {2}", prod.producto, prod.marca, prod.presentacion), costo.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), (precio - costo).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture));
+                        
+
+                        sl.SetCellValue(row, 2, compra.Cantidad);
+                        sl.SetCellValue(row, 3, prod.producto + " - " + prod.marca + " - " + prod.presentacion);
+                        sl.SetCellValue(row, 4, costo);
+                        sl.SetCellValue(row, 5, precio);
+                        sl.SetCellValue(row, 6, precio - costo);
+
+                        sl.SetCellStyle(row, 4, centrado);
+                        sl.SetCellStyle(row, 5, centrado);
+                        sl.SetCellStyle(row, 6, centrado);
+
+
+                        row++;
+                    }
+
+                    sl.SetCellValue(row, 3, "Totales por local: ");
+                    sl.SetCellValue(row, 4, costoLocal);
+                    sl.SetCellValue(row, 5, precioLocal);
+                    sl.SetCellValue(row, 6, precioLocal - costoLocal);
+
+                    sl.SetCellStyle(row, 3, negrita);
+                    sl.SetCellStyle(row, 4, negrita);
+                    sl.SetCellStyle(row, 5, negrita);
+                    sl.SetCellStyle(row, 6, negrita);
+
+                    sl.SetCellStyle(row, 4, centrado);
+                    sl.SetCellStyle(row, 5, centrado);
+                    sl.SetCellStyle(row, 6, centrado);
+
+
+                    row++;
+                    row++;
+
+
+                }
+
+
+                sl.SaveAs(mem);
+                mem.Position = 0;
+
+
+                TempData[handle] = mem.ToArray();
+
+                return Json(new { FileGuid = handle, FileName = "Finanzas.xlsx" });
+            }
 
         }
 
@@ -430,7 +789,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             if (TempData[fileGuid] != null)
             {
                 byte[] data = TempData[fileGuid] as byte[];
-                return File(data, "application/vnd.ms-excel", fileName);
+                return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
             else
             {
