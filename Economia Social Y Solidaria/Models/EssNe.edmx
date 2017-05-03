@@ -60,6 +60,7 @@
           <Property Name="tandaId" Type="int" Nullable="false" />
           <Property Name="localId" Type="int" Nullable="false" />
           <Property Name="estadoId" Type="int" Nullable="false" />
+          <Property Name="hash" Type="int" />
         </EntityType>
         <EntityType Name="Costos">
           <Key>
@@ -740,6 +741,7 @@
           <Property Name="tandaId" Type="Int32" Nullable="false" />
           <Property Name="localId" Type="Int32" Nullable="false" />
           <Property Name="estadoId" Type="Int32" Nullable="false" />
+          <Property Name="hash" Type="Int32" />
           <NavigationProperty Name="Comentarios" Relationship="TanoNEModel.FK_Comentarios_Compras1" FromRole="Compras" ToRole="Comentarios" />
           <NavigationProperty Name="ComentariosProducto" Relationship="TanoNEModel.FK_ComentariosProducto_Compras" FromRole="Compras" ToRole="ComentariosProducto" />
           <NavigationProperty Name="CompraProducto" Relationship="TanoNEModel.FK_CompraProducto_Compras" FromRole="Compras" ToRole="CompraProducto" />
@@ -1234,6 +1236,7 @@
           <EntitySetMapping Name="Compras">
             <EntityTypeMapping TypeName="TanoNEModel.Compras">
               <MappingFragment StoreEntitySet="Compras">
+                <ScalarProperty Name="hash" ColumnName="hash" />
                 <ScalarProperty Name="estadoId" ColumnName="estadoId" />
                 <ScalarProperty Name="localId" ColumnName="localId" />
                 <ScalarProperty Name="tandaId" ColumnName="tandaId" />

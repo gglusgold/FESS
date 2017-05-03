@@ -36,8 +36,10 @@
     var error = Cookies.get('Error');
     var info = Cookies.get('Info');
     var mensaje = Cookies.get('Mensaje');
+    var mail = Cookies.get('Mail');
+    var k = Cookies.get('k');
 
-    if ((error !== undefined && error !== '') || (info !== undefined && info !== '') || (mensaje !== undefined && mensaje !== '')) {
+    if ((error !== undefined && error !== '') || (info !== undefined && info !== '') || (mensaje !== undefined && mensaje !== '') && (mensaje == undefined && mensaje == '')) {
         $("#login").modal("toggle")
         $('#btn_iniciar').popover('show');
         if (error !== "")
@@ -55,15 +57,45 @@
         Cookies.remove('Error');
         Cookies.remove('Info');
         Cookies.remove('Mensaje');
+
+        Cookies.remove('Mail');
+        Cookies.remove('k');
     }
+    else if ((mensaje !== undefined && mensaje !== '') && (mail !== undefined && mail !== ''))
+    {
+        //http://localhost:56693/Inicio/ResetearCuenta?k=56CD3CNLYPFEVKEHMVOA7LKEC
+        $("#cambiar").modal("toggle")
+        $("#cambiar").find("#emailolvido").val(mail);
+        $("#cambiar").find("#emaila").val(mail);
+        $("#cambiar").find("#k").val(k);
+
+        Cookies.remove('Mensaje');
+        Cookies.remove('Mail');
+        Cookies.remove('k');
+    }
+
 
     $("#ComprasTanda").click(function (e) {
         $.redirectPost("/Tandas/VerCompras", { admin: true })
     })
 
-
+    $(document).on("click", "#olvidepass", function (e) {
+        $("#olvideform").modal("toggle");
+    });
 
     var password = document.getElementById("password"), confirm_password = document.getElementById("confirmpassword");
+    function validatePassword() {
+        if (password.value !== confirm_password.value) {
+            confirm_password.setCustomValidity("Las contraseñas no coinciden");
+        } else {
+            confirm_password.setCustomValidity('');
+        }
+    }
+
+    password.onchange = validatePassword;
+    confirm_password.onkeyup = validatePassword;
+
+    var password = document.getElementById("password1"), confirm_password = document.getElementById("confirmpassword1");
     function validatePassword() {
         if (password.value !== confirm_password.value) {
             confirm_password.setCustomValidity("Las contraseñas no coinciden");

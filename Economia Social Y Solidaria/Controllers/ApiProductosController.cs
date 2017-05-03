@@ -269,6 +269,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                 dynamic dyn = JArray.Parse(prods);
 
+                int hash = (idVecino + "-" + local + "-" + prods).GetHashCode();
+
                 TanoNEEntities ctx = new TanoNEEntities();
 
                 Locales localCompro = ctx.Locales.FirstOrDefault(a => a.idLocal == local);
@@ -283,11 +285,13 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 //Encargado
                 EstadosCompra estado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 1);
 
+                bool editando = false;
                 Compras compra = new Compras();
                 if (idCompra != -1)
                 {
                     compra = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra);
                     compra.CompraProducto.ToList().ForEach(cs => ctx.CompraProducto.Remove(cs));
+                    editando = true;
                 }
                 else
                 {
@@ -329,8 +333,13 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     ctx.CompraProducto.Add(productos);
                 }
 
+                var test = ctx.Compras.FirstOrDefault(a => a.hash == hash);
+                if (test != null && !editando)
+                    error = "Ya ha comprado los mismos productos para esta tanda";
+
                 if (string.IsNullOrEmpty(error))
                 {
+                    compra.hash = hash;
                     ctx.SaveChanges();
                 }
 
@@ -470,7 +479,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             string titulo = form["titulo"];
             string mensaje = form["mensaje"];
 
-            mandarNotificacion(titulo, mensaje);
+            //mandarNotificacion(titulo, mensaje);
+            mandarNotificacion("Ya poder pedir!", "Desde hoy tenés la posibilidad de hacer tu pedido", "CARRITO");
             return Json("Si");
         }
 

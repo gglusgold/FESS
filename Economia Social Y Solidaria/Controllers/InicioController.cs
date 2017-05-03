@@ -25,6 +25,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return View();
         }
 
+
         [HttpPost]
         public ActionResult IniciarSesion(string usuario, string pass, string email, string nombres, string telefono, string password, string url, int comuna = -1)
         {
@@ -41,6 +42,11 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == usuario);
                 if (vecino != null)
                 {
+                    if (vecino.contrasena == null)
+                    {
+                        Response.Cookies["Error"].Value = "Se ha reseteado su contraseña. Revise su mail";
+                        return RedirectToAction("Portada", "Noticias");
+                    }
 
                     if (!vecino.verificado)
                     {
@@ -59,7 +65,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         //if (url.Split('/').Length == 3)
                         //    return RedirectToAction(url.Split('/')[2], url.Split('/')[1]);
                         //else
-                            return RedirectToAction("Portada", "Noticias");
+                        return RedirectToAction("Portada", "Noticias");
                     }
                     else
                         Response.Cookies["Error"].Value = "Contraseña no válida";
@@ -92,7 +98,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     vecino.hash = hash;
                     ctx.Vecinos.Add(vecino);
 
-                    
+
                     using (MailMessage mail = new MailMessage())
                     {
                         //string datos = "Datos para entrar:<br/>Usuario: " + email;
@@ -108,7 +114,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
                         //using (SmtpClient smtp = new SmtpClient("smtp.encuentrocapital.com.ar", 587))
                         {
-                           // smtp.Credentials = new NetworkCredential("racinglocura07@gmail.com", "kapanga34224389,");
+                            // smtp.Credentials = new NetworkCredential("racinglocura07@gmail.com", "kapanga34224389,");
                             smtp.Credentials = new NetworkCredential("economiasocial@encuentrocapital.com.ar", "Frent3355");
                             smtp.EnableSsl = true;
                             smtp.Send(mail);
@@ -135,6 +141,84 @@ namespace Economia_Social_Y_Solidaria.Controllers
             }
             else
                 Response.Cookies["Mensaje"].Value = ViewBag.Error = "No se encontró la cuenta para activar";
+
+            return RedirectToAction("Portada", "Noticias");
+        }
+
+
+        public ActionResult ResetearCuenta(string k)
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+            Vecinos confirmar = ctx.Vecinos.FirstOrDefault(a => a.hash == k);
+            if (confirmar != null)
+            {
+                confirmar.contrasena = null;
+                ctx.SaveChanges();
+                Response.Cookies["Mensaje"].Value = "Ingrese su nuevas credenciales";
+                Response.Cookies["Mail"].Value = confirmar.correo;
+                Response.Cookies["k"].Value = k;
+            }
+            else
+                Response.Cookies["Mensaje"].Value = ViewBag.Error = "No se encontró la cuenta para activar";
+
+            return RedirectToAction("Portada", "Noticias");
+        }
+
+        public ActionResult Cambiar(string k, string emaila, string password1)
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+            Vecinos confirmar = ctx.Vecinos.FirstOrDefault(a => a.hash == k && a.correo == emaila);
+            if (confirmar != null)
+            {
+                confirmar.contrasena = GetCrypt(password1);
+                ctx.SaveChanges();
+
+                Response.Cookies["Info"].Value = "Se ha cambiado la contraseña satisfactoriamente";
+            }
+            else
+                Response.Cookies["Info"].Value = ViewBag.Error = "No se encontró la cuenta para activar";
+
+            return RedirectToAction("Portada", "Noticias");
+        }
+
+        public ActionResult OlvidePass(string emailolvido)
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+
+            Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == emailolvido);
+            if (vecino == null)
+            {
+                Response.Cookies["Info"].Value = "No existe el mail ingresado";
+                return RedirectToAction("Portada", "Noticias");
+            }
+
+            string urla = ConfigurationManager.AppSettings["UrlSitio"];
+
+            using (MailMessage mail = new MailMessage())
+            {
+                //string datos = "Datos para entrar:<br/>Usuario: " + email;
+                mail.From = new MailAddress("economiasocial@encuentrocapital.com.ar", "Economía Social y Solidaria");
+                mail.To.Add(emailolvido);
+                mail.Subject = "Economia Social y Solidaria -- Nuevo Encuentro";
+                mail.Body = "<p>Gracias por usar nuestro sistema. Hacé click en el link de abajo para resetear la contraseña</p>";
+                mail.Body += "<p><a href='" + urla + "Inicio/ResetearCuenta?k=" + vecino.hash + "'>Resetear contraseña</a></p>";
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                //using (SmtpClient smtp = new SmtpClient("smtp.encuentrocapital.com.ar", 587))
+                {
+                    // smtp.Credentials = new NetworkCredential("racinglocura07@gmail.com", "kapanga34224389,");
+                    smtp.Credentials = new NetworkCredential("economiasocial@encuentrocapital.com.ar", "Frent3355");
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                }
+
+                /*vecino.contrasena = null;
+                ctx.SaveChanges();*/
+            }
+
+
+            Response.Cookies["Info"].Value = "Te mandamos un mail para resetear la cuenta!";
 
             return RedirectToAction("Portada", "Noticias");
         }

@@ -203,7 +203,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         decimal total = 0;
                         foreach (CompraProducto prod in compras.CompraProducto)
                         {
-                            mail.Body += "<p>" + prod.cantidad + " - " + prod.Productos.producto + " - " + prod.Productos.presentacion + " - " + prod.Productos.marca + " - " + prod.Productos.Precios.LastOrDefault().precio + "</p>";
+                            mail.Body += "<p>" + prod.cantidad + " - " + prod.Productos.producto + " - " + prod.Productos.presentacion + " - " + prod.Productos.marca + " - " + (prod.Productos.Precios.LastOrDefault().precio * prod.cantidad) + "</p>";
                             total += prod.cantidad * prod.Productos.Precios.LastOrDefault().precio;
                         }
                         mail.Body += "<p>-------------------</p>";

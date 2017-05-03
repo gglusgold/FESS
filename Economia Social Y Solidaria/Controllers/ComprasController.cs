@@ -1,4 +1,8 @@
-﻿using Economia_Social_Y_Solidaria.Models;
+﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Economia_Social_Y_Solidaria.Models;
+using SpreadsheetLight;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -402,7 +406,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
         public FileResult ExportarEncargado()
         {
-            StringBuilder csv = new StringBuilder();
+            /*StringBuilder csv = new StringBuilder();
             string Columnas = string.Format("{0};{1};{2};{3};{4}", "N", "Nombre", "Productos", "Precio", "Local");
             csv.AppendLine(Columnas);
 
@@ -432,9 +436,138 @@ namespace Economia_Social_Y_Solidaria.Controllers
             {
                 memoryStream.Position = 0;
                 return File(memoryStream.ToArray() as byte[], "application/vnd.ms-excel", "Reporte.csv");
+            }*/
+
+
+            TanoNEEntities ctx = new TanoNEEntities();
+            Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
+
+            Tandas ultima = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado != null);
+            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            string nombreLibro = ProximaEntrea.ToString("dd-MM-yyyy") + " Entrega";
+
+            using (MemoryStream mem = new MemoryStream())
+            using (SLDocument sl = new SLDocument())
+            {
+                sl.RenameWorksheet(SLDocument.DefaultFirstSheetName, nombreLibro);
+
+                SLStyle bordeNegrita = sl.CreateStyle();
+                bordeNegrita.Border.LeftBorder.Color = System.Drawing.Color.Black;
+                bordeNegrita.Border.TopBorder.Color = System.Drawing.Color.Black;
+                bordeNegrita.Border.RightBorder.Color = System.Drawing.Color.Black;
+                bordeNegrita.Border.BottomBorder.Color = System.Drawing.Color.Black;
+
+                bordeNegrita.Border.LeftBorder.BorderStyle = BorderStyleValues.Thin;
+                bordeNegrita.Border.TopBorder.BorderStyle = BorderStyleValues.Thin;
+                bordeNegrita.Border.RightBorder.BorderStyle = BorderStyleValues.Thin;
+                bordeNegrita.Border.BottomBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeIz = sl.CreateStyle();
+                bordeIz.Border.LeftBorder.Color = System.Drawing.Color.Black;
+                bordeIz.Border.LeftBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeDe = sl.CreateStyle();
+                bordeDe.Border.RightBorder.Color = System.Drawing.Color.Black;
+                bordeDe.Border.RightBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeAr = sl.CreateStyle();
+                bordeAr.Border.TopBorder.Color = System.Drawing.Color.Black;
+                bordeAr.Border.TopBorder.BorderStyle = BorderStyleValues.Thin;
+
+                SLStyle bordeAb = sl.CreateStyle();
+                bordeAb.Border.BottomBorder.Color = System.Drawing.Color.Black;
+                bordeAb.Border.BottomBorder.BorderStyle = BorderStyleValues.Thin;
+
+
+                bordeNegrita.Font.Bold = true;
+
+                SLStyle saltoLinea = sl.CreateStyle();
+                saltoLinea.SetVerticalAlignment(VerticalAlignmentValues.Center);
+                saltoLinea.SetWrapText(true);
+
+                SLStyle rojo = sl.CreateStyle();
+                rojo.Fill.SetPatternType(PatternValues.Solid);//.BottomBorder.Color = System.Drawing.Color.Red;
+                rojo.Font.FontColor = System.Drawing.Color.White;
+                rojo.Fill.SetPatternForegroundColor(System.Drawing.Color.Red);
+
+                SLStyle centrado = sl.CreateStyle();
+                centrado.FormatCode = "$ * #,##0.00";
+                centrado.Font.FontSize = 10;
+                centrado.SetHorizontalAlignment(HorizontalAlignmentValues.Right);
+
+                sl.SetColumnWidth(1, 16);
+                sl.SetColumnWidth(2, 55);
+                sl.SetColumnWidth(3, 10);
+                sl.SetColumnWidth(4, 10);
+                sl.SetColumnWidth(5, 35);
+
+                sl.SetCellValue(1, 1, "Nombre");
+                sl.SetCellValue(1, 2, "Producto");
+                sl.SetCellValue(1, 3, "Precio");
+                sl.SetCellValue(1, 4, "Total");
+                sl.SetCellValue(1, 5, "Observaciones");
+
+                sl.SetCellStyle(1, 1, 1, 5, bordeNegrita);
+
+                int row = 3;
+
+                bordeNegrita.Font.Bold = false;
+                bordeNegrita.Border.Outline = true;
+
+                var lista = ctx.Compras.Where(a => a.tandaId == ultima.idTanda && (vecino.localId == null ? vecino.comuna == a.Locales.comuna : vecino.localId == a.localId)).OrderBy(a => a.Vecinos.nombres);
+                foreach (var compra in lista)
+                {
+                    int totalVecinx = (row + compra.CompraProducto.Count - 1);
+                    sl.SetCellStyle(row, 1, totalVecinx, 1, bordeIz);
+                    sl.SetCellStyle(row, 1, row, 5, bordeAr);
+                    sl.SetCellStyle(totalVecinx, 1, totalVecinx, 5, bordeAb);
+                    for (int x = 1; x < 6; x++)
+                    {
+                        sl.SetCellStyle(row, x, totalVecinx, x, bordeDe);
+                    }
+
+                    sl.SetCellValue(row, 1, new System.Globalization.CultureInfo("en-US", false).TextInfo.ToTitleCase(compra.Vecinos.nombres.ToLower()) + "\n" + compra.Vecinos.telefono);
+                    sl.SetCellStyle(row, 1, saltoLinea);
+                    sl.MergeWorksheetCells(row, 1, totalVecinx, 1);
+
+                    foreach (var compraProducto in compra.CompraProducto)
+                    {
+                        centrado.Font.Bold = false;
+                        sl.SetCellValue(row, 2, compraProducto.cantidad + ": " + compraProducto.Productos.producto + " - " + compraProducto.Productos.marca + " - " + compraProducto.Productos.presentacion);
+                        sl.SetCellValue(row, 3, compraProducto.Productos.Precios.LastOrDefault(precio => compra.fecha > precio.fecha).precio);
+                        sl.SetCellStyle(row, 3, centrado);
+
+                        if (compraProducto.cantidad > 6)
+                        {
+                            sl.SetCellStyle(row, 2, row, 5, rojo);
+                            sl.SetCellValue(row, 6, "Alerta! Mucha cantidad");
+                        }
+
+                        row++;
+                    }
+
+                    centrado.Font.Bold = true;
+                    sl.SetCellValue(row - 1, 4, compra.CompraProducto.Sum(a => a.Productos.Precios.LastOrDefault(precio => compra.fecha > precio.fecha).precio));
+                    sl.SetCellStyle(row - 1, 4, centrado);
+                }
+
+
+                sl.SaveAs(mem);
+                mem.Position = 0;
+
+
+                return File(mem.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Reporte.xlsx");
             }
 
+        }
 
+        private Cell crearCelda(string value, CellValues dataType)
+        {
+            return new Cell()
+            {
+                CellValue = new CellValue(value),
+                DataType = new EnumValue<CellValues>(dataType),
+            };
         }
 
         public ActionResult EnregarPedido(int idCompra, bool entregado, int[] ids = null, int[] cantidad = null)
