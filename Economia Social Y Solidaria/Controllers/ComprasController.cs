@@ -398,7 +398,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 idCompra = a.idCompra,
                 nombre = a.Vecinos.nombres,
                 productos = string.Join("<br/>", a.CompraProducto.ToList().Select(b => "<span class='idca' style='display:none'>[" + b.productoId + "|" + b.cantidad + "]</span>(" + b.cantidad + ") " + b.Productos.producto + " - " + b.Productos.marca + " - " + b.Productos.presentacion)),
-                precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio),
+                precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Productos.Precios.LastOrDefault(precio => a.fecha > precio.fecha).precio),//precio => compra.fecha > precio.fecha
                 retiro = a.EstadosCompra.codigo
             });
             return Json(lista, JsonRequestBehavior.DenyGet);
@@ -530,11 +530,14 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     sl.MergeWorksheetCells(row, 1, totalVecinx, 1);
 
                     var ordenado = compra.CompraProducto.OrderBy(a => a.Productos.producto);
+                    decimal totaltotal = 0;
                     foreach (var compraProducto in ordenado)
                     {
+                        decimal total = compraProducto.Productos.Precios.LastOrDefault(precio => compra.fecha > precio.fecha).precio * compraProducto.cantidad;
+                        totaltotal += total;
                         centrado.Font.Bold = false;
                         sl.SetCellValue(row, 2, compraProducto.cantidad + ": " + compraProducto.Productos.producto + " - " + compraProducto.Productos.marca + " - " + compraProducto.Productos.presentacion);
-                        sl.SetCellValue(row, 3, compraProducto.Productos.Precios.LastOrDefault(precio => compra.fecha > precio.fecha).precio);
+                        sl.SetCellValue(row, 3, total);
                         sl.SetCellStyle(row, 3, centrado);
 
                         if (compraProducto.cantidad > 6)
@@ -547,7 +550,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     }
 
                     centrado.Font.Bold = true;
-                    sl.SetCellValue(row - 1, 4, compra.CompraProducto.Sum(a => a.Productos.Precios.LastOrDefault(precio => compra.fecha > precio.fecha).precio));
+                    sl.SetCellValue(row - 1, 4, totaltotal);
                     sl.SetCellStyle(row - 1, 4, centrado);
                 }
 
