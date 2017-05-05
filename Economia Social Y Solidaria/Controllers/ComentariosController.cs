@@ -23,6 +23,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 idProductoComentario = a.idProductoComentario,
                 local = a.Compras.Locales.nombre == null ? a.Compras.Locales.direccion : a.Compras.Locales.nombre,
                 comuna = a.Compras.Locales.comuna,
+                vecinx = a.Compras.Vecinos.nombres + " - " + a.Compras.Vecinos.telefono,
                 producto = a.Productos.producto + " - " + a.Productos.presentacion + (a.Productos.marca != null ? "\n" + a.Productos.marca : ""),
                 comentario = a.comentario,
                 estrellas = a.estrellas,
