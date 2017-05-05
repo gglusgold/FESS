@@ -4,26 +4,26 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="f03a32299ab94c96bc192919290ddef0" Name="Diagram1" ZoomLevel="63">
+      <Diagram DiagramId="f03a32299ab94c96bc192919290ddef0" Name="Diagram1" ZoomLevel="21">
         <EntityTypeShape EntityType="TanoNEModel.Categorias" Width="1.5" PointX="0.75" PointY="4.625" />
-        <EntityTypeShape EntityType="TanoNEModel.Circuitos" Width="1.5" PointX="0.75" PointY="9.375" />
-        <EntityTypeShape EntityType="TanoNEModel.Comentarios" Width="1.5" PointX="9.75" PointY="16.875" />
-        <EntityTypeShape EntityType="TanoNEModel.ComentariosProducto" Width="1.5" PointX="12.75" PointY="12.75" />
+        <EntityTypeShape EntityType="TanoNEModel.Circuitos" Width="1.5" PointX="0.75" PointY="9.5" />
+        <EntityTypeShape EntityType="TanoNEModel.Comentarios" Width="1.5" PointX="9.75" PointY="17" />
+        <EntityTypeShape EntityType="TanoNEModel.ComentariosProducto" Width="1.5" PointX="12.75" PointY="12.875" />
         <EntityTypeShape EntityType="TanoNEModel.CompraProducto" Width="1.5" PointX="9.75" PointY="10.125" />
-        <EntityTypeShape EntityType="TanoNEModel.Compras" Width="1.5" PointX="7.5" PointY="12.25" />
-        <EntityTypeShape EntityType="TanoNEModel.Costos" Width="1.5" PointX="5.25" PointY="3" />
-        <EntityTypeShape EntityType="TanoNEModel.EstadosCompra" Width="1.5" PointX="5.25" PointY="12.25" />
-        <EntityTypeShape EntityType="TanoNEModel.Locales" Width="1.5" PointX="3" PointY="8.75" />
+        <EntityTypeShape EntityType="TanoNEModel.Compras" Width="1.5" PointX="7.5" PointY="12.375" />
+        <EntityTypeShape EntityType="TanoNEModel.Costos" Width="1.5" PointX="5.25" PointY="3.125" />
+        <EntityTypeShape EntityType="TanoNEModel.EstadosCompra" Width="1.5" PointX="5.25" PointY="12.375" />
+        <EntityTypeShape EntityType="TanoNEModel.Locales" Width="1.5" PointX="3" PointY="8.875" />
         <EntityTypeShape EntityType="TanoNEModel.Noticias" Width="1.5" PointX="7.75" PointY="0.75" />
-        <EntityTypeShape EntityType="TanoNEModel.Precios" Width="1.5" PointX="5.25" PointY="5.75" />
-        <EntityTypeShape EntityType="TanoNEModel.Productos" Width="1.5" PointX="3" PointY="3.5" />
-        <EntityTypeShape EntityType="TanoNEModel.ProductosLocales" Width="1.5" PointX="5.25" PointY="9.375" />
+        <EntityTypeShape EntityType="TanoNEModel.Precios" Width="1.5" PointX="5.25" PointY="5.875" />
+        <EntityTypeShape EntityType="TanoNEModel.Productos" Width="1.5" PointX="3" PointY="3.625" />
+        <EntityTypeShape EntityType="TanoNEModel.ProductosLocales" Width="1.5" PointX="5.25" PointY="9.5" />
         <EntityTypeShape EntityType="TanoNEModel.Relevamientos" Width="1.5" PointX="7.75" PointY="4.75" />
-        <EntityTypeShape EntityType="TanoNEModel.Roles" Width="1.5" PointX="5.25" PointY="20.625" />
+        <EntityTypeShape EntityType="TanoNEModel.Roles" Width="1.5" PointX="5.25" PointY="20.75" />
         <EntityTypeShape EntityType="TanoNEModel.RolesVecinos" Width="1.5" PointX="7.5" PointY="17.625" />
         <EntityTypeShape EntityType="TanoNEModel.sysdiagrams" Width="1.5" PointX="0.75" PointY="0.75" />
         <EntityTypeShape EntityType="TanoNEModel.Tandas" Width="1.5" PointX="10.5" PointY="13.25" />
-        <EntityTypeShape EntityType="TanoNEModel.Vecinos" Width="1.5" PointX="5.25" PointY="15.5" />
+        <EntityTypeShape EntityType="TanoNEModel.Vecinos" Width="1.5" PointX="5.25" PointY="15.625" />
         <AssociationConnector Association="TanoNEModel.FK_Productos_Categorias" />
         <AssociationConnector Association="TanoNEModel.FK_Locales_Circuitos" />
         <AssociationConnector Association="TanoNEModel.FK_Tandas_Circuitos" />

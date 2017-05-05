@@ -32,6 +32,8 @@ public partial class Tandas
 
     public Nullable<System.DateTime> fechaCerrado { get; set; }
 
+    public Nullable<System.DateTime> fechaVenta { get; set; }
+
     public int circuitoId { get; set; }
 
     public int vecinoId { get; set; }

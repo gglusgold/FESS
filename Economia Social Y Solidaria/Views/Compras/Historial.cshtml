@@ -156,6 +156,7 @@
 
             var id = $(".borrar").closest('.card').data("idcompra");
             $.post("/Compras/CancelarPedido", {idCompra: id}, function(data){
+                console.log(data.Compras);
                 cargarDatos(data.Compras);
             });
 

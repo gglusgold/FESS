@@ -45,7 +45,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 descripcion = a.descripcion != null ? a.descripcion.Replace("\n", "<br/>") : "",
                 cantidad = a.presentacion,
                 imagen = System.IO.File.Exists(HttpContext.Server.MapPath("/Imagenes/Producto-" + a.idProducto + ".jpg")) ? "/Imagenes/Producto-" + a.idProducto + ".jpg" : "/Imagenes/Fijas/pp.jpeg",
-                categoriaId = a.categoriaId,
+                idCategoria = a.categoriaId,
                 categoria = a.Categorias.nombre,
                 precio = a.Precios.LastOrDefault().precio,
                 costo = a.Costos.LastOrDefault().costo,
@@ -146,7 +146,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 listaFinal = listaFinal.Where(a => a.nombre.Contains(cantidad)).ToList();
 
             if (idCategoria > 0)
-                listaFinal = listaFinal.Where(a => a.categoriaId == idCategoria).ToList();
+                listaFinal = listaFinal.Where(a => a.idCategoria == idCategoria).ToList();
 
             if (precio > 0)
                 listaFinal = listaFinal.Where(a => a.precio == precio).ToList();

@@ -17,8 +17,19 @@ namespace Economia_Social_Y_Solidaria.Controllers
     {
         public static DateTime GetNextWeekday(DateTime start, DayOfWeek day)
         {
-            int daysToAdd = ((int)day - (int)start.DayOfWeek + 7) % 7;
-            return start.AddDays(daysToAdd);
+            TanoNEEntities ctx = new TanoNEEntities();
+            Tandas ultimaTanda = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado == null);
+            if (ultimaTanda == null)
+            {
+                return DateTime.Now;
+            }
+            else
+            {
+                return ultimaTanda.fechaVenta.HasValue ? ultimaTanda.fechaVenta.Value : DateTime.Now;
+            }
+
+            /*int daysToAdd = ((int)day - (int)start.DayOfWeek + 7) % 7;
+            return start.AddDays(daysToAdd);*/
         }
 
         // GET api/apiproductos
@@ -479,8 +490,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             string titulo = form["titulo"];
             string mensaje = form["mensaje"];
 
-            //mandarNotificacion(titulo, mensaje);
-            mandarNotificacion("Ya poder pedir!", "Desde hoy tenés la posibilidad de hacer tu pedido", "CARRITO");
+            mandarNotificacion(titulo, mensaje);
+            //mandarNotificacion("Ya poder pedir!", "Desde hoy tenés la posibilidad de hacer tu pedido", "CARRITO");
             return Json("Si");
         }
 

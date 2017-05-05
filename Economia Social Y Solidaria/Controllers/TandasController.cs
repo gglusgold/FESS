@@ -3,6 +3,7 @@ using Economia_Social_Y_Solidaria.Models;
 using SpreadsheetLight;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -68,7 +69,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return View(conf);
         }
 
-        public ActionResult Modificar(int codigo, bool abrir, int idTanda = -1)
+        public ActionResult Modificar(int codigo, bool abrir, string fechaVenta, int idTanda = -1)
         {
             TanoNEEntities ctx = new TanoNEEntities();
             ConfCircuitos conf = new ConfCircuitos();
@@ -93,6 +94,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     {
                         Tandas tanda = new Tandas();
                         tanda.fechaAbierto = DateTime.Now;
+                        tanda.fechaVenta = DateTime.ParseExact(fechaVenta, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                         tanda.Circuitos = circuito;
                         tanda.Vecinos = responsable;
                         conf.abrir = false;
@@ -102,7 +104,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         conf.idCircuito = tanda.Circuitos.idCircuito;
                         conf.leyenda = "Circuito Abierto: ";
 
-                        ApiProductosController.mandarNotificacion("Ya poder pedir!", "Desde hoy tenés la posibilidad de hacer tu pedido", "CARRITO");
+                        //ApiProductosController.mandarNotificacion("Ya poder pedir!", "Desde hoy tenés la posibilidad de hacer tu pedido", "CARRITO");
 
                         ctx.Tandas.Add(tanda);
                         ctx.SaveChanges();
@@ -139,7 +141,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                             }
                             ctx.SaveChanges();
 
-                            MandarMailConfirmandoCompra(tanda);
+                            //MandarMailConfirmandoCompra(tanda);
 
                             ctx.SaveChanges();
                         }
@@ -171,7 +173,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
         private void MandarMailConfirmandoCompra(Tandas tandaActual)
         {
-            DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
 
 
             TanoNEEntities ctx = new TanoNEEntities();
@@ -801,11 +803,11 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
 
 
-        public static DateTime GetNextWeekday(DateTime start, DayOfWeek day)
+        /*public static DateTime GetNextWeekday(DateTime start, DayOfWeek day)
         {
             int daysToAdd = ((int)day - (int)start.DayOfWeek + 7) % 7;
             return start.AddDays(daysToAdd);
-        }
+        }*/
 
     }
 }

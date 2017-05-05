@@ -182,6 +182,7 @@
           <Property Name="idTanda" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="fechaAbierto" Type="date" Nullable="false" />
           <Property Name="fechaCerrado" Type="date" />
+          <Property Name="fechaVenta" Type="date" />
           <Property Name="circuitoId" Type="int" Nullable="false" />
           <Property Name="vecinoId" Type="int" Nullable="false" />
         </EntityType>
@@ -888,6 +889,7 @@
           <Property Name="idTanda" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="fechaAbierto" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="fechaCerrado" Type="DateTime" Precision="0" />
+          <Property Name="fechaVenta" Type="DateTime" Precision="0" />
           <Property Name="circuitoId" Type="Int32" Nullable="false" />
           <Property Name="vecinoId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Circuitos" Relationship="TanoNEModel.FK_Tandas_Circuitos" FromRole="Tandas" ToRole="Circuitos" />
@@ -1375,6 +1377,7 @@
               <MappingFragment StoreEntitySet="Tandas">
                 <ScalarProperty Name="vecinoId" ColumnName="vecinoId" />
                 <ScalarProperty Name="circuitoId" ColumnName="circuitoId" />
+                <ScalarProperty Name="fechaVenta" ColumnName="fechaVenta" />
                 <ScalarProperty Name="fechaCerrado" ColumnName="fechaCerrado" />
                 <ScalarProperty Name="fechaAbierto" ColumnName="fechaAbierto" />
                 <ScalarProperty Name="idTanda" ColumnName="idTanda" />

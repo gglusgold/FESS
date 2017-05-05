@@ -46,7 +46,7 @@
   <ItemGroup>
     <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\DocumentFormat.OpenXml.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net40\EntityFramework.dll</HintPath>
@@ -330,6 +330,7 @@
     <Content Include="Css\metro\purple\jtable.less" />
     <Content Include="Css\metro\red\jtable.less" />
     <None Include="Js\comunas.json" />
+    <Content Include="Js\datepicker-es.js" />
     <Content Include="Js\drilldown.js" />
     <Content Include="Js\highcharts.js" />
     <Content Include="Js\highmaps.js" />
@@ -357,6 +358,7 @@
     <Content Include="Views\Prueba\Prueba.cshtml" />
     <Content Include="Views\Productos\Asignar.cshtml" />
     <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
+    <Content Include="Views\Categorias\Categorias.cshtml" />
     <None Include="Web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>

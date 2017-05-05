@@ -3,8 +3,10 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Economia_Social_Y_Solidaria.Models;
 using SpreadsheetLight;
+using SpreadsheetLight.Drawing;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -84,7 +86,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             ChanguitoCompleta completo = new ChanguitoCompleta();
             crearChango(completo, idCategoria, idLocal);
 
-            DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
             completo.proxFecha = ProximaEntrea.ToString("dd/MM/yyyy");
 
 
@@ -97,7 +99,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             ChanguitoCompleta completo = new ChanguitoCompleta();
             crearChango(completo, idCategoria, idLocal);
 
-            DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
             completo.proxFecha = ProximaEntrea.ToString("dd/MM/yyyy");
 
             return Json(new { lista = completo.changuito });
@@ -175,9 +177,10 @@ namespace Economia_Social_Y_Solidaria.Controllers
             EstadosCompra comentado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 4);
 
             //Precios ultimop = prod.Precios.Count > 1 ? prod.Precios.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Precios.FirstOrDefault();
+            Tandas ultimaTanda = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado == null);
 
 
-            MisCompras compras = new MisCompras();
+                MisCompras compras = new MisCompras();
             compras.Compras = ctx.Compras.Where(a => a.vecinoId == vecino.idVecino).OrderByDescending(a => a.fecha).ToList().Select(a => new Comprados
             {
                 idCompra = a.idCompra,
@@ -186,7 +189,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 idLocal = a.Locales.idLocal,
                 local = a.Locales.direccion,
                 barrio = a.Locales.barrio,
-                editar = a.estadoId == EstadoEntregado.idEstadoCompra,
+                editar = (ultimaTanda != null && a.Tandas.idTanda == ultimaTanda.idTanda) && a.estadoId == EstadoEntregado.idEstadoCompra,
                 comentar = a.estadoId == confirmado.idEstadoCompra,
                 comentado = a.estadoId == comentado.idEstadoCompra,
                 comuna = a.Locales.comuna,
@@ -239,6 +242,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     idProducto = b.Productos.idProducto,
                     nombre = b.Productos.producto,
                     cantidad = b.cantidad,
+                    marca = b.Productos.marca,
+                    presentacion = b.Productos.presentacion,
                     //precioUnidad = b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio
                     precioUnidad = b.Productos.Precios.Count > 1 ? b.Productos.Precios.LastOrDefault(precio => a.fecha.Date <= precio.fecha.Date).precio : b.Productos.Precios.FirstOrDefault().precio,
                 }).ToList()
@@ -443,7 +448,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
 
             Tandas ultima = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado != null);
-            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+
+            DateTime ProximaEntrea = ultima.fechaVenta.HasValue ? ultima.fechaVenta.Value : DateTime.Now;
             string nombreLibro = ProximaEntrea.ToString("dd-MM-yyyy") + " Entrega";
 
             using (MemoryStream mem = new MemoryStream())
@@ -478,7 +484,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                 SLStyle bordeAb = sl.CreateStyle();
                 bordeAb.Border.BottomBorder.Color = System.Drawing.Color.Black;
-                bordeAb.Border.BottomBorder.BorderStyle = BorderStyleValues.Thin;               
+                bordeAb.Border.BottomBorder.BorderStyle = BorderStyleValues.Thin;
 
                 SLStyle saltoLinea = sl.CreateStyle();
                 saltoLinea.SetVerticalAlignment(VerticalAlignmentValues.Center);
@@ -509,6 +515,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                 sl.SetCellStyle(1, 1, 1, 5, bordeNegrita);
 
+
+                string urla = ConfigurationManager.AppSettings["UrlSitio"];
+
                 int row = 3;
 
                 bordeNegrita.Font.Bold = false;
@@ -537,6 +546,11 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         totaltotal += total;
                         centrado.Font.Bold = false;
                         sl.SetCellValue(row, 2, compraProducto.cantidad + ": " + compraProducto.Productos.producto + " - " + compraProducto.Productos.marca + " - " + compraProducto.Productos.presentacion);
+
+                        //SLPicture pic = new SLPicture(urla + "/Imagenes/Producto-" + compraProducto.Productos.idProducto + ".jpg");
+                        //pic.SetPosition(1, 6);
+                        //sl.InsertPicture(pic);
+
                         sl.SetCellValue(row, 3, total);
                         sl.SetCellStyle(row, 3, centrado);
 
@@ -604,11 +618,11 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(new { error = false }, JsonRequestBehavior.DenyGet);
         }
 
-        public static DateTime GetNextWeekday(DateTime start, DayOfWeek day)
+        /*public static DateTime GetNextWeekday(DateTime start, DayOfWeek day)
         {
             int daysToAdd = ((int)day - (int)start.DayOfWeek + 7) % 7;
             return start.AddDays(daysToAdd);
-        }
+        }*/
 
         public string MandarMailCalificacion()
         {
