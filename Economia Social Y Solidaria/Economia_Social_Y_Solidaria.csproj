@@ -133,6 +133,7 @@
   <ItemGroup>
     <Compile Include="Controllers\ApiProductosController.cs" />
     <Compile Include="Controllers\CircuitosController.cs" />
+    <Compile Include="Controllers\ComentariosController.cs" />
     <Compile Include="Controllers\LocalesController.cs" />
     <Compile Include="Controllers\CategoriasController.cs" />
     <Compile Include="Controllers\EstadisticasController.cs" />
@@ -305,9 +306,11 @@
     <Content Include="Imagenes\Fijas\ESS_1.jpg" />
     <Content Include="Imagenes\Fijas\ESS_2.jpg" />
     <Content Include="Imagenes\Fijas\ESS_3.jpg" />
+    <Content Include="Imagenes\Fijas\no.png" />
     <Content Include="Imagenes\Fijas\pencil.png" />
     <Content Include="Imagenes\Fijas\pp.jpeg" />
     <Content Include="Imagenes\Fijas\rubbish.png" />
+    <Content Include="Imagenes\Fijas\si.png" />
     <Content Include="Imagenes\Fijas\trash.png" />
     <Content Include="Js\bootstrap-switch.js" />
     <Content Include="Js\bootstrap-table-es-ES.js" />
@@ -359,6 +362,7 @@
     <Content Include="Views\Productos\Asignar.cshtml" />
     <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
     <Content Include="Views\Categorias\Categorias.cshtml" />
+    <Content Include="Views\Comentarios\Comentarios.cshtml" />
     <None Include="Web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>

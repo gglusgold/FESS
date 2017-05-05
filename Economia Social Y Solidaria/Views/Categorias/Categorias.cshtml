@@ -124,18 +124,6 @@
             },
             formCreated: function (event, data) {
                 data.form.validationEngine({ promptPosition: "topLeft", scroll: false });
-                data.form.attr('enctype', 'multipart/form-data');
-
-                $("#Edit-imagen").attr("type", "file");
-
-                if (data.formType == "edit") {
-                    var text = $("#Edit-descripcion").val();
-                    $("#Edit-descripcion").val(text.replaceAll("<br/>", ""));
-                }
-                else {
-                    $("#Edit-stock").val("-1");
-                }
-
             },
             formSubmitting: function (event, data) {
                 return data.form.validationEngine('validate');
@@ -143,10 +131,6 @@
             formClosed: function (event, data) {
                 data.form.validationEngine('hide');
                 data.form.validationEngine('detach');
-            },
-            recordUpdated: function (event, data) {
-                var d = new Date();
-                $(data.row).find(".img_p").attr("src", data.record.imagen + "?" + d.getTime());
             }
         });
         tabla.jtable('load');
