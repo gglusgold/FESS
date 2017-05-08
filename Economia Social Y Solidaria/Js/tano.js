@@ -69,7 +69,7 @@
 
         var modal = $("<div/>").addClass("modal fade");
         modal.attr("tabindex", "-1");
-        var dialog = $("<div/>").addClass("modal-dialog");
+        var dialog = $("<div/>").addClass("modal-dialog ");
         var content = $("<div/>").addClass("modal-content");
 
         var header = $("<div/>").addClass("modal-header").append("<h4 class='modal-title'>" + titulo + "</h4>");

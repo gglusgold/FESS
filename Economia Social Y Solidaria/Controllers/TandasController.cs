@@ -3,6 +3,7 @@ using Economia_Social_Y_Solidaria.Models;
 using SpreadsheetLight;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -104,7 +105,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         conf.idCircuito = tanda.Circuitos.idCircuito;
                         conf.leyenda = "Circuito Abierto: ";
 
-                        //ApiProductosController.mandarNotificacion("Ya poder pedir!", "Desde hoy tenés la posibilidad de hacer tu pedido", "CARRITO");
+                        if (!bool.Parse(ConfigurationManager.AppSettings["debug"]))
+                            ApiProductosController.mandarNotificacion("Ya poder pedir!", "Desde hoy tenés la posibilidad de hacer tu pedido", "CARRITO");
 
                         ctx.Tandas.Add(tanda);
                         ctx.SaveChanges();
@@ -141,7 +143,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                             }
                             ctx.SaveChanges();
 
-                            //MandarMailConfirmandoCompra(tanda);
+                            if (!bool.Parse(ConfigurationManager.AppSettings["debug"]))
+                                MandarMailConfirmandoCompra(tanda);
 
                             ctx.SaveChanges();
                         }
@@ -629,7 +632,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             TanoNEEntities ctx = new TanoNEEntities();
             Tandas actual = ctx.Tandas.FirstOrDefault(a => a.idTanda == idTanda);
 
-            EstadosCompra noretirado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 5);
+            EstadosCompra entre = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 3);
 
             using (MemoryStream mem = new MemoryStream())
             using (SLDocument sl = new SLDocument())
@@ -700,7 +703,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                 sl.SetCellStyle(1, 1, 1, 5, bordeNegrita);
 
-                var locales = ctx.Compras.Where(a => a.tandaId == idTanda && a.estadoId != noretirado.idEstadoCompra).Select(a => a.Locales).Distinct().OrderBy(a => new { a.comuna, a.nombre }).ToList();
+                var locales = ctx.Compras.Where(a => a.tandaId == idTanda && a.estadoId != entre.idEstadoCompra).Select(a => a.Locales).Distinct().OrderBy(a => new { a.comuna, a.nombre }).ToList();
                 foreach (var local in locales)
                 {
                     var listado = ctx.CompraProducto.Where(a => a.Compras.localId == local.idLocal && a.Compras.tandaId == idTanda).GroupBy(a => a.productoId).Select(a => new { idProducto = a.Key, Cantidad = a.Sum(b => b.cantidad), CompraProducto = a.FirstOrDefault() }).ToArray();
@@ -737,7 +740,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         precioLocal += precio;
 
                         //string filas = string.Format(";{0};{1};${2};${3};${4}", compra.Cantidad, string.Format("{0} - {1} - {2}", prod.producto, prod.marca, prod.presentacion), costo.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), (precio - costo).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture));
-                        
+
 
                         sl.SetCellValue(row, 2, compra.Cantidad);
                         sl.SetCellValue(row, 3, prod.producto + " - " + prod.marca + " - " + prod.presentacion);

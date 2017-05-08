@@ -27,7 +27,7 @@
     </div>
 
     <div class="modal fade" id="entregaParcial" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <form id="form_entregar">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -41,7 +41,8 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Producto</th>
-                                    <th>Cantidad</th>
+                                    <th>Colgó</th>
+                                    <th>No usados</th>
                                     <th>Reubicar</th>
                                 </tr>
                             </thead>
@@ -125,8 +126,6 @@
                                }, "Frente de Economia Social y Solidaria", "Si", function () {
                                    console.log("No");
 
-                                   console.log(row.productos);
-
                                    $("#tabla_listado").attr("data-idcompra", row.idCompra)
                                    $("#entregaParcial").modal("show");
                                    $("#tabla_listado").find("tbody").empty();
@@ -136,7 +135,8 @@
                                        var id = info[0];
                                        var cantidad = info[1];
 
-                                       var tr = $("<tr><input name='pid' type='hidden' value='" + id + "'/><td>" + (i + 1) + "</td><td>" + val.substring(val.indexOf(")") + 1) + "</td><td><input name='pcantidad' type='number' max='" + cantidad + "' value='" + cantidad + "' min='0'/></td><td></td></tr>");
+                                       var input = $("<input readonly name='pcantidad' type='number' max='" + cantidad + "' value='" + cantidad + "' min='0'/>");
+                                       var tr = $("<tr><input name='pid' type='hidden' value='" + id + "'/><td>" + (i + 1) + "</td><td>" + val.substring(val.indexOf(")") + 1) + "</td><td>" + cantidad + "</td><td></td><td></td></tr>");
 
                                        $("#tabla_listado").find("tbody").append(tr);
                                        //vecinxs
@@ -146,9 +146,9 @@
                                        lista.removeAttr("class");
                                        lista.show();
 
-                                       var td = tr.find("td:eq(3)").empty();
+                                       var td = tr.find("td:eq(4)").empty().append(lista);
+                                       tr.find("td:eq(3)").empty().append(input);
                                        
-                                       td.append(lista);
                                        lista.chosen({
                                            disable_search_threshold: 10,
                                            no_results_text: "No se encontró informacion!",
@@ -158,7 +158,8 @@
                                            allow_duplicates: true
                                        });
                                        lista.on('change', function (evt, params) {
-                                           console.log(evt, params);
+                                           var seles = lista.val() == null ? 0 : lista.val().length;
+                                           input.val(input.val() - seles);
                                            evt.preventDefault();
                                        });
                                    });
