@@ -176,7 +176,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
         private void MandarMailConfirmandoCompra(Tandas tandaActual)
         {
-            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday();
 
 
             TanoNEEntities ctx = new TanoNEEntities();

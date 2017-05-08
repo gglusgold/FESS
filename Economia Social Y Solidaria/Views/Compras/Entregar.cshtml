@@ -39,11 +39,11 @@
                             <caption>Listado de compras.</caption>
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Producto</th>
-                                    <th>Colgó</th>
-                                    <th>No usados</th>
-                                    <th>Reubicar</th>
+                                    <th width="5%">#</th>
+                                    <th width="50%">Producto</th>
+                                    <th width="10%">Cantidad</th>
+                                    <th width="10%">No usados</th>
+                                    <th width="35%">Reubicar</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -134,8 +134,9 @@
                                        var info = $(val).text().match(/\[(.*)\]/).pop().split("|");
                                        var id = info[0];
                                        var cantidad = info[1];
+                                       var noUsado = 0;
 
-                                       var input = $("<input readonly name='pcantidad' type='number' max='" + cantidad + "' value='" + cantidad + "' min='0'/>");
+                                       var input = $("<input name='pcantidad' type='number' max='" + cantidad + "' value='" + noUsado + "' min='0'/>");
                                        var tr = $("<tr><input name='pid' type='hidden' value='" + id + "'/><td>" + (i + 1) + "</td><td>" + val.substring(val.indexOf(")") + 1) + "</td><td>" + cantidad + "</td><td></td><td></td></tr>");
 
                                        $("#tabla_listado").find("tbody").append(tr);
@@ -144,11 +145,14 @@
                                        //console.log(i, val);
                                        var lista = $(".vecinxs").clone();
                                        lista.removeAttr("class");
+                                       lista.attr("name", "vecinxs");
                                        lista.show();
+
+                                       var ids = [];
 
                                        var td = tr.find("td:eq(4)").empty().append(lista);
                                        tr.find("td:eq(3)").empty().append(input);
-                                       
+
                                        lista.chosen({
                                            disable_search_threshold: 10,
                                            no_results_text: "No se encontró informacion!",
@@ -158,9 +162,19 @@
                                            allow_duplicates: true
                                        });
                                        lista.on('change', function (evt, params) {
-                                           var seles = lista.val() == null ? 0 : lista.val().length;
-                                           input.val(input.val() - seles);
-                                           evt.preventDefault();
+                                           
+                                           if (params.selected !== undefined)
+                                               ids.push(params.selected)
+
+                                           if (params.deselected !== undefined)
+                                               ids.splice(ids.indexOf(params.deselected), 1);
+
+                                           input.attr("max", cantidad - ids.length);
+
+                                           if (cantidad < ids.length)
+                                               alert("¡Hay mas vecinxs que productos!");
+
+                                           lista.attr("data-vecinxs", ids);
                                        });
                                    });
 
@@ -201,19 +215,25 @@
                 e.preventDefault();
                 var cantidad = [];
                 var ids = [];
+                var vecinxs = [];
 
                 var idCompra = $(this).find("table").data("idcompra");
                 $.each($(this).find("table tr"), function (i, val) {
                     if ($(val).find("input[name='pid']").val() != undefined) {
+
+                        var vecinx = $(val).find(":input[name='vecinxs']").data("vecinxs");
+
                         ids.push($(val).find("input[name='pid']").val());
                         cantidad.push($(val).find("input[name='pcantidad']").val());
+                        console.log($(val).find("input[name='pcantidad']").val());
+                        vecinxs.push(vecinx === undefined ? null : vecinx);
                     }
                 });
 
                 $.ajax({
                     type: "POST",
                     url: "/Compras/EnregarPedido",
-                    data: { idCompra: idCompra, entregado: true, ids: ids, cantidad: cantidad },
+                    data: { idCompra: idCompra, entregado: true, ids: ids, noUsados: cantidad, vecinxs: vecinxs },
                     dataType: "json",
                     traditional: true,
                     success: function (response) {

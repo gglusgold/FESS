@@ -15,7 +15,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 {
     public class ApiProductosController : ApiController
     {
-        public static DateTime GetNextWeekday(DateTime start, DayOfWeek day)
+        public static DateTime GetNextWeekday()
         {
             TanoNEEntities ctx = new TanoNEEntities();
             Tandas ultimaTanda = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado == null);
@@ -89,7 +89,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 barrio = b.Locales.barrio,
             }).Distinct();
 
-            DateTime ProximaEntrea = GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            DateTime ProximaEntrea = GetNextWeekday();
 
             return Json(new { Proxima = ProximaEntrea.ToString("dd/MM/yyyy"), Lista = locales });
 

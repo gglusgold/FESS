@@ -32,7 +32,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
         }
     }
 
-    
+
 
     public class ComentariosAux
     {
@@ -112,7 +112,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             ChanguitoCompleta completo = new ChanguitoCompleta();
             crearChango(completo, idCategoria, idLocal);
 
-            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday();
             completo.proxFecha = ProximaEntrea.ToString("dd/MM/yyyy");
 
 
@@ -125,7 +125,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             ChanguitoCompleta completo = new ChanguitoCompleta();
             crearChango(completo, idCategoria, idLocal);
 
-            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday(DateTime.Now, DayOfWeek.Saturday);
+            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday();
             completo.proxFecha = ProximaEntrea.ToString("dd/MM/yyyy");
 
             return Json(new { lista = completo.changuito });
@@ -266,7 +266,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 Vecinos = a.Select(b => new VecinxsComunaAux.VecinxsAux { IdVecinx = b.idVecino, Nombre = new CultureInfo("en-Us", false).TextInfo.ToTitleCase(b.nombres.ToLower()) }).ToList()
             }).ToList();
 
-            vecino.InsertRange(0,ctx.Vecinos.Where(a => a.comuna == actual.comuna).GroupBy(a => a.comuna).ToList().Select(a => new VecinxsComunaAux
+            vecino.InsertRange(0, ctx.Vecinos.Where(a => a.comuna == actual.comuna).GroupBy(a => a.comuna).ToList().Select(a => new VecinxsComunaAux
             {
                 Comuna = a.Key.Value, // == -1 ? "Gran Bs. As" : a.Key.ToString(),
                 ComunaNombre = a.Key == -1 ? "Gran Bs. As" : a.Key.ToString(),
@@ -276,7 +276,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return View(vecino);
         }
 
-        
+
 
         public ActionResult CancelarPedido(int idCompra)
         {
@@ -636,7 +636,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             };
         }
 
-        public ActionResult EnregarPedido(int idCompra, bool entregado, int[] ids = null, int[] cantidad = null)
+        public ActionResult EnregarPedido(int idCompra, bool entregado, int[] ids = null, int[] noUsados = null, string[] vecinxs = null)
         {
             TanoNEEntities ctx = new TanoNEEntities();
             Vecinos vecino = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
@@ -651,15 +651,111 @@ namespace Economia_Social_Y_Solidaria.Controllers
             else
             {
                 var productos = compra.CompraProducto;
+                for (int x = 0; x < productos.Count; x++ )
+                {
+                    var producto = productos.ElementAt(x);
+                    int posicion = Array.IndexOf(ids, producto.productoId);
+
+
+                    if (noUsados[posicion] > 0)
+                    {
+                        //Vino menos cantidad
+                        if (producto.cantidad - noUsados[posicion] == 0)
+                            ctx.CompraProducto.Remove(producto);
+                        else
+                            producto.cantidad = producto.cantidad - noUsados[posicion];
+                    }
+                    if (!string.IsNullOrEmpty(vecinxs[posicion]))
+                    {
+                        //REUBICADO A UN VEXINX
+                        var arrayvecino = vecinxs[posicion].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList().GroupBy(a => a);
+                        foreach (var idVecinx in arrayvecino)
+                        {
+                            Vecinos reubicado = ctx.Vecinos.FirstOrDefault(a => a.idVecino == idVecinx.Key);
+                            Compras vecinoCompra = ctx.Compras.FirstOrDefault(a => a.vecinoId == idVecinx.Key && a.tandaId == compra.tandaId);
+                            if (vecinoCompra == null)
+                            {
+                                vecinoCompra = new Compras();
+                                vecinoCompra.fecha = ApiProductosController.GetNextWeekday();
+                                vecinoCompra.EstadosCompra = entre;
+                                vecinoCompra.localId = compra.localId;
+                                vecinoCompra.tandaId = compra.tandaId;
+                                vecinoCompra.Vecinos = reubicado;
+                                
+                                ctx.Compras.Add(vecinoCompra);
+
+                            }
+
+                            CompraProducto cp = new CompraProducto();
+                            cp.cantidad = idVecinx.Count();
+                            cp.Compras = vecinoCompra;
+                            cp.Costos = producto.Costos;
+                            cp.Precios = producto.Precios;
+                            cp.Productos = ctx.Productos.FirstOrDefault(a => a.idProducto == producto.productoId);
+
+                            vecinoCompra.CompraProducto.Add(cp);
+                        }
+
+                        var cantidadTotal = arrayvecino.Sum(a => a.Count());
+                        if (producto.cantidad - cantidadTotal == 0)
+                            ctx.CompraProducto.Remove(producto);
+                        else
+                            producto.cantidad = producto.cantidad - cantidadTotal;
+                    }
+
+                    compra.EstadosCompra = entregado ? entre : nopaso;
+                }
+
+
+                /*var productos = compra.CompraProducto;
                 for (int x = 0; x < ids.Count(); x++)
                 {
                     var prod = productos.FirstOrDefault(a => a.productoId == ids[x]);
-                    prod.cantidad = cantidad[x];
 
-                    if (prod.cantidad == 0)
-                        ctx.CompraProducto.Remove(prod);
+                    if (vecinxs[x] != null)
+                    {
+                        var arrayvecino = vecinxs[x].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList().GroupBy( a => a);
+                        foreach ( var idVecinx in arrayvecino )
+                        {
+                            Vecinos reubicado = ctx.Vecinos.FirstOrDefault(a => a.idVecino == idVecinx.Key);
+                            Compras vecinoCompra = ctx.Compras.FirstOrDefault(a => a.vecinoId == idVecinx.Key && a.tandaId == compra.tandaId);
+
+                            //SOLO SE ESTA LLEVANDO COSAS
+                            if ( vecinoCompra == null)
+                            {
+                                vecinoCompra = new Compras();
+                                vecinoCompra.fecha = ApiProductosController.GetNextWeekday();
+                                vecinoCompra.EstadosCompra = entre;
+                                vecinoCompra.localId = compra.localId;
+                                vecinoCompra.tandaId = compra.tandaId;
+                                vecinoCompra.Vecinos = reubicado;
+
+                                prod.cantidad = idVecinx.Count();
+                                compra.CompraProducto.Remove(prod);
+                                vecinoCompra.CompraProducto.Add(prod);
+                                ctx.Compras.Add(vecinoCompra);
+
+                            }
+                            else
+                            {
+                                prod.cantidad = idVecinx.Count();
+                                compra.CompraProducto.Remove(prod);
+                                vecinoCompra.CompraProducto.Add(prod);
+                                ctx.Compras.Add(vecinoCompra);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        prod.cantidad = cantidad[x];
+
+                        if (prod.cantidad == 0)
+                            ctx.CompraProducto.Remove(prod);
+                    }
+
+
                 }
-                compra.EstadosCompra = entregado ? entre : nopaso;
+                compra.EstadosCompra = entregado ? entre : nopaso;*/
             }
 
             ctx.SaveChanges();
