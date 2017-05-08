@@ -149,7 +149,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                             presentacion = b.Productos.presentacion,
                             cantidad = b.cantidad,
                             comentado = a.ComentariosProducto.FirstOrDefault(c => c.productoId == b.productoId) != null,  // a.Comentarios.Count == 1 ? a.Comentarios.FirstOrDefault().ComentariosProducto.FirstOrDefault(cp => cp.productoId == b.productoId).Productos != null : false,
-                            precioUnidad = b.Productos.Precios.Count > 1 ? b.Productos.Precios.LastOrDefault(precio => a.fecha.Date >= precio.fecha.Date).precio : b.Productos.Precios.FirstOrDefault().precio,
+                            precioUnidad = b.Precios.precio //.Precios.Count > 1 ? b.Productos.Precios.LastOrDefault(precio => a.fecha.Date >= precio.fecha.Date).precio : b.Productos.Precios.FirstOrDefault().precio,
 
                         })
                     }).ToList();
@@ -408,7 +408,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         presentacion = b.Productos.presentacion,
                         cantidad = b.cantidad,
                         comentado = a.ComentariosProducto.FirstOrDefault(c => c.productoId == b.productoId) != null,  // a.Comentarios.Count == 1 ? a.Comentarios.FirstOrDefault().ComentariosProducto.FirstOrDefault(cp => cp.productoId == b.productoId).Productos != null : false,
-                        precioUnidad = b.Productos.Precios.Count > 1 ? b.Productos.Precios.LastOrDefault(precio => a.fecha.Date >= precio.fecha.Date).precio : b.Productos.Precios.FirstOrDefault().precio,
+                        precioUnidad = b.Precios.precio //.Precios.Count > 1 ? b.Productos.Precios.LastOrDefault(precio => a.fecha.Date >= precio.fecha.Date).precio : b.Productos.Precios.FirstOrDefault().precio,
 
                     })
                 }).ToList();

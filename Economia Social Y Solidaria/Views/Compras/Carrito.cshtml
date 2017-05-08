@@ -31,13 +31,22 @@
         <div class="col-md-9">
 
             <div class="row" style="margin-bottom:20px">
-                <select id="scat" class=" pull-right">
-                    @foreach (var categoria in Model.categorias)
-                    {
-                        <option value="@categoria.idCategoria">@categoria.nombre</option>
-                    }
-                </select>
+                <div class="col-md-12">
+                    <form class="form-inline">
+
+                        <label for="scat">Elegí una categoria:</label>
+                        <select id="scat" class="form-control">
+                            @foreach (var categoria in Model.categorias)
+                            {
+                                <option value="@categoria.idCategoria">@categoria.nombre</option>
+                            }
+                        </select>
+
+                    </form>
+                </div>
+
             </div>
+
 
             <div class="row cont">
 
@@ -61,7 +70,7 @@
                     <h4 class="modal-title">Comenzar pedido</h4>
                 </div>
                 <div class="modal-body">
-                    <h3>Para saber qué productos mostrarte, tenemos que saber dónde vas a retirar tu pedido<br/>Los locales de:</h3>
+                    <h3>Para saber qué productos mostrarte, tenemos que saber dónde vas a retirar tu pedido<br />Los locales de:</h3>
                     <div class="radio locales">
                         @foreach (var local in Model.locales)
                         {
@@ -108,14 +117,14 @@
                     <div class="form-group">
                         <div class="row">
                             @*<div class="col-sm-4">
-                                <button type="button" data-loading-text="Espere..." id="btn_anterior_compra" class="form-control btn btn-primary" style="display: none">Anterior</button>
-                            </div>*@
+                                    <button type="button" data-loading-text="Espere..." id="btn_anterior_compra" class="form-control btn btn-primary" style="display: none">Anterior</button>
+                                </div>*@
                             <div class="col-sm-4">
                                 <button type="button" data-loading-text="Espere..." class="form-control btn btn-default" data-dismiss="modal">Cancelar</button>
                             </div>
                             @*<div class="col-sm-4">
-                                <button type="button" id="btn_siguiente_compra" class="form-control btn btn-primary">Siguiente</button>
-                            </div>*@
+                                    <button type="button" id="btn_siguiente_compra" class="form-control btn btn-primary">Siguiente</button>
+                                </div>*@
                             <div class="col-sm-4">
                                 <button type="submit" id="confirmada" data-loading-text="Espere..." class="form-control btn btn-success">Terminar</button>
                             </div>
@@ -208,6 +217,7 @@
                 heading: 'Reservas cerradas',
                 text: 'No se encuentra abierto el formulario para pedidos',
                 position : 'top-right' ,
+                hideAfter : false,
                 icon: 'warning',
                 loader: false,
             })
@@ -346,7 +356,7 @@
             $("#btn_siguiente_compra").hide();
             //$("#confirmada").show();
 
-           // $("#parte_dos").show();
+            // $("#parte_dos").show();
             $("#parte_uno").hide();
             e.preventDefault();
 
@@ -422,12 +432,13 @@
 
                     console.log(response.error == null );
                     if ( response.error == null ){
-                        alert("Gracias!");
-                        if ( editarCompra != null )
-                            Cookies.remove("editar");
+                        alert("Su pedido ha sido confirmado!", "Gracias!", function(){
+                            if ( editarCompra != null )
+                                Cookies.remove("editar");
 
-                        Cookies.remove("listado");
-                        location.href = "/Compras/Historial";
+                            Cookies.remove("listado");
+                            location.href = "/Compras/Historial";
+                        });
                     }
                     else
                     {
@@ -596,6 +607,10 @@
             var target = this;
             return target.replace(new RegExp(search, 'g'), replacement);
         };
+
+        $(window).unload(function(){
+            Cookies.remove("editar");
+        });
 
     </script>
 }

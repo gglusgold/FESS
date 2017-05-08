@@ -45,6 +45,14 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     listaFinal = listaFinal.OrderByDescending(a => a.local);
                     break;
 
+                case "comuna ASC":
+                    listaFinal = listaFinal.OrderBy(a => a.comuna);
+                    break;
+
+                case "comuna DESC":
+                    listaFinal = listaFinal.OrderByDescending(a => a.comuna);
+                    break;
+
                 case "producto ASC":
                     listaFinal = listaFinal.OrderBy(a => a.producto);
                     break;

@@ -156,7 +156,6 @@
 
             var id = $(".borrar").closest('.card').data("idcompra");
             $.post("/Compras/CancelarPedido", {idCompra: id}, function(data){
-                console.log(data.Compras);
                 cargarDatos(data.Compras);
             });
 
@@ -165,7 +164,7 @@
         $(document).on("click", ".modificar", function(e){
             $(e.currentTarget).closest('.row').find('button').button('loading')
 
-            var id = $(".borrar").closest('.card').data("idcompra");
+            var id = $(this).closest('.card').data("idcompra");
 
             var todo = {};
             var compra = returnObj(compras, id);

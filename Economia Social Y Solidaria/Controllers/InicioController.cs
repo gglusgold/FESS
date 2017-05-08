@@ -102,13 +102,13 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     using (MailMessage mail = new MailMessage())
                     {
                         //string datos = "Datos para entrar:<br/>Usuario: " + email;
-                        string datos = "Datos para entrar:<br/>Usuario: " + email + " Contraseña :" + password;
+                       // string datos = "Datos para entrar:<br/>Usuario: " + email + " Contraseña :" + password;
                         mail.From = new MailAddress("economiasocial@encuentrocapital.com.ar", "Economía Social y Solidaria");
                         mail.To.Add(email);
                         mail.Subject = "Economia Social y Solidaria -- Nuevo Encuentro";
                         mail.Body = "<p>Gracias por usar nuestro sistema. Hacé click en el link de abajo para activar la cuenta</p>";
                         mail.Body += "<p><a href='" + urla + "Inicio/ActivarCuenta?k=" + hash + "'>Activar Cuenta</a></p>";
-                        mail.Body += "<p>-------------------</p><p><p>" + datos + "</p><p>-------------------</p>";
+                       // mail.Body += "<p>-------------------</p><p><p>" + datos + "</p><p>-------------------</p>";
                         mail.IsBodyHtml = true;
 
                         using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))

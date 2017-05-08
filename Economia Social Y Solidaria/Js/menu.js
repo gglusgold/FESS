@@ -13,6 +13,68 @@
         $("#registrarse").modal("toggle")
     });
 
+    $("#btn_perfil").click(function () {
+        $.post("/Vecinos/Perfil", function (data) {
+
+            $('#perfil #EditarPerfil').show();
+            $('#perfil #GuardarPerfil').hide();
+            $('#perfil #helpBlock').hide();
+            
+
+            if (data.Error !== undefined)
+            {
+                alert(data.Error, "Error", function () {
+                    window.location = "../../Inicio/CerrarSesion";
+                });
+            }
+
+            var perf = data.Perfil;
+            var perfil = $("#perfilform").clone();
+            perfil.removeAttr("id")
+
+            perfil.find("#idVecinx").val(perf.idVecinx);
+            perfil.find("#emailperfil").attr('disabled', 'disabled').val(perf.correo);
+            perfil.find("#nombreperfil").attr('disabled', 'disabled').val(perf.nombre);
+            perfil.find("#telefonoperfil").attr('disabled', 'disabled').val(perf.telefono);
+            perfil.find("#comunaperfil").attr('disabled', 'disabled').val(perf.comuna);
+
+            
+            perfil.show();
+            $("#perfil").find(".modal-body").empty().append(perfil);
+        });
+        $("#perfil").modal("toggle")
+    });
+    
+    $('#perfil #EditarPerfil').on('click', function (e) {
+        $('#perfil #EditarPerfil').hide('slow');
+        $('#perfil #helpBlock').show('slow');
+        
+        $("#perfil :input[required]").removeAttr('disabled');
+        $('#perfil #GuardarPerfil').show('slow');
+    });
+    
+    $('#perfil-form').on('submit', function (e) {
+        e.preventDefault();
+        $('#perfil').find("button").button('loading')
+        
+        $.post("/Vecinos/ModificarPerfil", $("#perfil form").serialize(), function (data) {
+            $('#perfil').find("button").button('reset')
+            if ( data.Error != undefined )
+            {
+                alert(data.Error, "Algo salió mal!");
+            }
+            else if (data.sacar)
+            {
+                alert("Al cambiar el mail de ingreso, se deberá confirmar de nuevo la cuenta, revise su correo para volver a ingresar", "Su perfil ha sido cambiado", function () {
+                    window.location = "../../Inicio/CerrarSesion";
+                });
+            }
+            else {
+                $("#perfil").modal("toggle")
+            }
+        });
+    });
+    
 
 
     $('#btn_iniciar').on('click', function (e) {

@@ -7,15 +7,40 @@ using SpreadsheetLight.Drawing;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace Economia_Social_Y_Solidaria.Controllers
 {
+    public class VecinxsComunaAux
+    {
+        public int Comuna { get; internal set; }
+        public string ComunaNombre { get; internal set; }
+        public IEnumerable<VecinxsAux> Vecinos { get; set; }
+
+        public class VecinxsAux
+        {
+            public int IdVecinx { get; internal set; }
+            public string Nombre { get; set; }
+        }
+    }
+
+    
+
+    public class ComentariosAux
+    {
+        public string vecinx;
+        public string comentario;
+        public int estrellas;
+        public int haceCuanto;
+    }
 
     public class Changuito
     {
@@ -30,6 +55,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
         public int categoria { get; set; }
 
         public int stock { get; set; }
+        public List<ComentariosAux> comentario { get; set; }
     }
 
     public class ChanguitoCompleta
@@ -110,7 +136,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             TanoNEEntities ctx = new TanoNEEntities();
             Tandas ultima = ctx.Tandas.ToList().LastOrDefault();
             if (ultima != null && ultima.fechaCerrado == null)
-                completo.locales = ultima.Circuitos.Locales.Where(a => a.activo).ToList();
+                completo.locales = ultima.Circuitos.Locales.Where(a => a.activo).OrderBy(a => a.comuna).ToList();
 
             completo.categorias = ctx.Categorias.Where(a => a.Productos.Any(b => b.activo)).Select(a => new Cat { idCategoria = a.idCategoria, nombre = a.nombre }).OrderBy(a => a.nombre).ToList();
 
@@ -133,22 +159,40 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
             ViewBag.categoria = cat.idCategoria;
 
-            completo.changuito = ctx.Productos.Where(a => a.categoriaId == cat.idCategoria && a.ProductosLocales.Any(b => b.localId == idLocal)).ToList().Where(a => a.activo).Select(a => new Changuito()
+            if (idLocal == -1)
             {
-                idProducto = a.idProducto,
-                stock = a.stock,
-                nombre = a.producto + " - " + a.presentacion + (a.marca != null ? "\n" + a.marca : ""),
-                descripcion = a.descripcion == null ? "" : a.descripcion,//.Replace("\n", "<br/>"),
-                precio = a.Precios.LastOrDefault().precio,
-                comentarios = a.ComentariosProducto.Count,
-                rating = a.ComentariosProducto.Count == 0 ? 0 : a.ComentariosProducto.Average(b => b.estrellas)
-            }).ToList();
+                completo.changuito = ctx.Productos.Where(a => a.categoriaId == cat.idCategoria && a.activo).OrderBy(a => a.producto).ToList().Select(a => new Changuito()
+                {
+                    idProducto = a.idProducto,
+                    stock = a.stock,
+                    nombre = a.producto + " - " + a.presentacion + (a.marca != null ? "\n" + a.marca : ""),
+                    descripcion = a.descripcion == null ? "" : a.descripcion,//.Replace("\n", "<br/>"),
+                    precio = a.Precios.LastOrDefault().precio,
+                    comentarios = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count(),
+                    rating = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count() == 0 ? 0 : a.ComentariosProducto.Where(comentarios => comentarios.visible).Average(b => b.estrellas)
+                }).ToList();
+            }
+            else
+            {
+                completo.changuito = ctx.Productos.Where(a => a.categoriaId == cat.idCategoria && a.ProductosLocales.Any(b => b.localId == idLocal) && a.activo).OrderBy(a => a.producto).ToList().Select(a => new Changuito()
+                {
+                    idProducto = a.idProducto,
+                    stock = a.stock,
+                    nombre = a.producto + " - " + a.presentacion + (a.marca != null ? "\n" + a.marca : ""),
+                    descripcion = a.descripcion == null ? "" : a.descripcion,//.Replace("\n", "<br/>"),
+                    precio = a.Precios.LastOrDefault().precio,
+                    comentarios = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count(),
+                    rating = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count() == 0 ? 0 : a.ComentariosProducto.Where(comentarios => comentarios.visible).Average(b => b.estrellas)
+                }).ToList();
+            }
+
 
             return completo;
         }
 
         public ActionResult Detalle(int id)
         {
+            DateTime hoy = DateTime.Today;
             TanoNEEntities ctx = new TanoNEEntities();
 
             Productos actual = ctx.Productos.FirstOrDefault(a => a.idProducto == id);
@@ -161,7 +205,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 precio = actual.Precios.LastOrDefault().precio,
                 comentarios = actual.ComentariosProducto.Count,
                 rating = actual.ComentariosProducto.Count == 0 ? 0 : actual.ComentariosProducto.Average(b => b.estrellas),
-                categoria = actual.Categorias.idCategoria
+                categoria = actual.Categorias.idCategoria,
+                comentario = actual.ComentariosProducto.Where(a => a.visible == true).Select(a => new ComentariosAux { comentario = a.comentario, vecinx = a.Compras.Vecinos.nombres, estrellas = a.estrellas, haceCuanto = (hoy - a.fecha).Days }).ToList()
             });
         }
 
@@ -180,7 +225,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             Tandas ultimaTanda = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado == null);
 
 
-                MisCompras compras = new MisCompras();
+            MisCompras compras = new MisCompras();
             compras.Compras = ctx.Compras.Where(a => a.vecinoId == vecino.idVecino).OrderByDescending(a => a.fecha).ToList().Select(a => new Comprados
             {
                 idCompra = a.idCompra,
@@ -201,7 +246,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     presentacion = b.Productos.presentacion,
                     cantidad = b.cantidad,
                     comentado = a.ComentariosProducto.FirstOrDefault(c => c.productoId == b.productoId) != null,  // a.Comentarios.Count == 1 ? a.Comentarios.FirstOrDefault().ComentariosProducto.FirstOrDefault(cp => cp.productoId == b.productoId).Productos != null : false,
-                    precioUnidad = b.Productos.Precios.Count > 1 ? b.Productos.Precios.LastOrDefault(precio => a.fecha.Date >= precio.fecha.Date).precio : b.Productos.Precios.FirstOrDefault().precio,
+                    precioUnidad = b.Precios.precio
 
                 }).ToList()
             }).ToList();
@@ -211,8 +256,27 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
         public ActionResult Entregar()
         {
-            return View();
+            TanoNEEntities ctx = new TanoNEEntities();
+            Vecinos actual = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
+
+            var vecino = ctx.Vecinos.Where(a => a.comuna != actual.comuna).GroupBy(a => a.comuna).ToList().Select(a => new VecinxsComunaAux
+            {
+                Comuna = a.Key.Value, // == -1 ? "Gran Bs. As" : a.Key.ToString(),
+                ComunaNombre = a.Key == -1 ? "Gran Bs. As" : a.Key.ToString(),
+                Vecinos = a.Select(b => new VecinxsComunaAux.VecinxsAux { IdVecinx = b.idVecino, Nombre = new CultureInfo("en-Us", false).TextInfo.ToTitleCase(b.nombres.ToLower()) }).ToList()
+            }).ToList();
+
+            vecino.InsertRange(0,ctx.Vecinos.Where(a => a.comuna == actual.comuna).GroupBy(a => a.comuna).ToList().Select(a => new VecinxsComunaAux
+            {
+                Comuna = a.Key.Value, // == -1 ? "Gran Bs. As" : a.Key.ToString(),
+                ComunaNombre = a.Key == -1 ? "Gran Bs. As" : a.Key.ToString(),
+                Vecinos = a.Select(b => new VecinxsComunaAux.VecinxsAux { IdVecinx = b.idVecino, Nombre = new CultureInfo("en-Us", false).TextInfo.ToTitleCase(b.nombres.ToLower()) }).ToList()
+            }));
+
+            return View(vecino);
         }
+
+        
 
         public ActionResult CancelarPedido(int idCompra)
         {
@@ -245,7 +309,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     marca = b.Productos.marca,
                     presentacion = b.Productos.presentacion,
                     //precioUnidad = b.Productos.Precios.FirstOrDefault(precio => a.fecha > precio.fecha).precio
-                    precioUnidad = b.Productos.Precios.Count > 1 ? b.Productos.Precios.LastOrDefault(precio => a.fecha.Date <= precio.fecha.Date).precio : b.Productos.Precios.FirstOrDefault().precio,
+                    precioUnidad = b.Precios.precio
                 }).ToList()
             }).ToList();
 
@@ -316,6 +380,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 productos.Productos = prod;
                 productos.Compras = compra;
                 productos.cantidad = cantidad[x];
+                productos.Precios = prod.Precios.LastOrDefault();
+                productos.Costos = prod.Costos.LastOrDefault();
 
                 ctx.CompraProducto.Add(productos);
             }
@@ -341,19 +407,6 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
             var totalProductos = compra.CompraProducto.Where(a => a.compraId == idCompra).Count();
 
-
-            //Comentarios comentario = ctx.Comentarios.FirstOrDefault(a => a.vecinoId == vecino.idVecino && a.compraId == compra.idCompra);
-            //if (comentario == null)
-            //{
-            //    comentario = new Comentarios();
-            //    comentario.Vecinos = vecino;
-            //    comentario.Compras = compra;
-            //    ctx.Comentarios.Add(comentario);
-            //}
-            //else
-            //{
-            //    comentario.fecha = DateTime.Now;
-            //}
             var ids = new List<int>();
             for (int x = 0; x < idProducto.Length; x++)
             {
@@ -403,7 +456,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 idCompra = a.idCompra,
                 nombre = a.Vecinos.nombres,
                 productos = string.Join("<br/>", a.CompraProducto.ToList().Select(b => "<span class='idca' style='display:none'>[" + b.productoId + "|" + b.cantidad + "]</span>(" + b.cantidad + ") " + b.Productos.producto + " - " + b.Productos.marca + " - " + b.Productos.presentacion)),
-                precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Productos.Precios.LastOrDefault(precio => a.fecha > precio.fecha).precio),//precio => compra.fecha > precio.fecha
+                precio = a.CompraProducto.ToList().Sum(b => b.cantidad * b.Precios.precio),
                 retiro = a.EstadosCompra.codigo
             });
             return Json(lista, JsonRequestBehavior.DenyGet);
@@ -542,14 +595,10 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     decimal totaltotal = 0;
                     foreach (var compraProducto in ordenado)
                     {
-                        decimal total = compraProducto.Productos.Precios.LastOrDefault(precio => compra.fecha > precio.fecha).precio * compraProducto.cantidad;
+                        decimal total = compraProducto.Precios.precio * compraProducto.cantidad;
                         totaltotal += total;
                         centrado.Font.Bold = false;
                         sl.SetCellValue(row, 2, compraProducto.cantidad + ": " + compraProducto.Productos.producto + " - " + compraProducto.Productos.marca + " - " + compraProducto.Productos.presentacion);
-
-                        //SLPicture pic = new SLPicture(urla + "/Imagenes/Producto-" + compraProducto.Productos.idProducto + ".jpg");
-                        //pic.SetPosition(1, 6);
-                        //sl.InsertPicture(pic);
 
                         sl.SetCellValue(row, 3, total);
                         sl.SetCellStyle(row, 3, centrado);

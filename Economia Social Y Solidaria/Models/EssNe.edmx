@@ -49,6 +49,8 @@
           <Property Name="compraId" Type="int" Nullable="false" />
           <Property Name="productoId" Type="int" Nullable="false" />
           <Property Name="cantidad" Type="int" Nullable="false" />
+          <Property Name="costoId" Type="int" />
+          <Property Name="precioId" Type="int" />
         </EntityType>
         <EntityType Name="Compras">
           <Key>
@@ -261,6 +263,30 @@
             </Principal>
             <Dependent Role="CompraProducto">
               <PropertyRef Name="compraId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CompraProducto_Costos">
+          <End Role="Costos" Type="Self.Costos" Multiplicity="0..1" />
+          <End Role="CompraProducto" Type="Self.CompraProducto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Costos">
+              <PropertyRef Name="idCosto" />
+            </Principal>
+            <Dependent Role="CompraProducto">
+              <PropertyRef Name="costoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CompraProducto_Precios">
+          <End Role="Precios" Type="Self.Precios" Multiplicity="0..1" />
+          <End Role="CompraProducto" Type="Self.CompraProducto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Precios">
+              <PropertyRef Name="idPrecio" />
+            </Principal>
+            <Dependent Role="CompraProducto">
+              <PropertyRef Name="precioId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -504,6 +530,14 @@
             <End Role="Compras" EntitySet="Compras" />
             <End Role="CompraProducto" EntitySet="CompraProducto" />
           </AssociationSet>
+          <AssociationSet Name="FK_CompraProducto_Costos" Association="Self.FK_CompraProducto_Costos">
+            <End Role="Costos" EntitySet="Costos" />
+            <End Role="CompraProducto" EntitySet="CompraProducto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CompraProducto_Precios" Association="Self.FK_CompraProducto_Precios">
+            <End Role="Precios" EntitySet="Precios" />
+            <End Role="CompraProducto" EntitySet="CompraProducto" />
+          </AssociationSet>
           <AssociationSet Name="FK_CompraProducto_Productos" Association="Self.FK_CompraProducto_Productos">
             <End Role="Productos" EntitySet="Productos" />
             <End Role="CompraProducto" EntitySet="CompraProducto" />
@@ -625,6 +659,14 @@
             <End Role="Compras" EntitySet="Compras" />
             <End Role="CompraProducto" EntitySet="CompraProducto" />
           </AssociationSet>
+          <AssociationSet Name="FK_CompraProducto_Costos" Association="TanoNEModel.FK_CompraProducto_Costos">
+            <End Role="Costos" EntitySet="Costos" />
+            <End Role="CompraProducto" EntitySet="CompraProducto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CompraProducto_Precios" Association="TanoNEModel.FK_CompraProducto_Precios">
+            <End Role="Precios" EntitySet="Precios" />
+            <End Role="CompraProducto" EntitySet="CompraProducto" />
+          </AssociationSet>
           <AssociationSet Name="FK_CompraProducto_Productos" Association="TanoNEModel.FK_CompraProducto_Productos">
             <End Role="Productos" EntitySet="Productos" />
             <End Role="CompraProducto" EntitySet="CompraProducto" />
@@ -729,7 +771,11 @@
           <Property Name="compraId" Type="Int32" Nullable="false" />
           <Property Name="productoId" Type="Int32" Nullable="false" />
           <Property Name="cantidad" Type="Int32" Nullable="false" />
+          <Property Name="costoId" Type="Int32" />
+          <Property Name="precioId" Type="Int32" />
           <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_CompraProducto_Compras" FromRole="CompraProducto" ToRole="Compras" />
+          <NavigationProperty Name="Costos" Relationship="TanoNEModel.FK_CompraProducto_Costos" FromRole="CompraProducto" ToRole="Costos" />
+          <NavigationProperty Name="Precios" Relationship="TanoNEModel.FK_CompraProducto_Precios" FromRole="CompraProducto" ToRole="Precios" />
           <NavigationProperty Name="Productos" Relationship="TanoNEModel.FK_CompraProducto_Productos" FromRole="CompraProducto" ToRole="Productos" />
         </EntityType>
         <EntityType Name="Compras">
@@ -759,6 +805,7 @@
           <Property Name="costo" Type="Decimal" Nullable="false" Precision="6" Scale="2" />
           <Property Name="fecha" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="productoId" Type="Int32" />
+          <NavigationProperty Name="CompraProducto" Relationship="TanoNEModel.FK_CompraProducto_Costos" FromRole="Costos" ToRole="CompraProducto" />
           <NavigationProperty Name="Productos" Relationship="TanoNEModel.FK_Costos_Productos" FromRole="Costos" ToRole="Productos" />
         </EntityType>
         <EntityType Name="EstadosCompra">
@@ -809,6 +856,7 @@
           <Property Name="precio" Type="Decimal" Nullable="false" Precision="6" Scale="2" />
           <Property Name="fecha" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="productoId" Type="Int32" />
+          <NavigationProperty Name="CompraProducto" Relationship="TanoNEModel.FK_CompraProducto_Precios" FromRole="Precios" ToRole="CompraProducto" />
           <NavigationProperty Name="Productos" Relationship="TanoNEModel.FK_Precios_Productos" FromRole="Precios" ToRole="Productos" />
         </EntityType>
         <EntityType Name="Productos">
@@ -1012,6 +1060,30 @@
             </Principal>
             <Dependent Role="CompraProducto">
               <PropertyRef Name="compraId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CompraProducto_Costos">
+          <End Type="TanoNEModel.Costos" Role="Costos" Multiplicity="0..1" />
+          <End Type="TanoNEModel.CompraProducto" Role="CompraProducto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Costos">
+              <PropertyRef Name="idCosto" />
+            </Principal>
+            <Dependent Role="CompraProducto">
+              <PropertyRef Name="costoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CompraProducto_Precios">
+          <End Type="TanoNEModel.Precios" Role="Precios" Multiplicity="0..1" />
+          <End Type="TanoNEModel.CompraProducto" Role="CompraProducto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Precios">
+              <PropertyRef Name="idPrecio" />
+            </Principal>
+            <Dependent Role="CompraProducto">
+              <PropertyRef Name="precioId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1228,6 +1300,8 @@
           <EntitySetMapping Name="CompraProducto">
             <EntityTypeMapping TypeName="TanoNEModel.CompraProducto">
               <MappingFragment StoreEntitySet="CompraProducto">
+                <ScalarProperty Name="precioId" ColumnName="precioId" />
+                <ScalarProperty Name="costoId" ColumnName="costoId" />
                 <ScalarProperty Name="cantidad" ColumnName="cantidad" />
                 <ScalarProperty Name="productoId" ColumnName="productoId" />
                 <ScalarProperty Name="compraId" ColumnName="compraId" />

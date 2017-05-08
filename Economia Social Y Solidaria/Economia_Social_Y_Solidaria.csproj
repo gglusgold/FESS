@@ -146,6 +146,8 @@
     <Compile Include="Controllers\InicioController.cs" />
     <Compile Include="Controllers\ProductosController.cs" />
     <Content Include="Css\bootstrap-switch.css" />
+    <Content Include="Css\chosen-sprite.png" />
+    <Content Include="Css\chosen.min.css" />
     <Content Include="Css\estadisticas.css" />
     <Content Include="Css\font-awesome.css" />
     <Content Include="Css\ui\images\ui-bg_glass_75_d0e5f5_1x400.png" />
@@ -333,6 +335,7 @@
     <Content Include="Css\metro\purple\jtable.less" />
     <Content Include="Css\metro\red\jtable.less" />
     <None Include="Js\comunas.json" />
+    <Content Include="Js\chosen.jquery.js" />
     <Content Include="Js\datepicker-es.js" />
     <Content Include="Js\drilldown.js" />
     <Content Include="Js\highcharts.js" />

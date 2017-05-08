@@ -166,7 +166,7 @@
         dialog.css({ "overflow-y": "initial !important" });
         var content = $("<div/>").addClass("modal-content");
 
-        var header = $("<div/>").addClass("modal-header").append("<button type='button' class='close' data-dismiss='modal' aria-hidden='true'><span class='glyphicon glyphicon-remove'></span></button>");
+        var header = $("<div/>").addClass("modal-header").append("");
         header.append("<h4 class='modal-title'>" + titulo + "</h4>");
         var body = $("<div/>").addClass("modal-body");
         //body.css({ "height": "350px", "overflow-y": "auto" });

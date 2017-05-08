@@ -207,8 +207,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         decimal total = 0;
                         foreach (CompraProducto prod in compras.CompraProducto)
                         {
-                            mail.Body += "<p>" + prod.cantidad + " - " + prod.Productos.producto + " - " + prod.Productos.presentacion + " - " + prod.Productos.marca + " - " + (prod.Productos.Precios.LastOrDefault().precio * prod.cantidad) + "</p>";
-                            total += prod.cantidad * prod.Productos.Precios.LastOrDefault().precio;
+                            mail.Body += "<p>" + prod.cantidad + " - " + prod.Productos.producto + " - " + prod.Productos.presentacion + " - " + prod.Productos.marca + " - " + (prod.Precios.precio * prod.cantidad) + "</p>";
+                            total += prod.cantidad * prod.Precios.precio;
                         }
                         mail.Body += "<p>-------------------</p>";
                         mail.Body += "<p>Total : " + total + "</p>";
@@ -450,7 +450,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     var locales = ctx.Compras.Where(a => a.tandaId == idTanda).Select(a => a.Locales).Distinct().OrderBy(a => new { a.comuna, a.nombre }).ToList();
                     foreach (var local in locales)
                     {
-                        var listado = ctx.CompraProducto.Where(a => a.Compras.localId == local.idLocal && a.Compras.tandaId == idTanda).OrderBy(a => a.Productos.producto).GroupBy(a => a.productoId).Select(a => new { idProducto = a.Key, Cantidad = a.Sum(b => b.cantidad) });
+                        var listado = ctx.CompraProducto.Where(a => a.Compras.localId == local.idLocal && a.Compras.tandaId == idTanda).OrderBy(a => a.Productos.producto).GroupBy(a => a.productoId).Select(a => new { idProducto = a.Key, cp = a.FirstOrDefault(), Cantidad = a.Sum(b => b.cantidad) });
                         int totalVecinx = (row + listado.Count() - 1);
 
                         sl.SetCellStyle(row, 1, totalVecinx, 1, bordeIz);
@@ -470,7 +470,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         {
                             Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == productos.idProducto);
 
-                            Costos ultimo = prod.Costos.Count > 1 ? (prod.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) == null ? prod.Costos.LastOrDefault() : prod.Costos.FirstOrDefault()) : prod.Costos.FirstOrDefault();
+                            Costos ultimo = productos.cp.Costos;
                             decimal costoTotal = ultimo.costo * productos.Cantidad;
                             subTotalLocal += costoTotal;
 
@@ -534,7 +534,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     {
                         var compra = listado.ElementAt(x);
 
-                        Costos ultimo = compra.Compra.Productos.Costos.Count > 1 ? (compra.Compra.Productos.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) == null ? compra.Compra.Productos.Costos.LastOrDefault() : compra.Compra.Productos.Costos.FirstOrDefault()) : compra.Compra.Productos.Costos.FirstOrDefault();
+                        Costos ultimo = compra.Compra.Costos; //.Costos.Count > 1 ? (compra.Compra.Productos.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) == null ? compra.Compra.Productos.Costos.LastOrDefault() : compra.Compra.Productos.Costos.FirstOrDefault()) : compra.Compra.Productos.Costos.FirstOrDefault();
                         decimal costoTotal = ultimo.costo * compra.Cantidad;
                         subTotal += costoTotal;
 
@@ -629,6 +629,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             TanoNEEntities ctx = new TanoNEEntities();
             Tandas actual = ctx.Tandas.FirstOrDefault(a => a.idTanda == idTanda);
 
+            EstadosCompra noretirado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 5);
+
             using (MemoryStream mem = new MemoryStream())
             using (SLDocument sl = new SLDocument())
             {
@@ -698,10 +700,10 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
                 sl.SetCellStyle(1, 1, 1, 5, bordeNegrita);
 
-                var locales = ctx.Compras.Where(a => a.tandaId == idTanda).Select(a => a.Locales).Distinct().OrderBy(a => new { a.comuna, a.nombre }).ToList();
+                var locales = ctx.Compras.Where(a => a.tandaId == idTanda && a.estadoId != noretirado.idEstadoCompra).Select(a => a.Locales).Distinct().OrderBy(a => new { a.comuna, a.nombre }).ToList();
                 foreach (var local in locales)
                 {
-                    var listado = ctx.CompraProducto.Where(a => a.Compras.localId == local.idLocal && a.Compras.tandaId == idTanda).GroupBy(a => a.productoId).Select(a => new { idProducto = a.Key, Cantidad = a.Sum(b => b.cantidad) }).ToArray();
+                    var listado = ctx.CompraProducto.Where(a => a.Compras.localId == local.idLocal && a.Compras.tandaId == idTanda).GroupBy(a => a.productoId).Select(a => new { idProducto = a.Key, Cantidad = a.Sum(b => b.cantidad), CompraProducto = a.FirstOrDefault() }).ToArray();
 
                     int totalVecinx = (row + listado.Count() - 1);
 
@@ -724,12 +726,12 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         var compra = listado[x];
                         Productos prod = ctx.Productos.FirstOrDefault(a => a.idProducto == compra.idProducto);
 
-                        Costos ultimoc = prod.Costos.Count > 1 ? prod.Costos.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Costos.FirstOrDefault();
+                        Costos ultimoc = compra.CompraProducto.Costos;
                         decimal costo = ultimoc.costo * compra.Cantidad;
                         //decimal costo = prod.Costos.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).costo * compra.Cantidad;
 
-                        Precios ultimop = prod.Precios.Count > 1 ? prod.Precios.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Precios.FirstOrDefault();
-                        decimal precio = ultimop.precio * compra.Cantidad;
+                        //Precios ultimop = prod.Precios.Count > 1 ? prod.Precios.LastOrDefault(a => a.fecha.Date <= actual.fechaAbierto.Date) : prod.Precios.FirstOrDefault();
+                        decimal precio = compra.CompraProducto.Precios.precio * compra.Cantidad;
                         //decimal precio = prod.Precios.FirstOrDefault(a => a.fecha <= actual.fechaAbierto).precio * compra.Cantidad;
                         costoLocal += costo;
                         precioLocal += precio;
