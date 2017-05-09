@@ -106,7 +106,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
                         conf.leyenda = "Circuito Abierto: ";
 
                         if (!bool.Parse(ConfigurationManager.AppSettings["debug"]))
-                            ApiProductosController.mandarNotificacion("Ya poder pedir!", "Desde hoy tenés la posibilidad de hacer tu pedido", "CARRITO");
+                        { 
+                            ApiProductosController.mandarNotificacion("Ya poder pedir!", "Desde hoy tenés la posibilidad de hacer tu pedido", "CARRITO", ctx.AlertasVecinxs.Where(a => a.Vecinos.token != null &&  a.Alertas.codigo == 3).Select(a => a.Vecinos.token).Distinct().ToArray());
+                        }
 
                         ctx.Tandas.Add(tanda);
                         ctx.SaveChanges();
@@ -143,8 +145,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                             }
                             ctx.SaveChanges();
 
-                            if (!bool.Parse(ConfigurationManager.AppSettings["debug"]))
-                                MandarMailConfirmandoCompra(tanda);
+                            //if (!bool.Parse(ConfigurationManager.AppSettings["debug"]))
+                            //    MandarMailConfirmandoCompraTodos(tanda);
 
                             ctx.SaveChanges();
                         }
@@ -174,7 +176,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(lista, JsonRequestBehavior.DenyGet);
         }
 
-        private void MandarMailConfirmandoCompra(Tandas tandaActual)
+        private void MandarMailConfirmandoCompraTodos(Tandas tandaActual)
         {
             DateTime ProximaEntrea = ApiProductosController.GetNextWeekday();
 
@@ -183,6 +185,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
             EstadosCompra confirmado = ctx.EstadosCompra.FirstOrDefault(a => a.codigo == 2);
             var vecinosQueCompraron = tandaActual.Compras.Where(a => a.EstadosCompra.idEstadoCompra == confirmado.idEstadoCompra).GroupBy(a => a.vecinoId).Select(a => a.FirstOrDefault(b => b.vecinoId == a.Key));
 
+            //ctx.AlertasVecinxs.Where(a => a.Vecinos.token != null && a.Alertas.codigo == 3).Select(a => a.vecinxId.ToString()).Distinct().ToArray()
+            //    vecinosQueCompraron.Where(a => a.Vecinos.token != null).Select(a => a.Vecinos.token)
             ApiProductosController.mandarNotificacion("Pedido Confirmado", "Gracias por colaborar con la economía social y solidaria. No te olvides de venir con cambio!", "MISCOMPRAS", vecinosQueCompraron.Where(a => a.Vecinos.token != null).Select(a => a.Vecinos.token).ToArray());
             foreach (var actualTanda in vecinosQueCompraron)
             {

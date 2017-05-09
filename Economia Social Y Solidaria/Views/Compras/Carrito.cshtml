@@ -197,6 +197,7 @@
         var productos = @Html.Raw(Json.Encode(Model.changuito));
         cargarDatos(productos);
 
+
         $("#scat").val(@ViewBag.categoria);
         $("#scat").change(function(e){
             $.blockUI({ message: null });
@@ -442,7 +443,6 @@
             });
 
             var data = { local:Cookies.get('idLocal'), idCompra: idCompra, cantidad: cantidad, idProducto: id };
-            console.log(data);
 
             $.ajax({
                 type: "POST",

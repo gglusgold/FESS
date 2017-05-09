@@ -19,10 +19,9 @@
             $('#perfil #EditarPerfil').show();
             $('#perfil #GuardarPerfil').hide();
             $('#perfil #helpBlock').hide();
-            
 
-            if (data.Error !== undefined)
-            {
+
+            if (data.Error !== undefined) {
                 alert(data.Error, "Error", function () {
                     window.location = "../../Inicio/CerrarSesion";
                 });
@@ -38,33 +37,76 @@
             perfil.find("#telefonoperfil").attr('disabled', 'disabled').val(perf.telefono);
             perfil.find("#comunaperfil").attr('disabled', 'disabled').val(perf.comuna);
 
-            
+            //         <div class="form-group">
+            //    <label for="mailperfil" class="col-md-4 control-label">Mails al confirmar la compra</label>
+            //    <div class="col-md-8">
+            //        <input type="checkbox" id="mailperfil" checked data-on-text="Recibir" data-off-text="No" data-off-color="danger" />
+            //    </div>
+            //</div>
+            console.log(perf);
+            //type="checkbox" id="mailperfil" checked data-on-text="Recibir" data-off-text="No" data-off-color="danger"
+            var alertasDiv = perfil.find("#alertasperfil");
+            alertasDiv.empty();
+            $.each(perf.alertas, function (i, val) {
+
+                var divNoti = $('<div/>').addClass("form-group");
+                var label = $('<label for="" class="col-md-4 control-label"/>').text(val.tipo)
+                var divInput = $('<div/>').addClass("col-md-8");
+                var input = $('<input />').attr({ id: val.codigo, type: "checkbox", "checked": val.activa, disabled: true })
+
+                divInput.append(input);
+                divNoti.append(label);
+                divNoti.append(divInput);
+                alertasDiv.append(divNoti);
+            });
+
             perfil.show();
             $("#perfil").find(".modal-body").empty().append(perfil);
+
+            var isSwitch;
+            isSwitch = $("input[type='checkbox']").data('bootstrap-switch')
+            if (!isSwitch) {
+                $("input[type='checkbox']").bootstrapSwitch({
+                    onText: "Recibir",
+                    offText: "No",
+                    offColor: "danger"
+                });
+            }
         });
         $("#perfil").modal("toggle")
     });
-    
+
     $('#perfil #EditarPerfil').on('click', function (e) {
         $('#perfil #EditarPerfil').hide('slow');
         $('#perfil #helpBlock').show('slow');
-        
+
+
+
         $("#perfil :input[required]").removeAttr('disabled');
+        $("#perfil input[type='checkbox']").bootstrapSwitch('disabled', false);
         $('#perfil #GuardarPerfil').show('slow');
     });
-    
+
     $('#perfil-form').on('submit', function (e) {
         e.preventDefault();
-        $('#perfil').find("button").button('loading')
-        
-        $.post("/Vecinos/ModificarPerfil", $("#perfil form").serialize(), function (data) {
+        //$('#perfil').find("button").button('loading')
+
+        var data = $("#perfil form").serialize();
+        $.each($("#perfil input[type='checkbox']"), function (i, val) {
+            data += "&idsalertas[]=" + $(val).attr("id");
+            data += "&valalertas[]=" + $(val).bootstrapSwitch('state');
+        });
+
+
+        console.log(data);
+      //  return;
+
+        $.post("/Vecinos/ModificarPerfil", data, function (data) {
             $('#perfil').find("button").button('reset')
-            if ( data.Error != undefined )
-            {
+            if (data.Error != undefined) {
                 alert(data.Error, "Algo salió mal!");
             }
-            else if (data.sacar)
-            {
+            else if (data.sacar) {
                 alert("Al cambiar el mail de ingreso, se deberá confirmar de nuevo la cuenta, revise su correo para volver a ingresar", "Su perfil ha sido cambiado", function () {
                     window.location = "../../Inicio/CerrarSesion";
                 });
@@ -74,7 +116,7 @@
             }
         });
     });
-    
+
 
 
     $('#btn_iniciar').on('click', function (e) {
@@ -123,9 +165,7 @@
         Cookies.remove('Mail');
         Cookies.remove('k');
     }
-    else if ((mensaje !== undefined && mensaje !== '') && (mail !== undefined && mail !== ''))
-    {
-        //http://localhost:56693/Inicio/ResetearCuenta?k=56CD3CNLYPFEVKEHMVOA7LKEC
+    else if ((mensaje !== undefined && mensaje !== '') && (mail !== undefined && mail !== '')) {
         $("#cambiar").modal("toggle")
         $("#cambiar").find("#emailolvido").val(mail);
         $("#cambiar").find("#emaila").val(mail);

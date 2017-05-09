@@ -72,12 +72,12 @@
                     title: 'Aceptado',
                     width: "5%",
                     display: function (data) {
-                        console.log(data);
+
                         var imagen = data.record.visible ? "si" : "no";
 
                         var $a = $("<img src='/Imagenes/Fijas/" + imagen + ".png' style='cursor:pointer'/>");
                         $a.click(function () {
-                            var img = console.log(this);
+                            var img = $(this);
                             $.post("/Comentarios/Cambiar", { idProductoComentario: data.record.idProductoComentario }, function (visible) {
                                 var nueba = visible ? "si" : "no";
                                 $a.attr("src", "/Imagenes/Fijas/" + nueba + ".png")

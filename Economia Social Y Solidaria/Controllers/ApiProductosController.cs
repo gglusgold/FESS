@@ -72,14 +72,16 @@ namespace Economia_Social_Y_Solidaria.Controllers
             string error = null;
             TanoNEEntities ctx = new TanoNEEntities();
 
+            int idCircuito;
             Tandas ultimaTanda = ctx.Tandas.ToList().LastOrDefault(a => a.fechaCerrado == null);
             if (ultimaTanda == null)
             {
-                error = "No hay circuitos abiertos en este momento";
-                return Json(new { Error = error });
+                idCircuito = ctx.Tandas.OrderByDescending(p => p.idTanda).FirstOrDefault().circuitoId;
             }
+            else
+                idCircuito = ultimaTanda.circuitoId;
 
-            var locales = ctx.ProductosLocales.Where(a => a.Locales.activo && a.Locales.circuitoId == ultimaTanda.circuitoId).ToList().Select(b => new
+            var locales = ctx.ProductosLocales.Where(a => a.Locales.activo && a.Locales.circuitoId == idCircuito).ToList().Select(b => new
             {
                 idLocal = b.Locales.idLocal,
                 nombre = b.Locales.nombre,
@@ -91,7 +93,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
             DateTime ProximaEntrea = GetNextWeekday();
 
-            return Json(new { Proxima = ProximaEntrea.ToString("dd/MM/yyyy"), Lista = locales });
+            return Json(new { Proxima = ProximaEntrea.ToString("dd/MM/yyyy"), Lista = locales, TandaAbierta = ultimaTanda != null });
 
             //return Json(locales);
         }
@@ -119,6 +121,13 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 pass = InicioController.GetCrypt(pass);
                 if (vecino.contrasena == pass)
                 {
+                    if ( vecino.token == null )
+                    {
+                        foreach (Alertas alerta in ctx.Alertas.Where(a => a.android))
+                        {
+                            vecino.AlertasVecinxs.Add(new AlertasVecinxs { Alertas = alerta });
+                        }
+                    }
                     vecino.token = token;
                     ctx.SaveChanges();
 

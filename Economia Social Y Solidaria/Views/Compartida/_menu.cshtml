@@ -290,13 +290,13 @@
 </div>
 
 <div id="perfilform" style="display:none">
-    <input type="hidden" value="idVecinx"/>
+    <input type="hidden" value="idVecinx" />
     <div class="form-group">
         <label for="emailperfil" class="col-md-4 control-label">Correo Electrónico</label>
         <div class="col-md-8">
             <input required type="email" name="emailperfil" id="emailperfil" tabindex="1" class="form-control" placeholder="Correo Electrónico" required="required" value="">
         </div>
-        <span  id="helpBlock" class="help-block text-danger pull-right" style="padding-right:15px;display:none; color:red">ATENCION! Si cambias el mail, vas a tener que verificarlo de vuelta!</span>
+        <span id="helpBlock" class="help-block text-danger pull-right" style="padding-right:15px;display:none; color:red">ATENCION! Si cambias el mail, vas a tener que verificarlo de vuelta!</span>
     </div>
     <div class="form-group">
         <label for="nombreperfil" class="col-md-4 control-label">Nombre</label>
@@ -333,7 +333,8 @@
                 <option value="16">Gran Bs As</option>
             </select>
         </div>
-    </div>         
+    </div>
+   <div id="alertasperfil"></div>
 </div>
 
 <div class="modal fade" id="perfil" tabindex="-1" role="dialog">
@@ -345,12 +346,12 @@
                     <h4 class="modal-title">Mi perfil</h4>
                 </div>
                 <div class="modal-body">
-                               
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" id="EditarPerfil" class="btn btn-warning">Editar</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal" data-loading-text="Espere...">Cerrar</button>
-                    <button type="submit" id="GuardarPerfil" class="btn btn-primary" style="display:none"  data-loading-text="Espere...">Grabar Cambios</button>
+                    <button type="submit" id="GuardarPerfil" class="btn btn-primary" style="display:none" data-loading-text="Espere...">Grabar Cambios</button>
                 </div>
             </form>
         </div><!-- /.modal-content -->

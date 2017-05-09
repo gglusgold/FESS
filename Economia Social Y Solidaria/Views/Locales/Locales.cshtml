@@ -360,7 +360,6 @@
         tabla.jtable('load');
 
         $(document).on("click", ".desactivar", function (e) {
-            console.log();
 
             $("#dialog-confirm").dialog({
                 resizable: false,
@@ -439,7 +438,6 @@
 
 
                 $.each(data.Records, function (i, val) {
-                    console.log(val);
                     $("#dialog").append("<label><input type='checkbox' value='" + val.idLocal + "' " + (val.selected == true ? "selected" : "") + "> " + val.direccion + "</label><br/>")
 
                 });

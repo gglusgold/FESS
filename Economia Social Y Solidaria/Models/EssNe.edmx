@@ -5,6 +5,23 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="TanoNEModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Alertas">
+          <Key>
+            <PropertyRef Name="idAlerta" />
+          </Key>
+          <Property Name="idAlerta" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="tipo" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="codigo" Type="int" Nullable="false" />
+          <Property Name="android" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AlertasVecinxs">
+          <Key>
+            <PropertyRef Name="idAlertaVecinx" />
+          </Key>
+          <Property Name="idAlertaVecinx" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="alertaId" Type="int" Nullable="false" />
+          <Property Name="vecinxId" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="Categorias">
           <Key>
             <PropertyRef Name="idCategoria" />
@@ -126,6 +143,8 @@
           <Property Name="descripcion" Type="varchar" MaxLength="255" />
           <Property Name="marca" Type="varchar" MaxLength="255" />
           <Property Name="presentacion" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="proveedor" Type="varchar" MaxLength="50" />
+          <Property Name="variedad" Type="varchar" MaxLength="50" />
           <Property Name="stock" Type="int" Nullable="false" />
           <Property Name="activo" Type="bit" Nullable="false" />
           <Property Name="categoriaId" Type="int" />
@@ -204,6 +223,30 @@
           <Property Name="fechaCreado" Type="datetime" />
           <Property Name="token" Type="varchar" MaxLength="255" />
         </EntityType>
+        <Association Name="FK_AlertasVecinxs_Alertas">
+          <End Role="Alertas" Type="Self.Alertas" Multiplicity="1" />
+          <End Role="AlertasVecinxs" Type="Self.AlertasVecinxs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Alertas">
+              <PropertyRef Name="idAlerta" />
+            </Principal>
+            <Dependent Role="AlertasVecinxs">
+              <PropertyRef Name="alertaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AlertasVecinxs_Vecinos">
+          <End Role="Vecinos" Type="Self.Vecinos" Multiplicity="1" />
+          <End Role="AlertasVecinxs" Type="Self.AlertasVecinxs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="AlertasVecinxs">
+              <PropertyRef Name="vecinxId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Comentarios_Compras1">
           <End Role="Compras" Type="Self.Compras" Multiplicity="1" />
           <End Role="Comentarios" Type="Self.Comentarios" Multiplicity="*" />
@@ -491,6 +534,8 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="TanoNEModelStoreContainer">
+          <EntitySet Name="Alertas" EntityType="Self.Alertas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AlertasVecinxs" EntityType="Self.AlertasVecinxs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Categorias" EntityType="Self.Categorias" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Circuitos" EntityType="Self.Circuitos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Comentarios" EntityType="Self.Comentarios" Schema="dbo" store:Type="Tables" />
@@ -510,6 +555,14 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Tandas" EntityType="Self.Tandas" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Vecinos" EntityType="Self.Vecinos" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_AlertasVecinxs_Alertas" Association="Self.FK_AlertasVecinxs_Alertas">
+            <End Role="Alertas" EntitySet="Alertas" />
+            <End Role="AlertasVecinxs" EntitySet="AlertasVecinxs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AlertasVecinxs_Vecinos" Association="Self.FK_AlertasVecinxs_Vecinos">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="AlertasVecinxs" EntitySet="AlertasVecinxs" />
+          </AssociationSet>
           <AssociationSet Name="FK_Comentarios_Compras1" Association="Self.FK_Comentarios_Compras1">
             <End Role="Compras" EntitySet="Compras" />
             <End Role="Comentarios" EntitySet="Comentarios" />
@@ -608,6 +661,8 @@
     <edmx:ConceptualModels>
       <Schema Namespace="TanoNEModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="TanoNEEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Alertas" EntityType="TanoNEModel.Alertas" />
+          <EntitySet Name="AlertasVecinxs" EntityType="TanoNEModel.AlertasVecinxs" />
           <EntitySet Name="Categorias" EntityType="TanoNEModel.Categorias" />
           <EntitySet Name="Circuitos" EntityType="TanoNEModel.Circuitos" />
           <EntitySet Name="Comentarios" EntityType="TanoNEModel.Comentarios" />
@@ -627,6 +682,14 @@
           <EntitySet Name="sysdiagrams" EntityType="TanoNEModel.sysdiagrams" />
           <EntitySet Name="Tandas" EntityType="TanoNEModel.Tandas" />
           <EntitySet Name="Vecinos" EntityType="TanoNEModel.Vecinos" />
+          <AssociationSet Name="FK_AlertasVecinxs_Alertas" Association="TanoNEModel.FK_AlertasVecinxs_Alertas">
+            <End Role="Alertas" EntitySet="Alertas" />
+            <End Role="AlertasVecinxs" EntitySet="AlertasVecinxs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AlertasVecinxs_Vecinos" Association="TanoNEModel.FK_AlertasVecinxs_Vecinos">
+            <End Role="Vecinos" EntitySet="Vecinos" />
+            <End Role="AlertasVecinxs" EntitySet="AlertasVecinxs" />
+          </AssociationSet>
           <AssociationSet Name="FK_Productos_Categorias" Association="TanoNEModel.FK_Productos_Categorias">
             <End Role="Categorias" EntitySet="Categorias" />
             <End Role="Productos" EntitySet="Productos" />
@@ -720,6 +783,26 @@
             <End Role="Tandas" EntitySet="Tandas" />
           </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Alertas">
+          <Key>
+            <PropertyRef Name="idAlerta" />
+          </Key>
+          <Property Name="idAlerta" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="tipo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="codigo" Type="Int32" Nullable="false" />
+          <Property Name="android" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="AlertasVecinxs" Relationship="TanoNEModel.FK_AlertasVecinxs_Alertas" FromRole="Alertas" ToRole="AlertasVecinxs" />
+        </EntityType>
+        <EntityType Name="AlertasVecinxs">
+          <Key>
+            <PropertyRef Name="idAlertaVecinx" />
+          </Key>
+          <Property Name="idAlertaVecinx" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="alertaId" Type="Int32" Nullable="false" />
+          <Property Name="vecinxId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Alertas" Relationship="TanoNEModel.FK_AlertasVecinxs_Alertas" FromRole="AlertasVecinxs" ToRole="Alertas" />
+          <NavigationProperty Name="Vecinos" Relationship="TanoNEModel.FK_AlertasVecinxs_Vecinos" FromRole="AlertasVecinxs" ToRole="Vecinos" />
+        </EntityType>
         <EntityType Name="Categorias">
           <Key>
             <PropertyRef Name="idCategoria" />
@@ -868,6 +951,8 @@
           <Property Name="descripcion" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="marca" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="presentacion" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="proveedor" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="variedad" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="stock" Type="Int32" Nullable="false" />
           <Property Name="activo" Type="Boolean" Nullable="false" />
           <Property Name="categoriaId" Type="Int32" />
@@ -959,12 +1044,37 @@
           <Property Name="localId" Type="Int32" />
           <Property Name="fechaCreado" Type="DateTime" Precision="3" />
           <Property Name="token" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="AlertasVecinxs" Relationship="TanoNEModel.FK_AlertasVecinxs_Vecinos" FromRole="Vecinos" ToRole="AlertasVecinxs" />
           <NavigationProperty Name="Comentarios" Relationship="TanoNEModel.FK_Comentarios_Vecinos1" FromRole="Vecinos" ToRole="Comentarios" />
           <NavigationProperty Name="Compras" Relationship="TanoNEModel.FK_Compras_Vecinos" FromRole="Vecinos" ToRole="Compras" />
           <NavigationProperty Name="Locales" Relationship="TanoNEModel.FK_Vecinos_Locales" FromRole="Vecinos" ToRole="Locales" />
           <NavigationProperty Name="RolesVecinos" Relationship="TanoNEModel.FK_RolesVecinos_Vecinos" FromRole="Vecinos" ToRole="RolesVecinos" />
           <NavigationProperty Name="Tandas" Relationship="TanoNEModel.FK_Tandas_Vecinos" FromRole="Vecinos" ToRole="Tandas" />
         </EntityType>
+        <Association Name="FK_AlertasVecinxs_Alertas">
+          <End Type="TanoNEModel.Alertas" Role="Alertas" Multiplicity="1" />
+          <End Type="TanoNEModel.AlertasVecinxs" Role="AlertasVecinxs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Alertas">
+              <PropertyRef Name="idAlerta" />
+            </Principal>
+            <Dependent Role="AlertasVecinxs">
+              <PropertyRef Name="alertaId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AlertasVecinxs_Vecinos">
+          <End Type="TanoNEModel.Vecinos" Role="Vecinos" Multiplicity="1" />
+          <End Type="TanoNEModel.AlertasVecinxs" Role="AlertasVecinxs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vecinos">
+              <PropertyRef Name="idVecino" />
+            </Principal>
+            <Dependent Role="AlertasVecinxs">
+              <PropertyRef Name="vecinxId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Productos_Categorias">
           <End Type="TanoNEModel.Categorias" Role="Categorias" Multiplicity="0..1" />
           <End Type="TanoNEModel.Productos" Role="Productos" Multiplicity="*" />
@@ -1257,6 +1367,25 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="TanoNEModelStoreContainer" CdmEntityContainer="TanoNEEntities">
+          <EntitySetMapping Name="Alertas">
+            <EntityTypeMapping TypeName="TanoNEModel.Alertas">
+              <MappingFragment StoreEntitySet="Alertas">
+                <ScalarProperty Name="android" ColumnName="android" />
+                <ScalarProperty Name="codigo" ColumnName="codigo" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="idAlerta" ColumnName="idAlerta" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AlertasVecinxs">
+            <EntityTypeMapping TypeName="TanoNEModel.AlertasVecinxs">
+              <MappingFragment StoreEntitySet="AlertasVecinxs">
+                <ScalarProperty Name="vecinxId" ColumnName="vecinxId" />
+                <ScalarProperty Name="alertaId" ColumnName="alertaId" />
+                <ScalarProperty Name="idAlertaVecinx" ColumnName="idAlertaVecinx" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Categorias">
             <EntityTypeMapping TypeName="TanoNEModel.Categorias">
               <MappingFragment StoreEntitySet="Categorias">
@@ -1386,6 +1515,8 @@
                 <ScalarProperty Name="categoriaId" ColumnName="categoriaId" />
                 <ScalarProperty Name="activo" ColumnName="activo" />
                 <ScalarProperty Name="stock" ColumnName="stock" />
+                <ScalarProperty Name="variedad" ColumnName="variedad" />
+                <ScalarProperty Name="proveedor" ColumnName="proveedor" />
                 <ScalarProperty Name="presentacion" ColumnName="presentacion" />
                 <ScalarProperty Name="marca" ColumnName="marca" />
                 <ScalarProperty Name="descripcion" ColumnName="descripcion" />

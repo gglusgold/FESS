@@ -28,7 +28,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 correo = a.correo,
                 telefono = a.telefono,
                 totalCompras = a.Compras.Count,
-                totalProductosComprados = 0
+                totalProductosComprados= 0,
+                alertas = ctx.Alertas.Where(b=> b.android == false || b.android == (a.token != null)).Select(b => new { tipo = b.tipo, codigo = b.codigo, activa = a.AlertasVecinxs.Any( c=> c.alertaId == b.idAlerta) })
             }).FirstOrDefault(a => a.correo == User.Identity.Name);
 
             if (perfil == null)
@@ -37,7 +38,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(new { Perfil = perfil, JsonRequestBehavior.DenyGet });
         }
 
-        public JsonResult ModificarPerfil(string emailperfil, string nombreperfil, string telefonoperfil, int comunaperfil)
+        public JsonResult ModificarPerfil(string emailperfil, string nombreperfil, string telefonoperfil, int comunaperfil, int[] idsalertas, bool[] valalertas)
         {
             TanoNEEntities ctx = new TanoNEEntities();
             var perfil = ctx.Vecinos.FirstOrDefault(a => a.correo == User.Identity.Name);
@@ -49,6 +50,21 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 perfil.nombres = nombreperfil;
                 perfil.telefono = telefonoperfil;
                 perfil.comuna = comunaperfil;
+
+                for ( int x = 0; x < idsalertas.Length; x++)
+                {
+                    int idAlerta = idsalertas[x];
+                    if (valalertas[x])
+                    {
+                        perfil.AlertasVecinxs.Add(new AlertasVecinxs { alertaId = idAlerta });
+                    }
+                    else
+                    {
+                        var alerta = ctx.AlertasVecinxs.FirstOrDefault(a => a.alertaId == idAlerta && a.vecinxId == perfil.idVecino);
+                        if (alerta != null)
+                            ctx.AlertasVecinxs.Remove(alerta);
+                    }
+                }
 
                 if (emailperfil != perfil.correo)
                 {

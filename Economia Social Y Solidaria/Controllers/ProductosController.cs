@@ -43,6 +43,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 stock = a.stock,
                 marca = a.marca,
                 descripcion = a.descripcion != null ? a.descripcion.Replace("\n", "<br/>") : "",
+                proveedor = a.proveedor,
+                variedad = a.variedad,
                 cantidad = a.presentacion,
                 imagen = System.IO.File.Exists(HttpContext.Server.MapPath("/Imagenes/Producto-" + a.idProducto + ".jpg")) ? "/Imagenes/Producto-" + a.idProducto + ".jpg" : "/Imagenes/Fijas/pp.jpeg",
                 idCategoria = a.categoriaId,
@@ -168,7 +170,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             //return Json(lista, JsonRequestBehavior.DenyGet);
         }
 
-        public JsonResult Crear(string nombre, string marca, string descripcion, HttpPostedFileBase imagen, string cantidad, int idCategoria, decimal precio, decimal costo, int stock)
+        public JsonResult Crear(string nombre, string marca, string descripcion, string proveedor, string variedad, HttpPostedFileBase imagen, string cantidad, int idCategoria, decimal precio, decimal costo, int stock)
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
@@ -181,6 +183,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 item.marca = marca;
                 item.descripcion = descripcion;
                 item.stock = stock;
+                item.proveedor = proveedor;
+                item.variedad = variedad;
                 item.presentacion = cantidad;
                 item.Categorias = categoria;
                 item.activo = true;
@@ -216,6 +220,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 stock = item.stock,
                 marca = item.marca,
                 descripcion = item.descripcion != null ? item.descripcion.Replace("\n", "<br/>") : "",
+                proveedor = item.proveedor,
+                variedad = item.variedad,
                 cantidad = item.presentacion,
                 imagen = System.IO.File.Exists(HttpContext.Server.MapPath("/Imagenes/Producto-" + item.idProducto + ".jpg")) ? "/Imagenes/Producto-" + item.idProducto + ".jpg" : "/Imagenes/Fijas/pp.jpeg",
                 idCategoria = item.categoriaId,
@@ -228,7 +234,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(new { Result = "OK", Record = devuelta }, JsonRequestBehavior.DenyGet);
         }
 
-        public JsonResult Editar(int idProducto, string nombre, string marca, string descripcion, HttpPostedFileBase imagen, string cantidad, int idCategoria, decimal precio, decimal costo, int stock)
+        public JsonResult Editar(int idProducto, string nombre, string marca, string descripcion, string proveedor, string variedad, HttpPostedFileBase imagen, string cantidad, int idCategoria, decimal precio, decimal costo, int stock)
         {
             TanoNEEntities ctx = new TanoNEEntities();
 
@@ -245,6 +251,8 @@ namespace Economia_Social_Y_Solidaria.Controllers
                 item.descripcion = descripcion;
                 item.presentacion = cantidad;
                 item.stock = stock;
+                item.proveedor = proveedor;
+                item.variedad = variedad;
                 item.Categorias = categoria;
 
                 Precios pre = new Precios();

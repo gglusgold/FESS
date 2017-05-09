@@ -15,20 +15,20 @@ namespace Economia_Social_Y_Solidaria.Models
 using System;
     using System.Collections.Generic;
     
-public partial class ProductosLocales
+public partial class AlertasVecinxs
 {
 
-    public int idProductoLocal { get; set; }
+    public int idAlertaVecinx { get; set; }
 
-    public int productoId { get; set; }
+    public int alertaId { get; set; }
 
-    public int localId { get; set; }
+    public int vecinxId { get; set; }
 
 
 
-    public virtual Locales Locales { get; set; }
+    public virtual Alertas Alertas { get; set; }
 
-    public virtual Productos Productos { get; set; }
+    public virtual Vecinos Vecinos { get; set; }
 
 }
 

@@ -210,6 +210,12 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Alertas.cs">
+      <DependentUpon>EssNe.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AlertasVecinxs.cs">
+      <DependentUpon>EssNe.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Categorias.cs">
       <DependentUpon>EssNe.tt</DependentUpon>
     </Compile>

@@ -51,7 +51,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
         public int comentarios = 0;
         public double rating = 0;
-        internal int vendidos;
+        public int vendidos;
 
         public int categoria { get; set; }
 
@@ -64,8 +64,9 @@ namespace Economia_Social_Y_Solidaria.Controllers
         public int totalCompraTandaUsuario = 0;
         public string proxFecha { get; set; }
         public List<Locales> locales = new List<Locales>();
-        public List<Changuito> changuito = new List<Changuito>();
+
         public List<Cat> categorias = new List<Cat>();
+        public IEnumerable<Changuito> changuito;
     }
 
     public class Cat
@@ -173,7 +174,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     comentarios = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count(),
                     vendidos = a.CompraProducto.GroupBy(b => b.productoId).Select(c => new { Id = c.Key, Cantidad = c.Count() }).Sum(d => d.Cantidad),
                     rating = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count() == 0 ? 0 : a.ComentariosProducto.Where(comentarios => comentarios.visible).Average(b => b.estrellas)
-                }).ToList();
+                });
             }
             else
             {
@@ -185,24 +186,21 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     descripcion = a.descripcion == null ? "" : a.descripcion,//.Replace("\n", "<br/>"),
                     precio = a.Precios.LastOrDefault().precio,
                     comentarios = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count(),
-                    vendidos = a.CompraProducto.GroupBy(b => b.productoId).Select( c => new { Id = c.Key, Cantidad = c.Count() } ).Sum( d => d.Cantidad),
+                    vendidos = a.CompraProducto.GroupBy(b => b.productoId).Select(c => new { Id = c.Key, Cantidad = c.Count() }).Sum(d => d.Cantidad),
                     rating = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count() == 0 ? 0 : a.ComentariosProducto.Where(comentarios => comentarios.visible).Average(b => b.estrellas)
-                }).ToList();
+                });
             }
 
             switch (ordenar)
             {
                 case 1:
-                    completo.changuito.OrderBy(a => a.nombre);
+                    completo.changuito = completo.changuito.OrderBy(a => a.nombre);
                     break;
                 case 2:
-                    completo.changuito.OrderByDescending(a => a.vendidos);
+                    completo.changuito = completo.changuito.OrderByDescending(a => a.vendidos).ThenByDescending(a => a.precio);
                     break;
                 case 3:
-                    completo.changuito.OrderBy(a => a.nombre);
-                    break;
-                case 4:
-                    completo.changuito.OrderBy(a => a.nombre);
+                    completo.changuito = completo.changuito.OrderByDescending(a => a.rating).ThenByDescending(a => a.precio);
                     break;
             }
 
@@ -412,9 +410,75 @@ namespace Economia_Social_Y_Solidaria.Controllers
             if (string.IsNullOrEmpty(error))
             {
                 ctx.SaveChanges();
+                if (!bool.Parse(ConfigurationManager.AppSettings["debug"]))
+                    MandarMailConfirmandoCompra(compra.idCompra);
             }
 
             return Json(new { error = error }, JsonRequestBehavior.DenyGet);
+        }
+
+        private void MandarMailConfirmandoCompra(int idCompra)
+        {
+            DateTime ProximaEntrea = ApiProductosController.GetNextWeekday();
+
+
+            TanoNEEntities ctx = new TanoNEEntities();
+
+            Compras actual = ctx.Compras.FirstOrDefault(a => a.idCompra == idCompra);
+
+            var vecino = ctx.AlertasVecinxs.FirstOrDefault(a => a.Vecinos.token != null && a.Alertas.codigo == 3 && a.vecinxId == actual.Vecinos.idVecino);
+            string token = vecino != null ? vecino.Vecinos.token : null;
+            if (token != null)
+                ApiProductosController.mandarNotificacion("Pedido Confirmado", "Gracias por colaborar con la economía social y solidaria. No te olvides de venir con cambio!", "MISCOMPRAS", new string[] { token });
+
+            string fecha = ProximaEntrea.ToString("dd/MM/yyyy") + " - " + actual.Locales.horario;
+            string nombre = actual.Vecinos.nombres;
+            string correo = actual.Vecinos.correo;
+
+            using (MailMessage mail = new MailMessage())
+            {
+
+                mail.From = new MailAddress("economiasocial@encuentrocapital.com.ar", "Economía Social y Solidaria");
+                mail.To.Add(correo);
+                //mail.To.Add("julianlionti@hotmail.com");
+                mail.Subject = "Economia Social y Solidaria -- Nuevo Encuentro";
+                mail.Body = "<p>Se han confirmado las siguientes compras</p>";
+                mail.BodyEncoding = System.Text.Encoding.UTF8;
+
+                List<Compras> totalCompras = ctx.Compras.Where(a => a.tandaId == actual.Tandas.idTanda && a.vecinoId == actual.Vecinos.idVecino).ToList();
+                foreach (var compras in totalCompras)
+                {
+                    mail.Body += "<p>-------------------</p>";
+                    mail.Body += "<p>Compra N° " + (totalCompras.IndexOf(compras) + 1) + "</p>";
+                    mail.Body += "<p><b>Lo tenés que pasar a retirar el dia " + fecha + " Por nuestro local en " + actual.Locales.direccion + "</b></p>";
+
+                    decimal total = 0;
+                    foreach (CompraProducto prod in compras.CompraProducto)
+                    {
+                        mail.Body += "<p>" + prod.cantidad + " - " + prod.Productos.producto + " - " + prod.Productos.presentacion + " - " + prod.Productos.marca + " - " + (prod.Precios.precio * prod.cantidad) + "</p>";
+                        total += prod.cantidad * prod.Precios.precio;
+                    }
+                    mail.Body += "<p>-------------------</p>";
+                    mail.Body += "<p>Total : " + total + "</p>";
+                    mail.Body += "<br/><br/>";
+
+                }
+
+                mail.Body += "<p>o	Sujeto a disponibilidad de stock</p>";
+                mail.Body += "<p>o	No te olvides de venir con cambio. Y con bolsa, changuito o lo que te parezca donde poder llevarte tu compra</p>";
+                mail.Body += "<p>o	Pasada el horario de entrega no se aceptan reclamos. Cualcuier problema avisanos con tiempo</p>";
+                mail.Body += "<p>o	Tené en cuenta que cada producto que se pide por este medio lo abonamos al productor (con el dinero de los militantes) y no tenemos devolución posible. No nos claves, gracias.</p>";
+
+                mail.Body += "<p>Muchas gracias! Te esperamos</p>";
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtp.Credentials = new NetworkCredential("economiasocial@encuentrocapital.com.ar", "Frent3355");
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                }
+            }
         }
 
         public ActionResult Calificar(int idCompra, int[] idProducto, string[] tComentarios, int[] rating)
