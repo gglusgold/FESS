@@ -116,84 +116,76 @@
                        events: {
                            'click .Retiro': function (e, value, row, index) {
 
-                               confirm("Se retiraron todos los productos?", function (a) {
+                               $("#tabla_listado").attr("data-idcompra", row.idCompra)
+                               $("#entregaParcial").modal("show");
+                               $("#tabla_listado").find("tbody").empty();
+                               $.each(row.productos.split("<br/>"), function (i, val) {
 
-                                   $(e.target).removeAttr("class").empty().addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
-                                   $.post("/Compras/EnregarPedido", { idCompra: row.idCompra, entregado: true }, function (devuelta) {
-                                       $(e.target).removeAttr("class").addClass("fa fa-thumbs-o-up").closest("a").removeClass("notactive");
+                                   var info = $(val).text().match(/\[(.*)\]/).pop().split("|");
+                                   var id = info[0];
+                                   var cantidad = info[1];
+                                   var noUsado = 0;
+
+                                   var input = $("<input name='pcantidad' type='number' max='" + cantidad + "' value='" + noUsado + "' min='0'/>");
+                                   var tr = $("<tr><input name='pid' type='hidden' value='" + id + "'/><td>" + (i + 1) + "</td><td>" + val.substring(val.indexOf(")") + 1) + "</td><td>" + cantidad + "</td><td></td><td></td></tr>");
+
+                                   $("#tabla_listado").find("tbody").append(tr);
+                                   //vecinxs
+
+                                   //console.log(i, val);
+                                   var lista = $(".vecinxs").clone();
+                                   lista.removeAttr("class");
+                                   lista.attr("name", "vecinxs");
+                                   lista.show();
+
+                                   var ids = [];
+
+                                   var td = tr.find("td:eq(4)").empty().append(lista);
+                                   tr.find("td:eq(3)").empty().append(input);
+
+                                   lista.chosen({
+                                       disable_search_threshold: 10,
+                                       no_results_text: "No se encontró informacion!",
+                                       width: "100%",
+                                       ax_selected_options: 3,
+                                       include_group_label_in_selected: true,
+                                       allow_duplicates: true
                                    });
+                                   lista.on('change', function (evt, params) {
 
-                               }, "Frente de Economia Social y Solidaria", "Si", function () {
-                                   console.log("No");
+                                       if (params.selected !== undefined)
+                                           ids.push(params.selected)
 
-                                   $("#tabla_listado").attr("data-idcompra", row.idCompra)
-                                   $("#entregaParcial").modal("show");
-                                   $("#tabla_listado").find("tbody").empty();
-                                   $.each(row.productos.split("<br/>"), function (i, val) {
+                                       if (params.deselected !== undefined)
+                                           ids.splice(ids.indexOf(params.deselected), 1);
 
-                                       var info = $(val).text().match(/\[(.*)\]/).pop().split("|");
-                                       var id = info[0];
-                                       var cantidad = info[1];
-                                       var noUsado = 0;
+                                       input.attr("max", cantidad - ids.length);
 
-                                       var input = $("<input name='pcantidad' type='number' max='" + cantidad + "' value='" + noUsado + "' min='0'/>");
-                                       var tr = $("<tr><input name='pid' type='hidden' value='" + id + "'/><td>" + (i + 1) + "</td><td>" + val.substring(val.indexOf(")") + 1) + "</td><td>" + cantidad + "</td><td></td><td></td></tr>");
+                                       if (cantidad < ids.length)
+                                           alert("¡Hay mas vecinxs que productos!");
 
-                                       $("#tabla_listado").find("tbody").append(tr);
-                                       //vecinxs
-
-                                       //console.log(i, val);
-                                       var lista = $(".vecinxs").clone();
-                                       lista.removeAttr("class");
-                                       lista.attr("name", "vecinxs");
-                                       lista.show();
-
-                                       var ids = [];
-
-                                       var td = tr.find("td:eq(4)").empty().append(lista);
-                                       tr.find("td:eq(3)").empty().append(input);
-
-                                       lista.chosen({
-                                           disable_search_threshold: 10,
-                                           no_results_text: "No se encontró informacion!",
-                                           width: "100%",
-                                           ax_selected_options: 3,
-                                           include_group_label_in_selected: true,
-                                           allow_duplicates: true
-                                       });
-                                       lista.on('change', function (evt, params) {
-                                           
-                                           if (params.selected !== undefined)
-                                               ids.push(params.selected)
-
-                                           if (params.deselected !== undefined)
-                                               ids.splice(ids.indexOf(params.deselected), 1);
-
-                                           input.attr("max", cantidad - ids.length);
-
-                                           if (cantidad < ids.length)
-                                               alert("¡Hay mas vecinxs que productos!");
-
-                                           lista.attr("data-vecinxs", ids);
-                                       });
+                                       lista.attr("data-vecinxs", ids);
                                    });
-
-
                                });
 
 
                            },
                            'click .Colgo': function (e, value, row, index) {
 
-                               $(e.target).removeAttr("class").addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
-                               $.post("/Compras/EnregarPedido", { idCompra: row.idCompra, entregado: false }, function (devuelta) {
+                               $(e.target).removeAttr("class").empty().addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
+                               $.post("/Compras/EnregarPedido", { idCompra: row.idCompra, entregado: true }, function (devuelta) {
                                    $(e.target).removeAttr("class").addClass("fa fa-thumbs-o-down").closest("a").removeClass("notactive");
                                });
+
+                               //$(e.target).removeAttr("class").addClass("fa fa-circle-o-notch fa-spin fa-fw").closest("a").addClass("notactive");
+                               //$.post("/Compras/EnregarPedido", { idCompra: row.idCompra, entregado: false }, function (devuelta) {
+                               //    $(e.target).removeAttr("class").addClass("fa fa-thumbs-o-down").closest("a").removeClass("notactive");
+                               //});
                            },
                        },
                        formatter: function operateFormatter(value, row, index) {
                            if (value != 3 && value != 5) {
-                               return "<a style='cursor:pointer' class='Retiro' title='Retiro'>Si</a> - <a style='cursor:pointer' class='Colgo' title='Colgo'>No</a>";
+                               return "<a style='cursor:pointer' class='Colgo' title='Retiro'>Si</a> - <a style='cursor:pointer' class='Retiro' title='Colgo'>Editar</a>";
                            }
                            else if (value == 3)
                                return '<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>'

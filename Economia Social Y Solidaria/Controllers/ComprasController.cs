@@ -51,6 +51,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
         public int comentarios = 0;
         public double rating = 0;
+        internal int vendidos;
 
         public int categoria { get; set; }
 
@@ -120,10 +121,10 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return View(completo);
         }
 
-        public ActionResult cambioCategoria(int idCategoria, int idLocal = -1)
+        public ActionResult cambioCategoria(int idCategoria, int idLocal = -1, int ordenar = 1)
         {
             ChanguitoCompleta completo = new ChanguitoCompleta();
-            crearChango(completo, idCategoria, idLocal);
+            crearChango(completo, idCategoria, idLocal, ordenar);
 
             DateTime ProximaEntrea = ApiProductosController.GetNextWeekday();
             completo.proxFecha = ProximaEntrea.ToString("dd/MM/yyyy");
@@ -131,7 +132,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(new { lista = completo.changuito });
         }
 
-        public ChanguitoCompleta crearChango(ChanguitoCompleta completo, int idCategoria = -1, int idLocal = -1)
+        public ChanguitoCompleta crearChango(ChanguitoCompleta completo, int idCategoria = -1, int idLocal = -1, int ordenar = 1)
         {
             TanoNEEntities ctx = new TanoNEEntities();
             Tandas ultima = ctx.Tandas.ToList().LastOrDefault();
@@ -158,6 +159,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
 
             ViewBag.categoria = cat.idCategoria;
+            ViewBag.ordenar = ordenar;
 
             if (idLocal == -1)
             {
@@ -169,6 +171,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     descripcion = a.descripcion == null ? "" : a.descripcion,//.Replace("\n", "<br/>"),
                     precio = a.Precios.LastOrDefault().precio,
                     comentarios = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count(),
+                    vendidos = a.CompraProducto.GroupBy(b => b.productoId).Select(c => new { Id = c.Key, Cantidad = c.Count() }).Sum(d => d.Cantidad),
                     rating = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count() == 0 ? 0 : a.ComentariosProducto.Where(comentarios => comentarios.visible).Average(b => b.estrellas)
                 }).ToList();
             }
@@ -182,9 +185,27 @@ namespace Economia_Social_Y_Solidaria.Controllers
                     descripcion = a.descripcion == null ? "" : a.descripcion,//.Replace("\n", "<br/>"),
                     precio = a.Precios.LastOrDefault().precio,
                     comentarios = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count(),
+                    vendidos = a.CompraProducto.GroupBy(b => b.productoId).Select( c => new { Id = c.Key, Cantidad = c.Count() } ).Sum( d => d.Cantidad),
                     rating = a.ComentariosProducto.Where(comentarios => comentarios.visible).Count() == 0 ? 0 : a.ComentariosProducto.Where(comentarios => comentarios.visible).Average(b => b.estrellas)
                 }).ToList();
             }
+
+            switch (ordenar)
+            {
+                case 1:
+                    completo.changuito.OrderBy(a => a.nombre);
+                    break;
+                case 2:
+                    completo.changuito.OrderByDescending(a => a.vendidos);
+                    break;
+                case 3:
+                    completo.changuito.OrderBy(a => a.nombre);
+                    break;
+                case 4:
+                    completo.changuito.OrderBy(a => a.nombre);
+                    break;
+            }
+
 
 
             return completo;
@@ -651,7 +672,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             else
             {
                 var productos = compra.CompraProducto;
-                for (int x = 0; x < productos.Count; x++ )
+                for (int x = 0; x < productos.Count; x++)
                 {
                     var producto = productos.ElementAt(x);
                     int posicion = Array.IndexOf(ids, producto.productoId);
@@ -681,7 +702,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
                                 vecinoCompra.localId = compra.localId;
                                 vecinoCompra.tandaId = compra.tandaId;
                                 vecinoCompra.Vecinos = reubicado;
-                                
+
                                 ctx.Compras.Add(vecinoCompra);
 
                             }

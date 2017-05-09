@@ -31,20 +31,26 @@
         <div class="col-md-9">
 
             <div class="row" style="margin-bottom:20px">
-                <div class="col-md-12">
-                    <form class="form-inline">
-
+                <form class="form-inline">
+                    <div class="col-md-6">
                         <label for="scat">Elegí una categoria:</label>
-                        <select id="scat" class="form-control">
+                        <select id="scat" class="form-control input-medium" style="width:50%;">
                             @foreach (var categoria in Model.categorias)
                             {
                                 <option value="@categoria.idCategoria">@categoria.nombre</option>
                             }
                         </select>
+                    </div>
 
-                    </form>
-                </div>
-
+                    <div class="col-md-6">
+                        <label for="sordenar">Ordenar Por:</label>
+                        <select id="sordenar" class="form-control input-medium" style="width:50%;">
+                            <option value="1">Nombre</option>
+                            <option value="2">Mas Vendidos</option>
+                            <option value="3">Mas Recomendados</option>
+                        </select>
+                    </div>
+                </form>
             </div>
 
 
@@ -194,7 +200,7 @@
         $("#scat").val(@ViewBag.categoria);
         $("#scat").change(function(e){
             $.blockUI({ message: null });
-            $.post("/Compras/cambioCategoria", {idCategoria:$(this).val(), idLocal: Cookies.get('idLocal')}, function(e){
+            $.post("/Compras/cambioCategoria", {idCategoria:$(this).val(), idLocal: Cookies.get('idLocal'), ordenar:$("#sordenar").val()}, function(e){
                 $.unblockUI();
                 productos = e.lista;
                 cargarDatos(e.lista);
@@ -203,6 +209,22 @@
                 alert("Ocurrio un error");
             });;
         });
+
+        $("#sordenar").val(@ViewBag.ordenar);
+        $("#sordenar").change(function(e){
+            $.blockUI({ message: null });
+            $.post("/Compras/cambioCategoria", {idCategoria:$("#scat").val(), idLocal: Cookies.get('idLocal'), ordenar:$(this).val()}, function(e){
+                $.unblockUI();
+                productos = e.lista;
+                cargarDatos(e.lista);
+            }).fail(function(xhr, status, error) {
+                $.unblockUI();
+                alert("Ocurrio un error");
+            });;
+        });
+
+
+
 
         var editarCompra = Cookies.getJSON('editar');
         if ( editarCompra == undefined )
