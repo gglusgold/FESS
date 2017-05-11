@@ -108,7 +108,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
 
     public class ComprasController : Controller
     {
-        public ActionResult Carrito(int idCategoria = 1, int idLocal = -1)
+        public ActionResult Carrito(int idCategoria = -1, int idLocal = -1)
         {
 
             ChanguitoCompleta completo = new ChanguitoCompleta();
@@ -122,7 +122,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return View(completo);
         }
 
-        public ActionResult cambioCategoria(int idCategoria, int idLocal = -1, int ordenar = 1)
+        public ActionResult cambioCategoria(int idCategoria, int idLocal = -1, int ordenar = 2)
         {
             ChanguitoCompleta completo = new ChanguitoCompleta();
             crearChango(completo, idCategoria, idLocal, ordenar);
@@ -133,7 +133,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(new { lista = completo.changuito });
         }
 
-        public ChanguitoCompleta crearChango(ChanguitoCompleta completo, int idCategoria = -1, int idLocal = -1, int ordenar = 1)
+        public ChanguitoCompleta crearChango(ChanguitoCompleta completo, int idCategoria = -1, int idLocal = -1, int ordenar = 2)
         {
             TanoNEEntities ctx = new TanoNEEntities();
             Tandas ultima = ctx.Tandas.ToList().LastOrDefault();
@@ -151,20 +151,23 @@ namespace Economia_Social_Y_Solidaria.Controllers
             }
 
             Categorias cat = ctx.Categorias.FirstOrDefault(a => a.nombre == "Bolsones");
-            cat = ctx.Categorias.FirstOrDefault(a => a.idCategoria == idCategoria);
-            if (!cat.Productos.Any(a => a.activo))
+            if (idCategoria != -1)
             {
-                int cate = completo.categorias.ToArray()[0].idCategoria;
-                cat = ctx.Categorias.FirstOrDefault(a => a.idCategoria == cate);
+                cat = ctx.Categorias.FirstOrDefault(a => a.idCategoria == idCategoria);
+                if (!cat.Productos.Any(a => a.activo))
+                {
+                    int cate = completo.categorias.ToArray()[0].idCategoria;
+                    cat = ctx.Categorias.FirstOrDefault(a => a.idCategoria == cate);
+                }
             }
 
 
-            ViewBag.categoria = cat.idCategoria;
+            ViewBag.categoria = idCategoria == -1 ? idCategoria : cat.idCategoria;
             ViewBag.ordenar = ordenar;
 
             if (idLocal == -1)
             {
-                completo.changuito = ctx.Productos.Where(a => a.categoriaId == cat.idCategoria && a.activo).OrderBy(a => a.producto).ToList().Select(a => new Changuito()
+                completo.changuito = ctx.Productos.Where(a => (idCategoria < 0 ? a.categoriaId > idCategoria : a.categoriaId == cat.idCategoria) && a.activo).OrderBy(a => a.producto).ToList().Select(a => new Changuito()
                 {
                     idProducto = a.idProducto,
                     stock = a.stock,
@@ -178,7 +181,7 @@ namespace Economia_Social_Y_Solidaria.Controllers
             }
             else
             {
-                completo.changuito = ctx.Productos.Where(a => a.categoriaId == cat.idCategoria && a.ProductosLocales.Any(b => b.localId == idLocal) && a.activo).OrderBy(a => a.producto).ToList().Select(a => new Changuito()
+                completo.changuito = ctx.Productos.Where(a => (idCategoria < 0 ? a.categoriaId > idCategoria : a.categoriaId == cat.idCategoria) && a.ProductosLocales.Any(b => b.localId == idLocal) && a.activo).OrderBy(a => a.producto).ToList().Select(a => new Changuito()
                 {
                     idProducto = a.idProducto,
                     stock = a.stock,

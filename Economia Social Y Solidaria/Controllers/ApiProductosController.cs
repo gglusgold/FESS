@@ -65,6 +65,28 @@ namespace Economia_Social_Y_Solidaria.Controllers
             return Json(groupedCustomerList);
         }
 
+        [ActionName("Detalle")]
+        public IHttpActionResult Detalle()
+        {
+            TanoNEEntities ctx = new TanoNEEntities();
+
+            var form = HttpContext.Current.Request.Form;
+
+            int idProducto = int.Parse(form["id"]);
+
+            return Json(ctx.Productos.Select(a => new
+            {
+                idProducto = a.idProducto,
+                producto = a.producto,
+                descripcion = a.descripcion,
+                marca = a.marca,
+                presentacion = a.presentacion,
+                proveedor = a.proveedor,
+                variedad = a.variedad,
+                precio = a.Precios.OrderByDescending(b => b.idPrecio).FirstOrDefault().precio,
+            }).FirstOrDefault(a => a.idProducto == idProducto));
+        }
+
 
         [ActionName("Locales")]
         public IHttpActionResult Get()
